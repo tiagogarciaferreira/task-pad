@@ -6,6 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "server": "nodemon server.js",
+    "dev:api": "nodemon server.js",
     "test": "ng test"
   },
   "private": true,
