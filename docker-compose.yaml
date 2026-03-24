@@ -1,0 +1,13 @@
+services:
+
+  postgres:
+    image: postgres:17.1
+    container_name: postgres
+    restart: always
+    shm_size: 100mb
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: task-pad-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres

@@ -1,0 +1,113 @@
+<div class="list-container">
+  <div class="header">
+    <h2>My Tasks</h2>
+    <button routerLink="/tasks/new" class="btn-primary">
+      Create New Task
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <div class="search-box">
+      <input
+        type="text"
+        [ngModel]="searchTitle()"
+        (ngModelChange)="searchTitle.set($event)"
+        placeholder="Search by title..."
+        (keyup.enter)="onSearch()"
+      />
+      <button (click)="onSearch()" class="btn-search">Search</button>
+    </div>
+
+    <div class="status-filters">
+      <span class="filter-label">Status:</span>
+      @for (option of statusOptions; track option) {
+        <button
+          class="status-filter-btn"
+          [class.active]="isStatusSelected(option)"
+          (click)="toggleStatusFilter(option)"
+        >
+          {{ option }}
+        </button>
+      }
+    </div>
+
+    @if (hasActiveFilters()) {
+      <button (click)="clearFilters()" class="btn-clear">
+        Clear Filters
+      </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (taskService.loading()) {
+    <div class="loading">
+      Loading tasks...
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (taskService.error()) {
+    <div class="error">
+      {{ taskService.error() }}
+      <button (click)="taskService.search()">Retry</button>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!taskService.loading() && taskService.tasks().length === 0) {
+    <div class="empty-state">
+      <p>No tasks found.</p>
+      @if (hasActiveFilters()) {
+        <button (click)="clearFilters()">Clear filters</button>
+      } @else {
+        <button routerLink="/tasks/new">Create your first task</button>
+      }
+    </div>
+  }
+
+  <!-- Tasks List -->
+  @if (!taskService.loading() && taskService.tasks()().length > 0) {
+    <div class="tasks-list">
+      @for (task of taskService.tasks()(); track task.id) {
+        <div class="task-card">
+          <div class="task-header">
+            <h3>{{ task.title }}</h3>
+            <span class="status-badge" [class]="getStatusClass(task.status)">
+              {{ task.status }}
+            </span>
+          </div>
+
+          <div class="task-description">
+            {{ task.description }}
+          </div>
+
+          <div class="task-footer">
+            <div class="task-meta">
+              @if (task.estimatedHours) {
+                <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
+              }
+              <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+
+            <div class="task-actions">
+              <button
+                [routerLink]="['/tasks', task.id, 'edit']"
+                class="btn-edit"
+              >
+                Edit
+              </button>
+              <button
+                (click)="taskService.delete(task.id)"
+                class="btn-delete"
+                [disabled]="taskService.loading()"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
