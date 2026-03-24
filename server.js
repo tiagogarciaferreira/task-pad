@@ -43,7 +43,7 @@ app.post('/api/tasks', async (req, res) => {
       return res.status(400).json({ errors: errors });
     }
 
-    const { title, description, estimatedHours } = validation.data;
+    const { title, description, estimatedHours, tags } = validation.data;
 
     const existingTask = await prisma.task.findFirst({
       where: {
@@ -62,6 +62,7 @@ app.post('/api/tasks', async (req, res) => {
         title: title.trim(),
         description: description.trim(),
         estimatedHours: Number(estimatedHours),
+        tags: tags,
         status: 'Pending',
         userId: userId,
       },
@@ -82,18 +83,16 @@ app.get('/api/tasks/search', async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { title, status, estimatedHoursMin, estimatedHoursMax } = req.query;
-
-    let statusArray = [];
-    if (status) {
-      statusArray = Array.isArray(status) ? status : [status];
-    }
+    const { title, status, estimatedHoursMin, estimatedHoursMax, tags } = req.query;
+    const statusArray = status ? (Array.isArray(status) ? status : [status]) : [];
+    const tagsArray = tags ? (Array.isArray(tags) ? tags : [tags]) : [];
 
     const validation = SearchSchema.safeParse({
       title,
       estimatedHoursMin: estimatedHoursMin ? Number(estimatedHoursMin) : undefined,
       estimatedHoursMax: estimatedHoursMax ? Number(estimatedHoursMax) : undefined,
       status: statusArray,
+      tags: tagsArray,
     });
 
     if (!validation.success) {
@@ -118,6 +117,10 @@ app.get('/api/tasks/search', async (req, res) => {
       where.status = { in: statusArray };
     }
 
+    if (tagsArray.length > 0) {
+      where.tags = { hasSome: tagsArray };
+    }
+
     if (estimatedHoursMin !== undefined || estimatedHoursMax !== undefined) {
       where.estimatedHours = {};
 
@@ -137,6 +140,7 @@ app.get('/api/tasks/search', async (req, res) => {
 
     res.json(tasks);
   } catch (error) {
+    console.error('Error searching tasks:', error);
     res.status(500).json({ error: 'Failed to search tasks' });
   }
 });
@@ -202,9 +206,9 @@ app.put('/api/tasks/:id', async (req, res) => {
       return res.status(400).json({ errors: errors });
     }
 
-    const { title, description, status , estimatedHours} = validation.data;
+    const { title, description, status , estimatedHours, tags} = validation.data;
 
-    if (title && title.trim() !== existingTask.title) {
+    if (title.trim() !== existingTask.title) {
       const duplicateTask = await prisma.task.findFirst({
         where: {
           title: title.trim(),
@@ -224,6 +228,7 @@ app.put('/api/tasks/:id', async (req, res) => {
         title: title.trim(),
         description: description.trim(),
         estimatedHours: Number(estimatedHours),
+        tags: tags,
         status: status,
       },
     });

@@ -11,6 +11,7 @@ model Task {
   title          String
   description    String
   estimatedHours Float
+  tags           String[] @default([])
   status         String   @default("Pending")
   userId         String
   createdAt      DateTime @default(now())
