@@ -12,6 +12,7 @@ import { TaskService } from '../../services/task';
   styleUrls: ['./form.scss'],
 })
 export class FormPage {
+
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
@@ -19,9 +20,30 @@ export class FormPage {
   title = '';
   description = '';
   estimatedHours = 0.5;
-  status= 'Pending';
+  status = 'Pending';
+  tags: string[] = [];
+  tagInput = '';
 
-  statusOptions = ['Pending', 'In Progress', 'Review', 'Done'];
+  statusOptions = ['Pending', 'In Progress'];
+
+  onTagKeyPress(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.addTag();
+    }
+  }
+
+  addTag() {
+    const tag = this.tagInput.trim().toUpperCase();
+    if (tag && !this.tags.includes(tag) && this.tags.length < 10) {
+      this.tags.push(tag);
+      this.tagInput = '';
+    }
+  }
+
+  removeTag(tag: string) {
+    this.tags = this.tags.filter((t) => t !== tag);
+  }
 
   async onSubmit() {
     this.taskService.clearError();

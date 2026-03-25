@@ -8,35 +8,158 @@
 
   <!-- Filtros -->
   <div class="filters">
-    <div class="search-box">
+    <!-- Campo Título -->
+    <div class="form-group">
+      <label for="searchTitle">Search by Title</label>
       <input
         type="text"
+        id="searchTitle"
         [ngModel]="searchTitle()"
         (ngModelChange)="searchTitle.set($event)"
-        placeholder="Search by title..."
+        placeholder="Type a title and press Enter..."
         (keyup.enter)="onSearch()"
+        minlength="2"
+        maxlength="50"
+        #titleFilter="ngModel"
       />
-      <button (click)="onSearch()" class="btn-search">Search</button>
-    </div>
-
-    <div class="status-filters">
-      <span class="filter-label">Status:</span>
-      @for (option of statusOptions; track option) {
-        <button
-          class="status-filter-btn"
-          [class.active]="isStatusSelected(option)"
-          (click)="toggleStatusFilter(option)"
-        >
-          {{ option }}
-        </button>
+      @if (titleFilter.invalid && titleFilter.touched) {
+        <div class="field-error">
+          @if (titleFilter.errors?.['minlength']) {
+            <span>Title must be at least 2 characters</span>
+          }
+          @if (titleFilter.errors?.['maxlength']) {
+            <span>Title must not exceed 50 characters</span>
+          }
+        </div>
       }
     </div>
 
-    @if (hasActiveFilters()) {
-      <button (click)="clearFilters()" class="btn-clear">
-        Clear Filters
-      </button>
-    }
+    <!-- Campo Status -->
+    <div class="form-group">
+      <label>Status</label>
+      <div class="status-filters">
+        @for (option of statusOptions; track option) {
+          <button
+            class="status-filter-btn"
+            [class.active]="isStatusSelected(option)"
+            (click)="toggleStatusFilter(option)"
+          >
+            {{ option }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Campo Horas Mínimo -->
+    <div class="form-group">
+      <label for="hoursMin">Estimated Hours (Min)</label>
+      <input
+        type="number"
+        id="hoursMin"
+        [ngModel]="estimatedHoursMin()"
+        (ngModelChange)="setHoursMin($event)"
+        placeholder="Min hours"
+        step="0.5"
+        min="0.5"
+        max="21"
+        #hoursMinFilter="ngModel"
+      />
+      @if (hoursMinFilter.invalid && hoursMinFilter.touched) {
+        <div class="field-error">
+          @if (hoursMinFilter.errors?.['min']) {
+            <span>Minimum 0.5 hours</span>
+          }
+          @if (hoursMinFilter.errors?.['max']) {
+            <span>Maximum 40 hours</span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Campo Horas Máximo -->
+    <div class="form-group">
+      <label for="hoursMax">Estimated Hours (Max)</label>
+      <input
+        type="number"
+        id="hoursMax"
+        [ngModel]="estimatedHoursMax()"
+        (ngModelChange)="setHoursMax($event)"
+        placeholder="Max hours"
+        step="0.5"
+        min="0.5"
+        max="21"
+        #hoursMaxFilter="ngModel"
+      />
+      @if (hoursMaxFilter.invalid && hoursMaxFilter.touched) {
+        <div class="field-error">
+          @if (hoursMaxFilter.errors?.['min']) {
+            <span>Minimum 0.5 hours</span>
+          }
+          @if (hoursMaxFilter.errors?.['max']) {
+            <span>Maximum 21 hours</span>
+          }
+        </div>
+      }
+      @let minHours = estimatedHoursMin();
+      @let maxHours = estimatedHoursMax();
+
+      @if (minHours !== undefined && maxHours !== undefined && minHours > maxHours) {
+        <div class="field-error">
+          <span>Min hours cannot be greater than max hours</span>
+        </div>
+      }
+    </div>
+
+    <!-- Campo Tags -->
+    <div class="form-group">
+      <label for="tags">Filter by Tags</label>
+      <div class="tags-input-wrapper">
+        <input
+          type="text"
+          id="tags"
+          [(ngModel)]="tagInput"
+          placeholder="Type a tag and press Enter..."
+          (keydown)="onTagKeyPress($event)"
+          minlength="2"
+          maxlength="20"
+          #tagFilter="ngModel"
+        />
+      </div>
+      @if (tagFilter.invalid && tagFilter.touched && tagInput.trim()) {
+        <div class="field-error">
+          @if (tagFilter.errors?.['minlength']) {
+            <span>Tag must be at least 2 characters</span>
+          }
+          @if (tagFilter.errors?.['maxlength']) {
+            <span>Tag must not exceed 20 characters</span>
+          }
+        </div>
+      }
+
+      @if (selectedTags().length > 0) {
+        <div class="selected-tags-list">
+          @for (tag of selectedTags(); track tag) {
+            <div class="filter-tag">
+              <span>{{ tag }}</span>
+              <button (click)="removeTagFilter(tag)" class="remove-filter-tag">✕</button>
+            </div>
+          }
+        </div>
+      }
+      @if (selectedTags().length > 10) {
+        <div class="field-error">
+          <span>Maximum 10 tags allowed</span>
+        </div>
+      }
+    </div>
+
+    <div class="form-actions">
+      @if (hasActiveFilters()) {
+        <button (click)="clearFilters()" class="btn-clear">
+          Clear All Filters
+        </button>
+      }
+    </div>
   </div>
 
   <!-- Loading State -->
@@ -54,60 +177,187 @@
     </div>
   }
 
-  <!-- Empty State -->
-  @if (!taskService.loading() && taskService.tasks().length === 0) {
-    <div class="empty-state">
-      <p>No tasks found.</p>
-      @if (hasActiveFilters()) {
-        <button (click)="clearFilters()">Clear filters</button>
-      } @else {
-        <button routerLink="/tasks/new">Create your first task</button>
-      }
-    </div>
-  }
-
-  <!-- Tasks List -->
-  @if (!taskService.loading() && taskService.tasks()().length > 0) {
-    <div class="tasks-list">
-      @for (task of taskService.tasks()(); track task.id) {
-        <div class="task-card">
-          <div class="task-header">
-            <h3>{{ task.title }}</h3>
-            <span class="status-badge" [class]="getStatusClass(task.status)">
-              {{ task.status }}
-            </span>
-          </div>
-
-          <div class="task-description">
-            {{ task.description }}
-          </div>
-
-          <div class="task-footer">
-            <div class="task-meta">
-              @if (task.estimatedHours) {
-                <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
-              }
-              <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
-            </div>
-
-            <div class="task-actions">
-              <button
-                [routerLink]="['/tasks', task.id, 'edit']"
-                class="btn-edit"
-              >
-                Edit
-              </button>
-              <button
-                (click)="taskService.delete(task.id)"
-                class="btn-delete"
-                [disabled]="taskService.loading()"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+  <!-- Tasks Board - 4 Colunas (sempre mostra o board, mesmo vazio) -->
+  @if (!taskService.loading() && !taskService.error()) {
+    <div class="tasks-board">
+      <!-- Coluna Pending -->
+      <div class="board-column">
+        <div class="column-header" style="border-top-color: #f59e0b">
+          <h3>To Do</h3>
+          <span class="task-count">{{ tasksByStatus().pending.length }}</span>
         </div>
-      }
+        <div class="column-tasks">
+          @for (task of tasksByStatus().pending; track task.id) {
+            <div class="task-card">
+              <div class="task-header">
+                <h3>{{ task.title }}</h3>
+              </div>
+              <div class="task-description">
+                {{ task.description }}
+              </div>
+              @if (task.tags && task.tags.length > 0) {
+                <div class="task-tags">
+                  @for (tag of task.tags; track tag) {
+                    <span class="task-tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+              <div class="task-footer">
+                <div class="task-meta">
+                  @if (task.estimatedHours) {
+                    <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
+                  }
+                  <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="task-actions">
+                  <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
+                  <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
+                </div>
+              </div>
+            </div>
+          }
+          @if (tasksByStatus().pending.length === 0) {
+            <div class="empty-column">
+              <p>No tasks</p>
+              @if (!hasActiveFilters()) {
+                <button routerLink="/tasks/new" class="create-task-btn">Create task</button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Coluna In Progress -->
+      <div class="board-column">
+        <div class="column-header" style="border-top-color: #3b82f6">
+          <h3>In Progress</h3>
+          <span class="task-count">{{ tasksByStatus().inProgress.length }}</span>
+        </div>
+        <div class="column-tasks">
+          @for (task of tasksByStatus().inProgress; track task.id) {
+            <div class="task-card">
+              <div class="task-header">
+                <h3>{{ task.title }}</h3>
+              </div>
+              <div class="task-description">
+                {{ task.description }}
+              </div>
+              @if (task.tags && task.tags.length > 0) {
+                <div class="task-tags">
+                  @for (tag of task.tags; track tag) {
+                    <span class="task-tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+              <div class="task-footer">
+                <div class="task-meta">
+                  @if (task.estimatedHours) {
+                    <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
+                  }
+                  <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="task-actions">
+                  <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
+                  <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
+                </div>
+              </div>
+            </div>
+          }
+          @if (tasksByStatus().inProgress.length === 0) {
+            <div class="empty-column">
+              <p>No tasks</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Coluna Review -->
+      <div class="board-column">
+        <div class="column-header" style="border-top-color: #8b5cf6">
+          <h3>Review</h3>
+          <span class="task-count">{{ tasksByStatus().review.length }}</span>
+        </div>
+        <div class="column-tasks">
+          @for (task of tasksByStatus().review; track task.id) {
+            <div class="task-card">
+              <div class="task-header">
+                <h3>{{ task.title }}</h3>
+              </div>
+              <div class="task-description">
+                {{ task.description }}
+              </div>
+              @if (task.tags && task.tags.length > 0) {
+                <div class="task-tags">
+                  @for (tag of task.tags; track tag) {
+                    <span class="task-tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+              <div class="task-footer">
+                <div class="task-meta">
+                  @if (task.estimatedHours) {
+                    <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
+                  }
+                  <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="task-actions">
+                  <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
+                  <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
+                </div>
+              </div>
+            </div>
+          }
+          @if (tasksByStatus().review.length === 0) {
+            <div class="empty-column">
+              <p>No tasks</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Coluna Done -->
+      <div class="board-column">
+        <div class="column-header" style="border-top-color: #10b981">
+          <h3>Done</h3>
+          <span class="task-count">{{ tasksByStatus().done.length }}</span>
+        </div>
+        <div class="column-tasks">
+          @for (task of tasksByStatus().done; track task.id) {
+            <div class="task-card">
+              <div class="task-header">
+                <h3>{{ task.title }}</h3>
+              </div>
+              <div class="task-description">
+                {{ task.description }}
+              </div>
+              @if (task.tags && task.tags.length > 0) {
+                <div class="task-tags">
+                  @for (tag of task.tags; track tag) {
+                    <span class="task-tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+              <div class="task-footer">
+                <div class="task-meta">
+                  @if (task.estimatedHours) {
+                    <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
+                  }
+                  <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="task-actions">
+                  <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
+                  <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
+                </div>
+              </div>
+            </div>
+          }
+          @if (tasksByStatus().done.length === 0) {
+            <div class="empty-column">
+              <p>No tasks</p>
+            </div>
+          }
+        </div>
+      </div>
     </div>
   }
 </div>

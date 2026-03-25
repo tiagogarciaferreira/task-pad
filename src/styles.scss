@@ -5,7 +5,19 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background: #fafafa;
-  color: #333;
+  background: #0f172a;
+  color: #f1f5f9;
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+}
+
+// Links
+a {
+  color: #818cf8;
+  text-decoration: none;
+
+  &:hover {
+    color: #6366f1;
+  }
 }

@@ -62,7 +62,7 @@ app.post('/api/tasks', async (req, res) => {
         title: title.trim(),
         description: description.trim(),
         estimatedHours: Number(estimatedHours),
-        tags: tags,
+        tags: tags.map((tag) => tag.trim().toUpperCase()),
         status: 'Pending',
         userId: userId,
       },
@@ -118,7 +118,7 @@ app.get('/api/tasks/search', async (req, res) => {
     }
 
     if (tagsArray.length > 0) {
-      where.tags = { hasSome: tagsArray };
+      where.tags = { hasSome: tagsArray.map((tag) => tag.trim().toUpperCase()) };
     }
 
     if (estimatedHoursMin !== undefined || estimatedHoursMax !== undefined) {

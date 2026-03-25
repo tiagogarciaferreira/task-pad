@@ -5,7 +5,6 @@ import { Task } from '../models/task';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-
   private api = inject(ApiService);
 
   private tasksSignal = signal<Task[]>([]);
@@ -13,44 +12,6 @@ export class TaskService {
   loading = signal(false);
 
   error = signal<string | null>(null);
-
-  async search(
-    title?: string,
-    status?: string | string[],
-    estimatedHoursMin?: number,
-    estimatedHoursMax?: number,
-  ) {
-    this.loading.set(true);
-
-    try {
-      const params: Record<string, string | string[] | number> = {};
-
-      if (title) {
-        params['title'] = title;
-      }
-
-      if (status) {
-        params['status'] = status;
-      }
-
-      if (estimatedHoursMin) {
-        params['estimatedHoursMin'] = estimatedHoursMin;
-      }
-
-      if (estimatedHoursMax) {
-        params['estimatedHoursMax'] = estimatedHoursMax;
-      }
-
-      const tasks = await firstValueFrom(
-        this.api.getWithParams<Task[]>('/api/tasks/search', params),
-      );
-      this.tasksSignal.set(tasks);
-    } catch {
-      this.error.set('Failed to load tasks');
-    } finally {
-      this.loading.set(false);
-    }
-  }
 
   async getById(id: string) {
     this.loading.set(true);
@@ -65,12 +26,41 @@ export class TaskService {
     }
   }
 
-  async create(title: string, description: string, estimatedHours: number) {
+  async search(
+    title?: string,
+    status?: string | string[],
+    estimatedHoursMin?: number,
+    estimatedHoursMax?: number,
+    tags?: string | string[],
+  ) {
+    this.loading.set(true);
+
+    try {
+      const params: Record<string, string | string[] | number> = {};
+
+      if (title) params['title'] = title;
+      if (status) params['status'] = status;
+      if (tags) params['tags'] = tags;
+      if (estimatedHoursMin) params['estimatedHoursMin'] = estimatedHoursMin;
+      if (estimatedHoursMax) params['estimatedHoursMax'] = estimatedHoursMax;
+
+      const tasks = await firstValueFrom(
+        this.api.getWithParams<Task[]>('/api/tasks/search', params),
+      );
+      this.tasksSignal.set(tasks);
+    } catch {
+      this.error.set('Failed to load tasks');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async create(title: string, description: string, estimatedHours: number, tags: string[] = []) {
     this.loading.set(true);
 
     try {
       const newTask = await firstValueFrom(
-        this.api.post<Task>('/api/tasks', { title, description, estimatedHours }),
+        this.api.post<Task>('/api/tasks', { title, description, estimatedHours, tags }),
       );
       this.tasksSignal.update((tasks) => [newTask, ...tasks]);
     } catch {
@@ -123,7 +113,7 @@ export class TaskService {
     this.error.set(null);
   }
 
-   tasks() {
+  tasks() {
     return this.tasksSignal.asReadonly();
   }
 }
