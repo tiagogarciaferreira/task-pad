@@ -70,19 +70,6 @@ export class TaskService {
     }
   }
 
-  async update(id: string, updates: Partial<Task>) {
-    this.loading.set(true);
-
-    try {
-      const updated = await firstValueFrom(this.api.put<Task>(`/api/tasks/${id}`, updates));
-      this.tasksSignal.update((tasks) => tasks.map((task) => (task.id === id ? updated : task)));
-    } catch {
-      this.error.set('Failed to update task');
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
   async updateStatus(id: string, status: string) {
     this.loading.set(true);
 
@@ -91,6 +78,34 @@ export class TaskService {
       this.tasksSignal.update((tasks) => tasks.map((task) => (task.id === id ? updated : task)));
     } catch {
       this.error.set('Failed to update task status');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async update(
+    id: string,
+    title: string,
+    description: string,
+    estimatedHours: number,
+    tags: string[] = [],
+    status: string,
+  ) {
+    this.loading.set(true);
+
+    try {
+      const updated = await firstValueFrom(
+        this.api.put<Task>(`/api/tasks/${id}`, {
+          title,
+          description,
+          estimatedHours,
+          tags,
+          status,
+        }),
+      );
+      this.tasksSignal.update((tasks) => tasks.map((task) => (task.id === id ? updated : task)));
+    } catch {
+      this.error.set('Failed to update task');
     } finally {
       this.loading.set(false);
     }

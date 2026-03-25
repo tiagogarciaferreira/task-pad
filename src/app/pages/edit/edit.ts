@@ -1,0 +1,92 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { TaskService } from '../../services/task';
+
+@Component({
+  selector: 'app-edit',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './edit.html',
+  styleUrls: ['./edit.scss'],
+})
+export class EditPage implements OnInit {
+
+  protected taskService = inject(TaskService);
+
+  private router = inject(Router);
+
+  private route = inject(ActivatedRoute);
+
+  id = '';
+  title = '';
+  description = '';
+  estimatedHours = 0.5;
+  status = 'Pending';
+  tags: string[] = [];
+  tagInput = '';
+
+  statusOptions = ['Pending', 'In Progress', 'Review', 'Done'];
+
+  ngOnInit() {
+    this.id = this.route.snapshot.paramMap.get('id') || '';
+    if (this.id) {
+      this.loadTask();
+    }
+  }
+
+  async loadTask() {
+    const task = await this.taskService.getById(this.id);
+    if (task) {
+      this.title = task.title;
+      this.description = task.description || '';
+      this.estimatedHours = task.estimatedHours || 0.5;
+      this.status = task.status;
+      this.tags = task.tags || [];
+    } else {
+      await this.router.navigate(['/tasks']);
+    }
+  }
+
+  onTagKeyPress(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.addTag();
+    }
+  }
+
+  addTag() {
+    const tag = this.tagInput.trim().toUpperCase();
+    if (tag && !this.tags.includes(tag) && this.tags.length < 10) {
+      this.tags.push(tag);
+      this.tagInput = '';
+    }
+  }
+
+  removeTag(tag: string) {
+    this.tags = this.tags.filter((t) => t !== tag);
+  }
+
+  async onSubmit() {
+    this.taskService.clearError();
+
+    if (this.tags.length === 0) {
+      this.taskService.error.set('At least one tag is required');
+      return;
+    }
+
+    await this.taskService.update(
+      this.id,
+      this.title.trim(),
+      this.description.trim(),
+      this.estimatedHours,
+      this.tags,
+      this.status,
+    );
+
+    if (!this.taskService.error()) {
+      await this.router.navigate(['/tasks']);
+    }
+  }
+}
