@@ -23,11 +23,11 @@ export class EditPage implements OnInit {
   title = '';
   description = '';
   estimatedHours = 0.5;
-  status = 'Pending';
+  status = 'To Do';
   tags: string[] = [];
   tagInput = '';
 
-  statusOptions = ['Pending', 'In Progress', 'Review', 'Done'];
+  statusOptions = ['To Do', 'In Progress', 'Review', 'Done'];
 
   ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id') || '';

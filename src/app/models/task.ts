@@ -4,7 +4,7 @@ export interface Task {
   description: string;
   estimatedHours: number;
   tags: string[];
-  status: 'Pending' | 'In Progress' | 'Review' | 'Done';
+  status: 'To Do' | 'In Progress' | 'Review' | 'Done';
   userId: string;
   createdAt: Date;
   updatedAt: Date;

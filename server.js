@@ -43,7 +43,7 @@ app.post('/api/tasks', async (req, res) => {
       return res.status(400).json({ errors: errors });
     }
 
-    const { title, description, estimatedHours, tags } = validation.data;
+    const { title, description, estimatedHours, tags, status} = validation.data;
 
     const existingTask = await prisma.task.findFirst({
       where: {
@@ -63,7 +63,7 @@ app.post('/api/tasks', async (req, res) => {
         description: description.trim(),
         estimatedHours: Number(estimatedHours),
         tags: tags.map((tag) => tag.trim().toUpperCase()),
-        status: 'Pending',
+        status: status,
         userId: userId,
       },
     });
@@ -206,7 +206,7 @@ app.put('/api/tasks/:id', async (req, res) => {
       return res.status(400).json({ errors: errors });
     }
 
-    const { title, description, status , estimatedHours, tags} = validation.data;
+    const { title, description, estimatedHours, tags, status } = validation.data;
 
     if (title.trim() !== existingTask.title) {
       const duplicateTask = await prisma.task.findFirst({

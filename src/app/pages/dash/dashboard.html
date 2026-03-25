@@ -1,12 +1,16 @@
 <div class="dashboard-container">
   <div class="header">
     <h2>Dashboard</h2>
-    <button routerLink="/tasks/new" class="btn-primary">
-      Create New Task
-    </button>
+    <div class="header-buttons">
+      <button routerLink="/tasks" class="btn-primary">
+        Search
+      </button>
+      <button routerLink="/tasks/new" class="btn-primary">
+        New Task
+      </button>
+    </div>
   </div>
 
-  <!-- Loading State -->
   @if (taskService.loading()) {
     <div class="loading">
       Loading dashboard...
@@ -14,7 +18,6 @@
   }
 
   @if (!taskService.loading() && !taskService.error()) {
-    <!-- Cards de Métricas -->
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-icon total">📊</div>
@@ -25,10 +28,10 @@
       </div>
 
       <div class="metric-card">
-        <div class="metric-icon pending">⏳</div>
+        <div class="metric-icon toDo">⏳</div>
         <div class="metric-info">
-          <h3>{{ metrics().pending }}</h3>
-          <p>Pending</p>
+          <h3>{{ metrics().toDo }}</h3>
+          <p>To Do</p>
         </div>
       </div>
 
@@ -63,25 +66,8 @@
           <p>Completion Rate</p>
         </div>
       </div>
-
-      <div class="metric-card">
-        <div class="metric-icon hours">⏱️</div>
-        <div class="metric-info">
-          <h3>{{ metrics().totalHours }}h</h3>
-          <p>Total Hours</p>
-        </div>
-      </div>
-
-      <div class="metric-card">
-        <div class="metric-icon tags">🏷️</div>
-        <div class="metric-info">
-          <h3>{{ metrics().uniqueTags }}</h3>
-          <p>Unique Tags</p>
-        </div>
-      </div>
     </div>
 
-    <!-- Gráfico de Progresso Simples -->
     <div class="progress-section">
       <h3>Task Progress</h3>
       <div class="progress-bar-container">
@@ -95,7 +81,36 @@
       </div>
     </div>
 
-    <!-- Últimas Tarefas -->
+    <div class="recent-section">
+      <h3>Tasks In Progress</h3>
+      @if (inProgressTasks().length === 0) {
+        <div class="empty-recent">
+          <p>No tasks yet.</p>
+          <button routerLink="/tasks/new">Create your first task</button>
+        </div>
+      } @else {
+        <div class="recent-list">
+          @for (task of inProgressTasks(); track task.id) {
+            <div class="recent-item">
+              <div class="recent-info">
+                <h4>{{ task.title }}</h4>
+                <span class="status-badge" [class]="getStatusClass(task.status)">
+                  {{ task.status }}
+              </span>
+              </div>
+              <div class="recent-meta">
+                <span class="hours">⏱️ {{ task.estimatedHours || 0 }}h</span>
+                <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                <button (click)="openTaskModal(task)" class="btn-view">View</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <br><br>
+
     <div class="recent-section">
       <h3>Recent Tasks</h3>
       @if (recentTasks().length === 0) {
@@ -111,21 +126,28 @@
                 <h4>{{ task.title }}</h4>
                 <span class="status-badge" [class]="getStatusClass(task.status)">
                   {{ task.status }}
-                </span>
+              </span>
               </div>
               <div class="recent-meta">
                 <span class="hours">⏱️ {{ task.estimatedHours || 0 }}h</span>
                 <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
-                <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-view">View</button>
+                <button (click)="openTaskModal(task)" class="btn-view">View</button>
               </div>
             </div>
           }
         </div>
       }
     </div>
+
+    @if (showModal() && selectedTask()) {
+      <app-task-modal
+        [task]="selectedTask()!"
+        (close)="closeModal()"
+        (edit)="editTask($event)"
+      />
+    }
   }
 
-  <!-- Error State -->
   @if (taskService.error()) {
     <div class="error">
       {{ taskService.error() }}

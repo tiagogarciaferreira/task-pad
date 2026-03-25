@@ -1,0 +1,162 @@
+[
+  {
+    "title": "Set up development environment with Docker",
+    "description": "Install and configure Docker, Docker Compose, and create containers for database and application",
+    "status": "To Do",
+    "estimatedHours": 4.5,
+    "tags": ["DOCKER", "SETUP", "ENVIRONMENT"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Study Spring Boot fundamentals",
+    "description": "Review dependency injection, auto-configuration, and starters concepts",
+    "status": "To Do",
+    "estimatedHours": 6,
+    "tags": ["SPRING BOOT", "FUNDAMENTALS", "STUDY"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Create base project with Spring Initializr",
+    "description": "Generate project with dependencies: Web, JPA, Lombok, Validation, and Security",
+    "status": "To Do",
+    "estimatedHours": 2,
+    "tags": ["SPRING BOOT", "SETUP", "INITIALIZR"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Implement user CRUD with JPA",
+    "description": "Create User entity, repository, service, and controller with basic operations",
+    "status": "To Do",
+    "estimatedHours": 8,
+    "tags": ["JPA", "CRUD", "BACKEND"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Configure PostgreSQL database",
+    "description": "Set up connection, properties, and create migrations with Flyway",
+    "status": "To Do",
+    "estimatedHours": 3.5,
+    "tags": ["POSTGRESQL", "FLYWAY", "DATABASE"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Develop JWT authentication",
+    "description": "Implement login, token generation, and authentication filter",
+    "status": "In Progress",
+    "estimatedHours": 10,
+    "tags": ["JWT", "SECURITY", "AUTHENTICATION"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Create RESTful endpoints with best practices",
+    "description": "Implement endpoints following REST patterns, validations, and error handling",
+    "status": "In Progress",
+    "estimatedHours": 7.5,
+    "tags": ["REST API", "BEST PRACTICES", "SPRING MVC"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Implement unit tests with JUnit and Mockito",
+    "description": "Create tests for services and repositories with minimum 80% coverage",
+    "status": "In Progress",
+    "estimatedHours": 12,
+    "tags": ["JUNIT", "MOCKITO", "TESTING"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Configure logging with SLF4J and Logback",
+    "description": "Set up log levels, appenders, and file rotation",
+    "status": "In Progress",
+    "estimatedHours": 3,
+    "tags": ["LOGGING", "SLF4J", "LOGBACK"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Implement caching with Redis",
+    "description": "Configure Redis and implement caching for frequent queries",
+    "status": "In Progress",
+    "estimatedHours": 5.5,
+    "tags": ["REDIS", "CACHE", "PERFORMANCE"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Review code and apply code review feedback",
+    "description": "Perform code review, refactoring, and apply feedback",
+    "status": "Review",
+    "estimatedHours": 4,
+    "tags": ["CODE REVIEW", "REFACTORING", "QUALITY"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Document API with OpenAPI/Swagger",
+    "description": "Add interactive API documentation using Springdoc annotations",
+    "status": "Review",
+    "estimatedHours": 3,
+    "tags": ["SWAGGER", "OPENAPI", "DOCUMENTATION"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Run integration tests",
+    "description": "Test complete flows with real database and containers",
+    "status": "Review",
+    "estimatedHours": 6,
+    "tags": ["INTEGRATION TESTS", "TESTCONTAINERS", "QUALITY"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Validate performance with load tests",
+    "description": "Use JMeter or Gatling to test critical endpoints",
+    "status": "Review",
+    "estimatedHours": 5,
+    "tags": ["PERFORMANCE", "JMETER", "LOAD TESTING"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Check test coverage in SonarQube",
+    "description": "Analyze quality metrics and fix improvement points",
+    "status": "Review",
+    "estimatedHours": 2.5,
+    "tags": ["SONARQUBE", "QUALITY GATES", "METRICS"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Deploy to staging environment",
+    "description": "Configure CI/CD pipeline and deploy to cloud",
+    "status": "Done",
+    "estimatedHours": 8,
+    "tags": ["CI/CD", "DEPLOY", "DEVOPS"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Set up monitoring with Actuator and Prometheus",
+    "description": "Expose metrics, configure health checks, and integrate with Grafana",
+    "status": "Done",
+    "estimatedHours": 6.5,
+    "tags": ["ACTUATOR", "PROMETHEUS", "MONITORING"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Implement messaging with RabbitMQ",
+    "description": "Create producers and consumers for asynchronous processing",
+    "status": "Done",
+    "estimatedHours": 9,
+    "tags": ["RABBITMQ", "MESSAGING", "ASYNC"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Create admin dashboard with Angular",
+    "description": "Build user management interface and reports",
+    "status": "Done",
+    "estimatedHours": 14,
+    "tags": ["ANGULAR", "FRONTEND", "DASHBOARD"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  },
+  {
+    "title": "Prepare technical documentation and training",
+    "description": "Create project wiki and record training videos",
+    "status": "Done",
+    "estimatedHours": 5,
+    "tags": ["DOCUMENTATION", "TRAINING", "KNOWLEDGE TRANSFER"],
+    "userId": "29b533c6-9446-4e33-88a3-9a5bad425954"
+  }
+]

@@ -1,0 +1,66 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Task Details</h2>
+      <button class="close-btn" (click)="onClose()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-group">
+        <label>Title</label>
+        <h3>{{ task().title }}</h3>
+      </div>
+
+      <div class="detail-group">
+        <label>Status</label>
+        <span class="status-badge" [class]="getStatusClass(task().status)">
+          {{ task().status }}
+        </span>
+      </div>
+
+      @if (task().description) {
+        <div class="detail-group">
+          <label>Description</label>
+          <p>{{ task().description }}</p>
+        </div>
+      }
+
+      @if (task().estimatedHours) {
+        <div class="detail-group">
+          <label>Estimated Hours</label>
+          <p>⏱️ {{ task().estimatedHours }} hours</p>
+        </div>
+      }
+
+      @if (task().tags && task().tags.length > 0) {
+        <div class="detail-group">
+          <label>Tags</label>
+          <div class="tags-list">
+            @for (tag of task().tags; track tag) {
+              <span class="tag">{{ tag }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="detail-group">
+        <label>Created At</label>
+        <p>📅 {{ formatDate(task().createdAt) }}</p>
+      </div>
+
+      <div class="detail-group">
+        <label>Last Updated</label>
+        <p>🔄 {{ formatDate(task().updatedAt) }}</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-edit" (click)="onEdit()">
+        ✏️ Edit
+      </button>
+      <button class="btn-close" (click)="onClose()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,12 +1,14 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TaskService } from '../../services/task';
+import { Task } from '../../models/task';
+import { TaskModalComponent } from '../detail/task-modal';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TaskModalComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
 })
@@ -14,13 +16,17 @@ export class DashboardPage implements OnInit {
 
   protected taskService = inject(TaskService);
 
-  // Métricas computadas
+  private router = inject(Router);
+
+  selectedTask = signal<Task | null>(null);
+
+  showModal = signal(false);
+
   metrics = computed(() => {
     const tasks = this.taskService.tasks();
-
     return {
       total: tasks().length,
-      pending: tasks().filter((t) => t.status === 'Pending').length,
+      toDo: tasks().filter((t) => t.status === 'To Do').length,
       inProgress: tasks().filter((t) => t.status === 'In Progress').length,
       review: tasks().filter((t) => t.status === 'Review').length,
       done: tasks().filter((t) => t.status === 'Done').length,
@@ -28,15 +34,19 @@ export class DashboardPage implements OnInit {
         tasks().length > 0
           ? Math.round((tasks().filter((t) => t.status === 'Done').length / tasks().length) * 100)
           : 0,
-      totalHours: tasks().reduce((sum, t) => sum + (t.estimatedHours || 0), 0),
-      uniqueTags: new Set(tasks().flatMap((t) => t.tags || [])).size,
     };
   });
 
-  // Últimas 5 tarefas
   recentTasks = computed(() => {
     return [...this.taskService.tasks()()]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5);
+  });
+
+  inProgressTasks = computed(() => {
+    return [...this.taskService.tasks()()]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .filter((t) => t.status === 'In Progress')
       .slice(0, 5);
   });
 
@@ -46,5 +56,20 @@ export class DashboardPage implements OnInit {
 
   getStatusClass(status: string): string {
     return status.toLowerCase().replace(/\s+/g, '-');
+  }
+
+  openTaskModal(task: Task) {
+    this.selectedTask.set(task);
+    this.showModal.set(true);
+  }
+
+  closeModal() {
+    this.showModal.set(false);
+    this.selectedTask.set(null);
+  }
+
+  editTask(taskId: string) {
+    this.closeModal();
+    this.router.navigate(['/tasks', taskId, 'edit']);
   }
 }

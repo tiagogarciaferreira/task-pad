@@ -1,18 +1,23 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../services/task';
+import { Task } from '../../models/task';
+import { TaskModalComponent } from '../detail/task-modal';
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TaskModalComponent],
   templateUrl: './list.html',
   styleUrls: ['./list.scss'],
 })
 export class ListPage implements OnInit {
+
   protected taskService = inject(TaskService);
+
+  private router = inject(Router);
 
   searchTitle = signal('');
 
@@ -24,13 +29,17 @@ export class ListPage implements OnInit {
 
   selectedTags = signal<string[]>([]);
 
+  selectedTask = signal<Task | null>(null);
+
+  showModal = signal(false);
+
   tagInput = '';
-  statusOptions = ['Pending', 'In Progress', 'Review', 'Done'];
+  statusOptions = ['To Do', 'In Progress', 'Review', 'Done'];
 
   tasksByStatus = computed(() => {
     const tasks = this.taskService.tasks();
     return {
-      pending: tasks().filter((t: { status: string }) => t.status === 'Pending'),
+      toDo: tasks().filter((t: { status: string }) => t.status === 'To Do'),
       inProgress: tasks().filter((t: { status: string }) => t.status === 'In Progress'),
       review: tasks().filter((t: { status: string }) => t.status === 'Review'),
       done: tasks().filter((t: { status: string }) => t.status === 'Done'),
@@ -122,5 +131,20 @@ export class ListPage implements OnInit {
 
   isStatusSelected(status: string): boolean {
     return this.selectedStatuses().includes(status);
+  }
+
+  openTaskModal(task: Task) {
+    this.selectedTask.set(task);
+    this.showModal.set(true);
+  }
+
+  closeModal() {
+    this.showModal.set(false);
+    this.selectedTask.set(null);
+  }
+
+  editTask(taskId: string) {
+    this.closeModal();
+    this.router.navigate(['/tasks', taskId, 'edit']);
   }
 }

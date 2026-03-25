@@ -1,14 +1,18 @@
 <div class="list-container">
   <div class="header">
     <h2>My Tasks</h2>
-    <button routerLink="/tasks/new" class="btn-primary">
-      Create New Task
-    </button>
+    <div class="header-buttons">
+      <button routerLink="/dashboard" class="btn-primary">
+        Dashboard
+      </button>
+      <button routerLink="/tasks/new" class="btn-primary">
+        New Task
+      </button>
+    </div>
+
   </div>
 
-  <!-- Filtros -->
   <div class="filters">
-    <!-- Campo Título -->
     <div class="form-group">
       <label for="searchTitle">Search by Title</label>
       <input
@@ -34,7 +38,6 @@
       }
     </div>
 
-    <!-- Campo Status -->
     <div class="form-group">
       <label>Status</label>
       <div class="status-filters">
@@ -50,7 +53,6 @@
       </div>
     </div>
 
-    <!-- Campo Horas Mínimo -->
     <div class="form-group">
       <label for="hoursMin">Estimated Hours (Min)</label>
       <input
@@ -76,7 +78,6 @@
       }
     </div>
 
-    <!-- Campo Horas Máximo -->
     <div class="form-group">
       <label for="hoursMax">Estimated Hours (Max)</label>
       <input
@@ -110,7 +111,6 @@
       }
     </div>
 
-    <!-- Campo Tags -->
     <div class="form-group">
       <label for="tags">Filter by Tags</label>
       <div class="tags-input-wrapper">
@@ -162,14 +162,12 @@
     </div>
   </div>
 
-  <!-- Loading State -->
   @if (taskService.loading()) {
     <div class="loading">
       Loading tasks...
     </div>
   }
 
-  <!-- Error State -->
   @if (taskService.error()) {
     <div class="error">
       {{ taskService.error() }}
@@ -177,17 +175,15 @@
     </div>
   }
 
-  <!-- Tasks Board - 4 Colunas (sempre mostra o board, mesmo vazio) -->
   @if (!taskService.loading() && !taskService.error()) {
     <div class="tasks-board">
-      <!-- Coluna Pending -->
       <div class="board-column">
         <div class="column-header" style="border-top-color: #f59e0b">
           <h3>To Do</h3>
-          <span class="task-count">{{ tasksByStatus().pending.length }}</span>
+          <span class="task-count">{{ tasksByStatus().toDo.length }}</span>
         </div>
         <div class="column-tasks">
-          @for (task of tasksByStatus().pending; track task.id) {
+          @for (task of tasksByStatus().toDo; track task.id) {
             <div class="task-card">
               <div class="task-header">
                 <h3>{{ task.title }}</h3>
@@ -210,13 +206,23 @@
                   <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="task-actions">
+                  <button (click)="openTaskModal(task)" class="btn-view">View</button>
                   <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
                   <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
                 </div>
               </div>
             </div>
           }
-          @if (tasksByStatus().pending.length === 0) {
+
+          @if (showModal() && selectedTask()) {
+            <app-task-modal
+              [task]="selectedTask()!"
+              (close)="closeModal()"
+              (edit)="editTask($event)"
+            />
+          }
+
+          @if (tasksByStatus().toDo.length === 0) {
             <div class="empty-column">
               <p>No tasks</p>
               @if (!hasActiveFilters()) {
@@ -227,7 +233,6 @@
         </div>
       </div>
 
-      <!-- Coluna In Progress -->
       <div class="board-column">
         <div class="column-header" style="border-top-color: #3b82f6">
           <h3>In Progress</h3>
@@ -257,6 +262,7 @@
                   <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="task-actions">
+                  <button (click)="openTaskModal(task)" class="btn-view">View</button>
                   <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
                   <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
                 </div>
@@ -271,7 +277,6 @@
         </div>
       </div>
 
-      <!-- Coluna Review -->
       <div class="board-column">
         <div class="column-header" style="border-top-color: #8b5cf6">
           <h3>Review</h3>
@@ -301,6 +306,7 @@
                   <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="task-actions">
+                  <button (click)="openTaskModal(task)" class="btn-view">View</button>
                   <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
                   <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
                 </div>
@@ -315,7 +321,6 @@
         </div>
       </div>
 
-      <!-- Coluna Done -->
       <div class="board-column">
         <div class="column-header" style="border-top-color: #10b981">
           <h3>Done</h3>
@@ -345,6 +350,7 @@
                   <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="task-actions">
+                  <button (click)="openTaskModal(task)" class="btn-view">View</button>
                   <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
                   <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
                 </div>

@@ -20,11 +20,11 @@ export class FormPage {
   title = '';
   description = '';
   estimatedHours = 0.5;
-  status = 'Pending';
+  status = 'To Do';
   tags: string[] = [];
   tagInput = '';
 
-  statusOptions = ['Pending', 'In Progress'];
+  statusOptions = ['To Do', 'In Progress'];
 
   onTagKeyPress(event: KeyboardEvent) {
     if (event.key === 'Enter') {

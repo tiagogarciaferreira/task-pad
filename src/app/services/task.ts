@@ -55,12 +55,12 @@ export class TaskService {
     }
   }
 
-  async create(title: string, description: string, estimatedHours: number, tags: string[] = []) {
+  async create(title: string, description: string, estimatedHours: number, tags: string[] = [], status: string = 'To Do') {
     this.loading.set(true);
 
     try {
       const newTask = await firstValueFrom(
-        this.api.post<Task>('/api/tasks', { title, description, estimatedHours, tags }),
+        this.api.post<Task>('/api/tasks', { title, description, estimatedHours, tags, status }),
       );
       this.tasksSignal.update((tasks) => [newTask, ...tasks]);
     } catch {
