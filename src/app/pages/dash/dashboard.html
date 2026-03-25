@@ -1,0 +1,135 @@
+<div class="dashboard-container">
+  <div class="header">
+    <h2>Dashboard</h2>
+    <button routerLink="/tasks/new" class="btn-primary">
+      Create New Task
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (taskService.loading()) {
+    <div class="loading">
+      Loading dashboard...
+    </div>
+  }
+
+  @if (!taskService.loading() && !taskService.error()) {
+    <!-- Cards de Métricas -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon total">📊</div>
+        <div class="metric-info">
+          <h3>{{ metrics().total }}</h3>
+          <p>Total Tasks</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon pending">⏳</div>
+        <div class="metric-info">
+          <h3>{{ metrics().pending }}</h3>
+          <p>Pending</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon progress">⚡</div>
+        <div class="metric-info">
+          <h3>{{ metrics().inProgress }}</h3>
+          <p>In Progress</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon review">🔍</div>
+        <div class="metric-info">
+          <h3>{{ metrics().review }}</h3>
+          <p>Review</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon done">✅</div>
+        <div class="metric-info">
+          <h3>{{ metrics().done }}</h3>
+          <p>Done</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon rate">📈</div>
+        <div class="metric-info">
+          <h3>{{ metrics().completionRate }}%</h3>
+          <p>Completion Rate</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon hours">⏱️</div>
+        <div class="metric-info">
+          <h3>{{ metrics().totalHours }}h</h3>
+          <p>Total Hours</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon tags">🏷️</div>
+        <div class="metric-info">
+          <h3>{{ metrics().uniqueTags }}</h3>
+          <p>Unique Tags</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico de Progresso Simples -->
+    <div class="progress-section">
+      <h3>Task Progress</h3>
+      <div class="progress-bar-container">
+        <div class="progress-bar" [style.width.%]="metrics().completionRate">
+          <span>{{ metrics().completionRate }}%</span>
+        </div>
+      </div>
+      <div class="progress-stats">
+        <span>✅ {{ metrics().done }} completed</span>
+        <span>📊 {{ metrics().total }} total</span>
+      </div>
+    </div>
+
+    <!-- Últimas Tarefas -->
+    <div class="recent-section">
+      <h3>Recent Tasks</h3>
+      @if (recentTasks().length === 0) {
+        <div class="empty-recent">
+          <p>No tasks yet.</p>
+          <button routerLink="/tasks/new">Create your first task</button>
+        </div>
+      } @else {
+        <div class="recent-list">
+          @for (task of recentTasks(); track task.id) {
+            <div class="recent-item">
+              <div class="recent-info">
+                <h4>{{ task.title }}</h4>
+                <span class="status-badge" [class]="getStatusClass(task.status)">
+                  {{ task.status }}
+                </span>
+              </div>
+              <div class="recent-meta">
+                <span class="hours">⏱️ {{ task.estimatedHours || 0 }}h</span>
+                <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-view">View</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (taskService.error()) {
+    <div class="error">
+      {{ taskService.error() }}
+      <button (click)="taskService.search()">Retry</button>
+    </div>
+  }
+</div>
