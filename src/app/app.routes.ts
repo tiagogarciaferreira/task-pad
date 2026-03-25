@@ -5,8 +5,8 @@ import { EditPage } from './pages/edit/edit';
 import { DashboardPage } from './pages/dash/dashboard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardPage },
+  { path: '', redirectTo: '/tasks/dashboard', pathMatch: 'full' },
+  { path: 'tasks/dashboard', component: DashboardPage },
   { path: 'tasks', component: ListPage },
   { path: 'tasks/new', component: FormPage },
   { path: 'tasks/:id/edit', component: EditPage },
