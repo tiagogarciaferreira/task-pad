@@ -96,7 +96,30 @@
       }
     </div>
 
-    <!-- Tags Input -->
+    <div class="form-group">
+      <label for="dueDate">
+        Due Date <span class="required">*</span>
+      </label>
+      <input
+        type="date"
+        id="dueDate"
+        [ngModel]="dueDate | date:'MM/dd/yyyy'"
+        name="dueDate"
+        required
+        #dueDateInput="ngModel"
+      />
+      @if (dueDateInput.invalid && dueDateInput.touched) {
+        <div class="field-error">
+          @if (dueDateInput.errors?.['required']) {
+            <span>Due date is required</span>
+          }
+          @if (dueDateInput.errors?.['min']) {
+            <span>Due date cannot be in the past</span>
+          }
+        </div>
+      }
+    </div>
+
     <div class="form-group">
       <label for="tags">
         Tags <span class="required">*</span>
@@ -164,6 +187,19 @@
       </label>
       <select id="status" [(ngModel)]="status" name="status" required>
         @for (option of statusOptions; track option) {
+          <option [value]="option">
+            {{ option }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="priority">
+        Priority <span class="required">*</span>
+      </label>
+      <select id="priority" [(ngModel)]="priority" name="priority" required>
+        @for (option of priorityOptions; track option) {
           <option [value]="option">
             {{ option }}
           </option>

@@ -9,7 +9,6 @@ import { Task } from '../../models/task';
   templateUrl: './task-modal.html',
   styleUrls: ['./task-modal.scss'],
 })
-
 export class TaskModalComponent {
 
   task = input.required<Task>();
@@ -30,7 +29,12 @@ export class TaskModalComponent {
     return status.toLowerCase().replace(/\s+/g, '-');
   }
 
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('pt-BR');
+  isOverdue(dueDate: string | Date): boolean {
+    if (this.task().status === 'Done') return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    due.setHours(0, 0, 0, 0);
+    return due < today;
   }
 }

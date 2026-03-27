@@ -18,6 +18,15 @@
         </span>
       </div>
 
+      <div class="detail-group">
+        <label>Priority</label>
+        @if (task().priority) {
+          <span class="priority-badge" [class]="task().priority.toLowerCase()">
+            {{ task().priority }}
+          </span>
+        }
+      </div>
+
       @if (task().description) {
         <div class="detail-group">
           <label>Description</label>
@@ -45,18 +54,27 @@
 
       <div class="detail-group">
         <label>Created At</label>
-        <p>📅 {{ formatDate(task().createdAt) }}</p>
+        <p>📅 {{ task().createdAt | date:'MM/dd/yyyy' }}</p>
+      </div>
+
+      <div class="detail-group">
+        <label>Due date At</label>
+        @if (task().dueDate) {
+          <span class="due-date" [class.overdue]="isOverdue(task().dueDate)">
+            📅 {{ task().dueDate | date:'MM/dd/yyyy' }}
+          </span>
+        }
       </div>
 
       <div class="detail-group">
         <label>Last Updated</label>
-        <p>🔄 {{ formatDate(task().updatedAt) }}</p>
+        <p>🔄 {{ task().updatedAt | date:'MM/dd/yyyy' }}</p>
       </div>
     </div>
 
     <div class="modal-footer">
       <button class="btn-edit" (click)="onEdit()">
-        ✏️ Edit
+        Edit
       </button>
       <button class="btn-close" (click)="onClose()">
         Close

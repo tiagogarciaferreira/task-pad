@@ -5,6 +5,7 @@ import { Task } from '../models/task';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
+
   private api = inject(ApiService);
 
   private tasksSignal = signal<Task[]>([]);
@@ -32,6 +33,9 @@ export class TaskService {
     estimatedHoursMin?: number,
     estimatedHoursMax?: number,
     tags?: string | string[],
+    priority?: string | string[],
+    dueDateMin?: Date,
+    dueDateMax?: Date,
   ) {
     this.loading.set(true);
 
@@ -43,6 +47,9 @@ export class TaskService {
       if (tags) params['tags'] = tags;
       if (estimatedHoursMin) params['estimatedHoursMin'] = estimatedHoursMin;
       if (estimatedHoursMax) params['estimatedHoursMax'] = estimatedHoursMax;
+      if (priority) params['priority'] = priority;
+      if (dueDateMin) params['dueDateMin'] = dueDateMin.toISOString();
+      if (dueDateMax) params['dueDateMax'] = dueDateMax.toISOString();
 
       const tasks = await firstValueFrom(
         this.api.getWithParams<Task[]>('/api/tasks/search', params),
@@ -55,29 +62,23 @@ export class TaskService {
     }
   }
 
-  async create(title: string, description: string, estimatedHours: number, tags: string[] = [], status: string = 'To Do') {
+  async create(
+    title: string,
+    description: string,
+    estimatedHours: number,
+    tags: string[] = [],
+    status: string = 'To Do',
+    priority: string = 'Low',
+    dueDate: Date = new Date()) {
     this.loading.set(true);
 
     try {
       const newTask = await firstValueFrom(
-        this.api.post<Task>('/api/tasks', { title, description, estimatedHours, tags, status }),
+        this.api.post<Task>('/api/tasks', { title, description, estimatedHours, tags, status, priority, dueDate }),
       );
       this.tasksSignal.update((tasks) => [newTask, ...tasks]);
     } catch {
       this.error.set('Failed to create task');
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-  async updateStatus(id: string, status: string) {
-    this.loading.set(true);
-
-    try {
-      const updated = await firstValueFrom(this.api.patch<Task>(`/api/tasks/${id}`, { status }));
-      this.tasksSignal.update((tasks) => tasks.map((task) => (task.id === id ? updated : task)));
-    } catch {
-      this.error.set('Failed to update task status');
     } finally {
       this.loading.set(false);
     }
@@ -90,6 +91,8 @@ export class TaskService {
     estimatedHours: number,
     tags: string[] = [],
     status: string,
+    priority: string,
+    dueDate: Date,
   ) {
     this.loading.set(true);
 
@@ -101,6 +104,8 @@ export class TaskService {
           estimatedHours,
           tags,
           status,
+          priority,
+          dueDate,
         }),
       );
       this.tasksSignal.update((tasks) => tasks.map((task) => (task.id === id ? updated : task)));

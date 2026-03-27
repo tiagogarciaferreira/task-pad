@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { ListPage } from './pages/list/list';
-import { FormPage } from './pages/form/form';
+import { FormPage } from './pages/create/create';
 import { EditPage } from './pages/edit/edit';
 import { DashboardPage } from './pages/dash/dashboard';
 

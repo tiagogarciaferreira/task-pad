@@ -14,7 +14,7 @@
 
   <div class="filters">
     <div class="form-group">
-      <label for="searchTitle">Search by Title</label>
+      <label for="searchTitle">Title</label>
       <input
         type="text"
         id="searchTitle"
@@ -54,62 +54,117 @@
     </div>
 
     <div class="form-group">
-      <label for="hoursMin">Estimated Hours (Min)</label>
-      <input
-        type="number"
-        id="hoursMin"
-        [ngModel]="estimatedHoursMin()"
-        (ngModelChange)="setHoursMin($event)"
-        placeholder="Min hours"
-        step="0.5"
-        min="0.5"
-        max="21"
-        #hoursMinFilter="ngModel"
-      />
-      @if (hoursMinFilter.invalid && hoursMinFilter.touched) {
-        <div class="field-error">
-          @if (hoursMinFilter.errors?.['min']) {
-            <span>Minimum 0.5 hours</span>
-          }
-          @if (hoursMinFilter.errors?.['max']) {
-            <span>Maximum 40 hours</span>
-          }
-        </div>
-      }
+      <label>Priority</label>
+      <div class="priority-filters">
+        @for (option of priorityOptions; track option) {
+          <button
+            class="priority-filter-btn"
+            [class.active]="isPrioritySelected(option)"
+            (click)="togglePriorityFilter(option)"
+          >
+            {{ option }}
+          </button>
+        }
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="hoursMax">Estimated Hours (Max)</label>
-      <input
-        type="number"
-        id="hoursMax"
-        [ngModel]="estimatedHoursMax()"
-        (ngModelChange)="setHoursMax($event)"
-        placeholder="Max hours"
-        step="0.5"
-        min="0.5"
-        max="21"
-        #hoursMaxFilter="ngModel"
-      />
-      @if (hoursMaxFilter.invalid && hoursMaxFilter.touched) {
-        <div class="field-error">
-          @if (hoursMaxFilter.errors?.['min']) {
-            <span>Minimum 0.5 hours</span>
-          }
-          @if (hoursMaxFilter.errors?.['max']) {
-            <span>Maximum 21 hours</span>
-          }
-        </div>
-      }
-      @let minHours = estimatedHoursMin();
-      @let maxHours = estimatedHoursMax();
+    <div class="hours-range-group">
+      <div class="form-group hours-item">
+        <label for="hoursMin">Estimated Hours (Min)</label>
+        <input
+          type="number"
+          id="hoursMin"
+          [ngModel]="estimatedHoursMin()"
+          (ngModelChange)="setHoursMin($event)"
+          placeholder="Min hours"
+          step="0.5"
+          min="0.5"
+          max="21"
+          class="hours-input"
+          #hoursMinFilter="ngModel"
+        />
+        @if (hoursMinFilter.invalid && hoursMinFilter.touched) {
+          <div class="field-error">
+            @if (hoursMinFilter.errors?.['min']) {
+              <span>Minimum 0.5 hours</span>
+            }
+            @if (hoursMinFilter.errors?.['max']) {
+              <span>Maximum 21 hours</span>
+            }
+          </div>
+        }
+      </div>
 
-      @if (minHours !== undefined && maxHours !== undefined && minHours > maxHours) {
-        <div class="field-error">
-          <span>Min hours cannot be greater than max hours</span>
-        </div>
-      }
+      <div class="form-group hours-item">
+        <label for="hoursMax">Estimated Hours (Max)</label>
+        <input
+          type="number"
+          id="hoursMax"
+          [ngModel]="estimatedHoursMax()"
+          (ngModelChange)="setHoursMax($event)"
+          placeholder="Max hours"
+          step="0.5"
+          min="0.5"
+          max="21"
+          class="hours-input"
+          #hoursMaxFilter="ngModel"
+        />
+        @if (hoursMaxFilter.invalid && hoursMaxFilter.touched) {
+          <div class="field-error">
+            @if (hoursMaxFilter.errors?.['min']) {
+              <span>Minimum 0.5 hours</span>
+            }
+            @if (hoursMaxFilter.errors?.['max']) {
+              <span>Maximum 21 hours</span>
+            }
+          </div>
+        }
+      </div>
     </div>
+
+    @let minHours = estimatedHoursMin();
+    @let maxHours = estimatedHoursMax();
+
+    @if (minHours !== undefined && maxHours !== undefined && minHours >= maxHours) {
+      <div class="field-error hours-range-error">
+        <span>Min hours cannot be greater than max hours</span>
+      </div>
+    }
+
+    <div class="date-range-group">
+      <div class="form-group date-item">
+        <label for="dueDateMin">Due Date (Min)</label>
+        <input
+          type="date"
+          id="dueDateMin"
+          [ngModel]="dueDateMin()"
+          (ngModelChange)="setDueDateMin($event)"
+          placeholder="Min due date"
+          class="date-input"
+        />
+      </div>
+
+      <div class="form-group date-item">
+        <label for="dueDateMax">Due Date (Max)</label>
+        <input
+          type="date"
+          id="dueDateMax"
+          [ngModel]="dueDateMax()"
+          (ngModelChange)="setDueDateMax($event)"
+          placeholder="Max due date"
+          class="date-input"
+        />
+      </div>
+    </div>
+
+    @let dateMin = dueDateMin();
+    @let dateMax = dueDateMax();
+
+    @if (dateMin !== undefined && dateMax !== undefined && dateMin >= dateMax) {
+      <div class="field-error date-range-error">
+        <span>Min due date cannot be greater than max due date</span>
+      </div>
+    }
 
     <div class="form-group">
       <label for="tags">Filter by Tags</label>
@@ -203,7 +258,11 @@
                   @if (task.estimatedHours) {
                     <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
                   }
-                  <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                  @if (task.dueDate) {
+                    <span class="due-date" [class.overdue]="isOverdue(task.dueDate)">
+                      📅 {{ task.dueDate | date:'MM/dd/yyyy' }}
+                    </span>
+                  }
                 </div>
                 <div class="task-actions">
                   <button (click)="openTaskModal(task)" class="btn-view">View</button>
@@ -259,7 +318,11 @@
                   @if (task.estimatedHours) {
                     <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
                   }
-                  <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                  @if (task.dueDate) {
+                    <span class="due-date" [class.overdue]="isOverdue(task.dueDate)">
+                      📅 {{ task.dueDate | date:'MM/dd/yyyy' }}
+                    </span>
+                  }
                 </div>
                 <div class="task-actions">
                   <button (click)="openTaskModal(task)" class="btn-view">View</button>
@@ -287,6 +350,11 @@
             <div class="task-card">
               <div class="task-header">
                 <h3>{{ task.title }}</h3>
+                @if (task.priority) {
+                  <span class="priority-badge" [class]="task.priority.toLowerCase()">
+                    {{ task.priority }}
+                  </span>
+                }
               </div>
               <div class="task-description">
                 {{ task.description }}
@@ -303,7 +371,11 @@
                   @if (task.estimatedHours) {
                     <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
                   }
-                  <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                  @if (task.dueDate) {
+                    <span class="due-date" [class.overdue]="isOverdue(task.dueDate)">
+                      📅 {{ task.dueDate | date:'MM/dd/yyyy' }}
+                    </span>
+                  }
                 </div>
                 <div class="task-actions">
                   <button (click)="openTaskModal(task)" class="btn-view">View</button>
@@ -347,7 +419,11 @@
                   @if (task.estimatedHours) {
                     <span class="hours">⏱️ {{ task.estimatedHours }}h</span>
                   }
-                  <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                  @if (task.dueDate) {
+                    <span class="due-date" [class.overdue]="task.status !== 'Done' && isOverdue(task.dueDate)">
+                      📅 {{ task.dueDate | date:'MM/dd/yyyy' }}
+                    </span>
+                  }
                 </div>
                 <div class="task-actions">
                   <button (click)="openTaskModal(task)" class="btn-view">View</button>

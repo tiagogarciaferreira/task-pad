@@ -1,8 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { TaskService } from '../../services/task';
+
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.css';
 
 @Component({
   selector: 'app-edit',
@@ -11,7 +14,7 @@ import { TaskService } from '../../services/task';
   templateUrl: './edit.html',
   styleUrls: ['./edit.scss'],
 })
-export class EditPage implements OnInit {
+export class EditPage implements OnInit, AfterViewInit {
 
   protected taskService = inject(TaskService);
 
@@ -24,16 +27,27 @@ export class EditPage implements OnInit {
   description = '';
   estimatedHours = 0.5;
   status = 'To Do';
+  priority = 'Low';
+  dueDate = new Date();
   tags: string[] = [];
   tagInput = '';
 
   statusOptions = ['To Do', 'In Progress', 'Review', 'Done'];
+  priorityOptions = ['Low', 'Medium', 'High'];
 
   ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id') || '';
     if (this.id) {
       this.loadTask();
     }
+  }
+
+  ngAfterViewInit() {
+    flatpickr('#dueDate', {
+      dateFormat: 'm/d/Y',
+      allowInput: true,
+      locale: 'en',
+    });
   }
 
   async loadTask() {
@@ -44,6 +58,8 @@ export class EditPage implements OnInit {
       this.estimatedHours = task.estimatedHours || 0.5;
       this.status = task.status;
       this.tags = task.tags || [];
+      this.dueDate = task.dueDate;
+      this.priority = task.priority || 'Low';
     } else {
       await this.router.navigate(['/tasks']);
     }
@@ -83,10 +99,14 @@ export class EditPage implements OnInit {
       this.estimatedHours,
       this.tags,
       this.status,
+      this.priority,
+      this.dueDate,
     );
 
     if (!this.taskService.error()) {
       await this.router.navigate(['/tasks']);
     }
   }
+
+  protected readonly Date = Date;
 }
