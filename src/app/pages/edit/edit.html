@@ -1,12 +1,6 @@
 <div class="form-container">
   <h2>Edit Task</h2>
 
-  @if (taskService.error()) {
-    <div class="error-message">
-      {{ taskService.error() }}
-    </div>
-  }
-
   <form (ngSubmit)="onSubmit()" #taskForm="ngForm">
     <div class="form-group">
       <label for="title">

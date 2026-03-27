@@ -267,7 +267,7 @@
                 <div class="task-actions">
                   <button (click)="openTaskModal(task)" class="btn-view">View</button>
                   <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
-                  <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
+                  <button (click)="confirmDelete(task.id, task.title)" class="btn-delete">Delete</button>
                 </div>
               </div>
             </div>
@@ -327,7 +327,7 @@
                 <div class="task-actions">
                   <button (click)="openTaskModal(task)" class="btn-view">View</button>
                   <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
-                  <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
+                  <button (click)="confirmDelete(task.id, task.title)" class="btn-delete">Delete</button>
                 </div>
               </div>
             </div>
@@ -380,7 +380,7 @@
                 <div class="task-actions">
                   <button (click)="openTaskModal(task)" class="btn-view">View</button>
                   <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
-                  <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
+                  <button (click)="confirmDelete(task.id, task.title)" class="btn-delete">Delete</button>
                 </div>
               </div>
             </div>
@@ -428,7 +428,7 @@
                 <div class="task-actions">
                   <button (click)="openTaskModal(task)" class="btn-view">View</button>
                   <button [routerLink]="['/tasks', task.id, 'edit']" class="btn-edit">Edit</button>
-                  <button (click)="taskService.delete(task.id)" class="btn-delete" [disabled]="taskService.loading()">Delete</button>
+                  <button (click)="confirmDelete(task.id, task.title)" class="btn-delete">Delete</button>
                 </div>
               </div>
             </div>

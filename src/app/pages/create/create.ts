@@ -1,9 +1,9 @@
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TaskService } from '../../services/task';
-
+import Swal from 'sweetalert2';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 
@@ -71,8 +71,38 @@ export class FormPage implements AfterViewInit{
       this.dueDate,
     );
 
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (!this.taskService.error()) {
-      await this.router.navigate(['/tasks']);
+
+      await Swal.fire({
+        title: '✨ Task Created!',
+        html: 'Your task "<strong>' + this.title + '</strong>" has been successfully created.',
+        icon: 'success',
+        confirmButtonColor: '#818cf8',
+        background: '#1e293b',
+        color: '#f1f5f9',
+        timer: 3000,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        this.router.navigate(['/tasks']);
+      }, 1000);
+    }
+    else{
+      await Swal.fire({
+        title: '❌ Error!',
+        html:
+          'Failed to create task "<strong>' +
+          this.taskService.error() +
+          '</strong>".<br>Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        background: '#1e293b',
+        color: '#f1f5f9',
+        confirmButtonText: 'OK',
+      });
     }
   }
 }

@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../services/task';
 import { Task } from '../../models/task';
 import { TaskModalComponent } from '../detail/task-modal';
-
+import Swal from 'sweetalert2';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 
@@ -207,5 +207,34 @@ export class ListPage implements OnInit, AfterViewInit {
   editTask(taskId: string) {
     this.closeModal();
     this.router.navigate(['/tasks', taskId, 'edit']);
+  }
+
+  async confirmDelete(id: string, title: string) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      html: `Delete "<strong>${title}</strong>"? This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#334155',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      background: '#1e293b',
+      color: '#f1f5f9',
+    });
+
+    if (result.isConfirmed) {
+      await this.taskService.delete(id);
+      await Swal.fire({
+        title: 'Deleted!',
+        text: 'Task has been deleted.',
+        icon: 'success',
+        confirmButtonColor: '#818cf8',
+        background: '#1e293b',
+        color: '#f1f5f9',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
   }
 }

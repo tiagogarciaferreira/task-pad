@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -6,6 +6,7 @@ import { TaskService } from '../../services/task';
 
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-edit',
@@ -103,10 +104,38 @@ export class EditPage implements OnInit, AfterViewInit {
       this.dueDate,
     );
 
-    if (!this.taskService.error()) {
-      await this.router.navigate(['/tasks']);
-    }
-  }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  protected readonly Date = Date;
+    if (!this.taskService.error()) {
+      await Swal.fire({
+        title: '✨ Task Edited!',
+        html: 'Your task "<strong>' + this.title + '</strong>" has been successfully edited.',
+        icon: 'success',
+        confirmButtonColor: '#818cf8',
+        background: '#1e293b',
+        color: '#f1f5f9',
+        timer: 3000,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        this.router.navigate(['/tasks']);
+      }, 1000);
+    }
+    else {
+      await Swal.fire({
+        title: '❌ Error!',
+        html:
+          'Failed to edited task "<strong>' +
+          this.taskService.error() +
+          '</strong>".<br>Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        background: '#1e293b',
+        color: '#f1f5f9',
+        confirmButtonText: 'OK',
+      });
+    }
+
+  }
 }
