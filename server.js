@@ -1,8 +1,10 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenvFlow = require('dotenv-flow');
 const { randomUUID } = require('crypto');
+const { setupProbes } = require('./src/probes');
 
 dotenvFlow.config({
   node_env: process.env.NODE_ENV || 'development',
@@ -28,9 +30,7 @@ console.log(`🚀 Environment: ${process.env.NODE_ENV}`);
 console.log(`📡 Port: ${PORT}`);
 console.log(`🗄️ Database: ${process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'not set'}`);
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'API working' });
-});
+const probes = setupProbes(app, prisma);
 
 app.post('/api/tasks', async (req, res) => {
   try {
@@ -248,6 +248,28 @@ async function getUserIdFromToken(req) {
   return '29b533c6-9446-4e33-88a3-9a5bad425954';
 }
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  app.get('*splat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
+
+app.listen(PORT, async () => {
+  const dbOk = await probes.checkDb();
+  const frontendOk = probes.checkFrontend();
+
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+  console.log(`🗄️ Database: ${dbOk ? 'connected' : 'disconnected'}`);
+  console.log(`🎨 Frontend: ${frontendOk ? 'built' : 'not found (dev mode)'}`);
+  console.log(`📡 Live: http://localhost:${PORT}/live`);
+  console.log(`📡 Ready: http://localhost:${PORT}/ready`);
+  console.log(`📡 Health: http://localhost:${PORT}/health`);
+
+  setTimeout(() => {
+    probes.setReady();
+    console.log('✅ Application is ready to accept traffic');
+  }, 3000);
 });

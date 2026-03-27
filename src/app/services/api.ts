@@ -6,10 +6,6 @@ export class ApiService {
 
   private http = inject(HttpClient);
 
-  healthCheck() {
-    return this.http.get('/api/health');
-  }
-
   get<T>(url: string) {
     return this.http.get<T>(url);
   }
