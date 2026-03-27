@@ -26,8 +26,7 @@ const PORT = process.env.SERVER_PORT || 4000;
 
 console.log(`🚀 Environment: ${process.env.NODE_ENV}`);
 console.log(`📡 Port: ${PORT}`);
-console.log('DATABASE_URL:', process.env.DATABASE_URL);
-console.log(`🗄️  Database: ${process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'not set'}`);
+console.log(`🗄️ Database: ${process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'not set'}`);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'API working' });
