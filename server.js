@@ -1,10 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const dotenv = require('dotenv');
+const dotenvFlow = require('dotenv-flow');
 const { randomUUID } = require('crypto');
 
-dotenv.config();
+dotenvFlow.config({
+  node_env: process.env.NODE_ENV || 'development',
+  default_node_env: 'development',
+});
+
 const app = express();
 
 const { prisma } = require('./src/config/database');
@@ -17,6 +21,13 @@ const {
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+const PORT = process.env.SERVER_PORT || 4000;
+
+console.log(`🚀 Environment: ${process.env.NODE_ENV}`);
+console.log(`📡 Port: ${PORT}`);
+console.log('DATABASE_URL:', process.env.DATABASE_URL);
+console.log(`🗄️  Database: ${process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'not set'}`);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'API working' });
@@ -238,7 +249,6 @@ async function getUserIdFromToken(req) {
   return '29b533c6-9446-4e33-88a3-9a5bad425954';
 }
 
-const PORT = process.env.SERVER_PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
