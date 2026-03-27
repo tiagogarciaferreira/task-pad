@@ -44,4 +44,5 @@ __screenshots__/
 Thumbs.db
 
 # Project
-.env
+.env.development
+.env.production
