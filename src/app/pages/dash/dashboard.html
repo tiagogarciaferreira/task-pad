@@ -1,4 +1,4 @@
-<div class="dashboard-container">
+<div class="dashboard-container" xmlns="http://www.w3.org/1999/html">
   <div class="header">
     <h2>Dashboard</h2>
     <div class="header-buttons">
@@ -94,9 +94,9 @@
             <div class="recent-item">
               <div class="recent-info">
                 <h4>{{ task.title }}</h4>
-                <span class="status-badge" [class]="getStatusClass(task.status)">
-                  {{ task.status }}
-              </span>
+                <span class="priority-badge" [class]="task.priority.toLowerCase()">
+                  {{ task.priority }}
+                </span>
               </div>
               <div class="recent-meta">
                 <span class="hours">⏱️ {{ task.estimatedHours || 0 }}h</span>
@@ -127,6 +127,9 @@
                 <span class="status-badge" [class]="getStatusClass(task.status)">
                   {{ task.status }}
               </span>
+                <span class="priority-badge" [class]="task.priority.toLowerCase()">
+                  {{ task.priority }}
+                </span>
               </div>
               <div class="recent-meta">
                 <span class="hours">⏱️ {{ task.estimatedHours || 0 }}h</span>
@@ -137,6 +140,110 @@
           }
         </div>
       }
+    </div>
+
+    <br>
+    <div class="metrics-section">
+      <h3>Priority Overview</h3><br>
+      <div class="priority-grid">
+        <div class="priority-card high">
+          <div class="priority-icon">🔴</div>
+          <div class="priority-info">
+            <h3>{{ priorityMetrics().high }}</h3>
+            <p>High Priority</p>
+            @if (priorityMetrics().highOverdue > 0) {
+              <span class="overdue-badge">{{ priorityMetrics().highOverdue }} overdue</span>
+            }
+          </div>
+        </div>
+        <div class="priority-card medium">
+          <div class="priority-icon">🟡</div>
+          <div class="priority-info">
+            <h3>{{ priorityMetrics().medium }}</h3>
+            <p>Medium Priority</p>
+          </div>
+        </div>
+        <div class="priority-card low">
+          <div class="priority-icon">🟢</div>
+          <div class="priority-info">
+            <h3>{{ priorityMetrics().low }}</h3>
+            <p>Low Priority</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="metrics-section">
+      <h3>Due Date Status</h3> <br>
+      <div class="due-date-grid">
+        <div class="due-card overdue">
+          <div class="due-icon">⚠️</div>
+          <div class="due-info">
+            <h3>{{ overdueMetrics().overdue }}</h3>
+            <p>Overdue Tasks</p>
+          </div>
+        </div>
+        <div class="due-card today">
+          <div class="due-icon">📅</div>
+          <div class="due-info">
+            <h3>{{ overdueMetrics().dueToday }}</h3>
+            <p>Due Today</p>
+          </div>
+        </div>
+        <div class="due-card week">
+          <div class="due-icon">🗓️</div>
+          <div class="due-info">
+            <h3>{{ overdueMetrics().dueThisWeek }}</h3>
+            <p>Due This Week</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    @if (overdueHighPriorityTasks().length > 0) {
+      <div class="alert-section">
+        <div class="alert-header">
+          <h3>⚠️ Urgent: Overdue High Priority Tasks</h3>
+        </div>
+        <div class="urgent-list">
+          @for (task of overdueHighPriorityTasks(); track task.id) {
+            <div class="urgent-task">
+              <div class="urgent-info">
+                <strong>{{ task.title }}</strong>
+                <span class="due-date-badge">Due: {{ task.dueDate | date:'MM/dd/yyyy' }}</span>
+              </div>
+              <button (click)="openTaskModal(task)" class="btn-view">View</button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="priority-progress">
+      <h3>Tasks by Priority</h3>
+      <div class="priority-bars">
+        <div class="priority-bar-item">
+          <span>High</span>
+          <div class="bar-container">
+            <div class="bar high" [style.width.%]="(priorityMetrics().high / totalTasks()) * 100"></div>
+          </div>
+          <span>{{ priorityMetrics().high }}</span>
+        </div>
+        <div class="priority-bar-item">
+          <span>Medium</span>
+          <div class="bar-container">
+            <div class="bar medium" [style.width.%]="(priorityMetrics().medium / totalTasks()) * 100"></div>
+          </div>
+          <span>{{ priorityMetrics().medium }}</span>
+        </div>
+        <div class="priority-bar-item">
+          <span>Low</span>
+          <div class="bar-container">
+            <div class="bar low" [style.width.%]="(priorityMetrics().low / totalTasks()) * 100"></div>
+          </div>
+          <span>{{ priorityMetrics().low }}</span>
+        </div>
+      </div>
     </div>
 
     @if (showModal() && selectedTask()) {

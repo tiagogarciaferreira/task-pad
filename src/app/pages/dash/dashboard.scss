@@ -322,3 +322,165 @@ $dark-warning: #fbbf24;
     justify-content: space-between;
   }
 }
+
+// Priority Cards
+.priority-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.priority-card {
+  background: $dark-bg-card;
+  padding: 1.25rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  &.high { border-left: 4px solid #ef4444; }
+  &.medium { border-left: 4px solid #f59e0b; }
+  &.low { border-left: 4px solid #10b981; }
+
+  .priority-icon { font-size: 2rem; }
+
+  .priority-info {
+    h3 { font-size: 1.5rem; margin: 0; }
+    p { margin: 0; color: $dark-text-muted; font-size: 0.75rem; }
+    .overdue-badge {
+      font-size: 0.7rem;
+      color: #ef4444;
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+// Due Date Cards
+.due-date-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.due-card {
+  background: $dark-bg-card;
+  padding: 1.25rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  &.overdue { border-left: 4px solid #ef4444; }
+  &.today { border-left: 4px solid #f59e0b; }
+  &.week { border-left: 4px solid #10b981; }
+
+  .due-icon { font-size: 2rem; }
+
+  .due-info {
+    h3 { font-size: 1.5rem; margin: 0; }
+    p { margin: 0; color: $dark-text-muted; font-size: 0.75rem; }
+  }
+}
+
+// Urgent Alert Section
+.alert-section {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 4px solid #ef4444;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+
+  .alert-header h3 {
+    margin: 0 0 1rem 0;
+    color: #ef4444;
+  }
+}
+
+.urgent-task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+
+  .urgent-info strong {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .due-date-badge {
+    font-size: 0.7rem;
+    color: #ef4444;
+  }
+}
+
+// Priority Progress Bars
+.priority-progress {
+  background: $dark-bg-card;
+  padding: 1.5rem;
+  border-radius: 12px;
+
+  h3 {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+}
+
+.priority-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+
+  span:first-child { width: 50px; }
+  span:last-child { width: 40px; text-align: right; }
+
+  .bar-container {
+    flex: 1;
+    height: 24px;
+    background: $dark-border;
+    border-radius: 12px;
+    overflow: hidden;
+
+    .bar {
+      height: 100%;
+      border-radius: 12px;
+      transition: width 0.3s ease;
+
+      &.high { background: #ef4444; }
+      &.medium { background: #f59e0b; }
+      &.low { background: #10b981; }
+    }
+  }
+}
+
+.priority-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.low {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid #10b981;
+  }
+
+  &.medium {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
+  }
+
+  &.high {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+  }
+}
