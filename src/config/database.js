@@ -27,6 +27,6 @@ async function importTasks() {
   }
 }
 
-importTasks();
+//importTasks();
 
 module.exports = { prisma };

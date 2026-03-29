@@ -1,0 +1,71 @@
+# Dependências
+node_modules/
+npm-debug.log*
+
+# Ambiente
+.env
+.env.*
+!.env.example
+.env.production
+.env.development
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testes
+coverage/
+.nyc_output/
+test/
+*.test.js
+*.spec.js
+**/*.spec.ts
+
+# Build temporário
+dist/
+build/
+.tmp/
+
+# Docker
+Dockerfile
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Documentação
+README.md
+docs/
+
+# Angular específico
+.angular/
+src/  # Não! Precisamos do src para build
+# OBS: src NÃO pode ser ignorado!
+
+# Arquivos de configuração (não necessários no container)
+.editorconfig
+.prettierrc
+proxy.conf.js
+tasks.json
+docker-compose.yaml
+
+# Prisma (já copiamos seletivamente)
+# prisma/ é copiado, mas migrations não são necessárias
+prisma/migrations/

@@ -250,10 +250,6 @@ async function getUserIdFromToken(req) {
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'public')));
-
-  app.get('*splat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  });
 }
 
 app.listen(PORT, async () => {

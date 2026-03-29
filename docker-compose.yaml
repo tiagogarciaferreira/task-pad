@@ -1,5 +1,34 @@
 services:
 
+  app:
+    #build:
+    #  context: .
+    #  dockerfile: Dockerfile
+    #  target: runtime
+    image: tiagogferreirainfnet/task-pad:latest
+    depends_on:
+      - postgres
+    container_name: task-pad-app
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - SERVER_PORT=4000
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/task-pad-db
+    env_file:
+      - .env.production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - task-network
+    command: sh -c "npx prisma db push && node server.js"
+
+
   postgres:
     image: postgres:17.1
     container_name: postgres
@@ -11,3 +40,11 @@ services:
       POSTGRES_DB: task-pad-db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    networks:
+      - task-network
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+
+networks:
+  task-network:
+    driver: bridge
