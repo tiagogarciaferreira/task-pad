@@ -17,7 +17,6 @@ import 'flatpickr/dist/flatpickr.css';
   styleUrls: ['./list.scss'],
 })
 export class ListPage implements OnInit, AfterViewInit {
-
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
@@ -121,13 +120,13 @@ export class ListPage implements OnInit, AfterViewInit {
     this.applyFilters();
   }
 
-  setDueDateMin(value: string) {
-    this.dueDateMin.set(new Date(value));
+  setDueDateMin($event: any) {
+    this.dueDateMin.set(new Date($event));
     this.applyFilters();
   }
 
-  setDueDateMax(value: string) {
-    this.dueDateMax.set(new Date(value));
+  setDueDateMax($event: any) {
+    this.dueDateMax.set(new Date($event));
     this.applyFilters();
   }
 

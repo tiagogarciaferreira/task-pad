@@ -65,7 +65,3 @@ src/  # Não! Precisamos do src para build
 proxy.conf.js
 tasks.json
 docker-compose.yaml
-
-# Prisma (já copiamos seletivamente)
-# prisma/ é copiado, mas migrations não são necessárias
-prisma/migrations/

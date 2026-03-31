@@ -14,8 +14,7 @@ import 'flatpickr/dist/flatpickr.css';
   templateUrl: './create.html',
   styleUrls: ['./create.scss'],
 })
-export class FormPage implements AfterViewInit{
-
+export class FormPage implements AfterViewInit {
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
@@ -74,7 +73,6 @@ export class FormPage implements AfterViewInit{
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (!this.taskService.error()) {
-
       await Swal.fire({
         title: '✨ Task Created!',
         html: 'Your task "<strong>' + this.title + '</strong>" has been successfully created.',
@@ -89,8 +87,7 @@ export class FormPage implements AfterViewInit{
       setTimeout(() => {
         this.router.navigate(['/tasks']);
       }, 1000);
-    }
-    else{
+    } else {
       await Swal.fire({
         title: '❌ Error!',
         html:
@@ -104,5 +101,9 @@ export class FormPage implements AfterViewInit{
         confirmButtonText: 'OK',
       });
     }
+  }
+
+  protected setDueDate($event: any) {
+    this.dueDate = new Date($event);
   }
 }

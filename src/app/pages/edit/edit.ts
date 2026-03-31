@@ -15,7 +15,6 @@ import 'flatpickr/dist/flatpickr.css';
   styleUrls: ['./edit.scss'],
 })
 export class EditPage implements OnInit, AfterViewInit {
-
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
@@ -59,6 +58,7 @@ export class EditPage implements OnInit, AfterViewInit {
       this.status = task.status;
       this.tags = task.tags || [];
       this.dueDate = task.dueDate;
+      console.log(this.dueDate);
       this.priority = task.priority || 'Low';
     } else {
       await this.router.navigate(['/tasks']);
@@ -120,8 +120,7 @@ export class EditPage implements OnInit, AfterViewInit {
       setTimeout(() => {
         this.router.navigate(['/tasks']);
       }, 1000);
-    }
-    else {
+    } else {
       await Swal.fire({
         title: '❌ Error!',
         html:
@@ -135,6 +134,9 @@ export class EditPage implements OnInit, AfterViewInit {
         confirmButtonText: 'OK',
       });
     }
+  }
 
+  protected setDueDate($event: any) {
+    this.dueDate = new Date($event);
   }
 }

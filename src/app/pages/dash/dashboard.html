@@ -86,7 +86,7 @@
       @if (inProgressTasks().length === 0) {
         <div class="empty-recent">
           <p>No tasks yet.</p>
-          <button routerLink="/tasks/new">Create your first task</button>
+          <button routerLink="/tasks/new">Create task</button>
         </div>
       } @else {
         <div class="recent-list">
@@ -100,7 +100,7 @@
               </div>
               <div class="recent-meta">
                 <span class="hours">⏱️ {{ task.estimatedHours || 0 }}h</span>
-                <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy':'UTC' }}</span>
                 <button (click)="openTaskModal(task)" class="btn-view">View</button>
               </div>
             </div>
@@ -116,7 +116,7 @@
       @if (recentTasks().length === 0) {
         <div class="empty-recent">
           <p>No tasks yet.</p>
-          <button routerLink="/tasks/new">Create your first task</button>
+          <button routerLink="/tasks/new">Create task</button>
         </div>
       } @else {
         <div class="recent-list">
@@ -133,7 +133,7 @@
               </div>
               <div class="recent-meta">
                 <span class="hours">⏱️ {{ task.estimatedHours || 0 }}h</span>
-                <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy' }}</span>
+                <span class="date">📅 {{ task.createdAt | date:'dd/MM/yyyy':'UTC' }}</span>
                 <button (click)="openTaskModal(task)" class="btn-view">View</button>
               </div>
             </div>
@@ -210,7 +210,7 @@
             <div class="urgent-task">
               <div class="urgent-info">
                 <strong>{{ task.title }}</strong>
-                <span class="due-date-badge">Due: {{ task.dueDate | date:'MM/dd/yyyy' }}</span>
+                <span class="due-date-badge">Due: {{ task.dueDate | date:'MM/dd/yyyy':'UTC' }}</span>
               </div>
               <button (click)="openTaskModal(task)" class="btn-view">View</button>
             </div>

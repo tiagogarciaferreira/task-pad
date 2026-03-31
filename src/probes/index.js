@@ -10,16 +10,16 @@ function checkAngularAssets() {
   return angularBuilt;
 }
 
-async function checkDatabaseConnection(prisma) {
+async function checkDatabaseConnection(database) {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await database.execute('select 1');
     return true;
   } catch {
     return false;
   }
 }
 
-function setupProbes(app, prisma) {
+function setupProbes(app, database) {
   app.get('/live', (req, res) => {
     res.status(200).json({
       status: 'alive',
@@ -29,7 +29,7 @@ function setupProbes(app, prisma) {
   });
 
   app.get('/ready', async (req, res) => {
-    const dbOk = await checkDatabaseConnection(prisma);
+    const dbOk = await checkDatabaseConnection(database);
     const angularOk = checkAngularAssets();
 
     const allReady = dbOk && angularOk && isReady;
@@ -53,7 +53,7 @@ function setupProbes(app, prisma) {
   });
 
   app.get('/health', async (req, res) => {
-    const dbOk = await checkDatabaseConnection(prisma);
+    const dbOk = await checkDatabaseConnection(database);
     const angularOk = checkAngularAssets();
 
     res.status(200).json({
@@ -71,7 +71,7 @@ function setupProbes(app, prisma) {
     setReady: () => {
       isReady = true;
     },
-    checkDb: () => checkDatabaseConnection(prisma),
+    checkDb: () => checkDatabaseConnection(database),
     checkFrontend: checkAngularAssets,
   };
 }

@@ -97,7 +97,8 @@
       <input
         type="date"
         id="dueDate"
-        [ngModel]="dueDate | date:'MM/dd/yyyy'"
+        [ngModel]="dueDate | date:'MM/dd/yyyy':'UTC'"
+        (ngModelChange)="setDueDate($event)"
         name="dueDate"
         required
         #dueDateInput="ngModel"

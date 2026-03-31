@@ -137,7 +137,7 @@
         <input
           type="date"
           id="dueDateMin"
-          [ngModel]="dueDateMin()"
+          [ngModel]="dueDateMin() | date:'MM/dd/yyyy':'UTC'"
           (ngModelChange)="setDueDateMin($event)"
           placeholder="Min due date"
           class="date-input"
@@ -149,7 +149,7 @@
         <input
           type="date"
           id="dueDateMax"
-          [ngModel]="dueDateMax()"
+          [ngModel]="dueDateMax() | date:'MM/dd/yyyy':'UTC'"
           (ngModelChange)="setDueDateMax($event)"
           placeholder="Max due date"
           class="date-input"
@@ -260,7 +260,7 @@
                   }
                   @if (task.dueDate) {
                     <span class="due-date" [class.overdue]="isOverdue(task.dueDate)">
-                      📅 {{ task.dueDate | date:'MM/dd/yyyy' }}
+                      📅 {{ task.dueDate | date:'MM/dd/yyyy':'UTC' }}
                     </span>
                   }
                 </div>
@@ -320,7 +320,7 @@
                   }
                   @if (task.dueDate) {
                     <span class="due-date" [class.overdue]="isOverdue(task.dueDate)">
-                      📅 {{ task.dueDate | date:'MM/dd/yyyy' }}
+                      📅 {{ task.dueDate | date:'MM/dd/yyyy':'UTC' }}
                     </span>
                   }
                 </div>
@@ -373,7 +373,7 @@
                   }
                   @if (task.dueDate) {
                     <span class="due-date" [class.overdue]="isOverdue(task.dueDate)">
-                      📅 {{ task.dueDate | date:'MM/dd/yyyy' }}
+                      📅 {{ task.dueDate | date:'MM/dd/yyyy':'UTC' }}
                     </span>
                   }
                 </div>
@@ -421,7 +421,7 @@
                   }
                   @if (task.dueDate) {
                     <span class="due-date" [class.overdue]="task.status !== 'Done' && isOverdue(task.dueDate)">
-                      📅 {{ task.dueDate | date:'MM/dd/yyyy' }}
+                      📅 {{ task.dueDate | date:'MM/dd/yyyy':'UTC' }}
                     </span>
                   }
                 </div>

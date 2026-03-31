@@ -1,10 +1,6 @@
 services:
 
   app:
-    #build:
-    #  context: .
-    #  dockerfile: Dockerfile
-    #  target: runtime
     image: tiagogferreirainfnet/task-pad:latest
     depends_on:
       - postgres
@@ -26,8 +22,6 @@ services:
       start_period: 10s
     networks:
       - task-network
-    command: sh -c "npx prisma db push && node server.js"
-
 
   postgres:
     image: postgres:17.1
