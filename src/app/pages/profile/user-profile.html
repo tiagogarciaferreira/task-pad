@@ -1,14 +1,28 @@
-<div class="user-profile" (click)="toggleMenu()">
-  <div class="user-avatar">
-      <img [src]="currentUser()?.photoURL" alt="Avatar">
+<div class="user-profile">
+  <div class="system-name">
+    TaskPad
   </div>
 
-  <div class="user-name">{{ currentUser()?.name }}</div>
+  <div class="user-info-wrapper" (click)="toggleMenu()">
+    <div class="user-avatar">
+      @if (currentUser()?.photo) {
+        <img [src]="currentUser()?.photo" alt="Avatar">
+      } @else {
+        <div class="avatar-placeholder">
+          {{ currentUser()?.initials }}
+        </div>
+      }
+    </div>
 
-  <div class="dropdown-icon">▼</div>
+    <div class="user-name">{{ currentUser()?.name }}</div>
+    <div class="dropdown-icon">▼</div>
+  </div>
 
   @if (showMenu()) {
     <div class="dropdown-menu">
+      <div class="user-info">
+        <div class="user-name">{{ currentUser()?.name }}</div>
+      </div>
       <div class="user-info">
         <div class="user-email">{{ currentUser()?.email }}</div>
       </div>

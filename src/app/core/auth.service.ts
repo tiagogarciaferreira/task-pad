@@ -10,22 +10,24 @@ import {
   setPersistence,
 } from '@angular/fire/auth';
 import { AuthUser } from './auth.user';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-
   private auth = inject(Auth);
-
-  user = signal<User | null>(null);
 
   loading = signal(false);
 
   error = signal<string | null>(null);
 
+  private userSubject = new BehaviorSubject<User | null>(null);
+
+  user$ = this.userSubject.asObservable();
+
   constructor() {
     authState(this.auth).subscribe((user) => {
-      console.log('👤 authState:', user?.email || 'logout');
-      this.user.set(user);
+      this.userSubject.next(user);
     });
   }
 
@@ -47,18 +49,6 @@ export class AuthService {
     } finally {
       this.loading.set(false);
     }
-  }
-
-  getCurrentUser(): AuthUser | null {
-    const user = this.user();
-    if (!user) return null;
-
-    return {
-      id: user.uid,
-      email: user.email,
-      name: user.displayName,
-      photoURL: user.photoURL,
-    };
   }
 
   async logout(): Promise<void> {

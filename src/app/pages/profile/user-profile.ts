@@ -1,8 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { AuthUser } from '../../core/auth.user';
+import { Subscription } from 'rxjs';
+import { User } from '@angular/fire/auth';
 
 @Component({
   selector: 'user-profile',
@@ -11,7 +13,7 @@ import { AuthUser } from '../../core/auth.user';
   templateUrl: './user-profile.html',
   styleUrls: ['./user-profile.scss'],
 })
-export class UserProfile implements OnInit {
+export class UserProfile implements OnInit, OnDestroy {
 
   private authService = inject(AuthService);
 
@@ -21,13 +23,37 @@ export class UserProfile implements OnInit {
 
   currentUser = signal<AuthUser | null>(null);
 
+  private userSubscription!: Subscription;
+
   ngOnInit() {
-    this.loadUserData();
+    this.userSubscription = this.authService.user$.subscribe((user) => {
+      this.loadUserData(user);
+    });
   }
 
-  loadUserData() {
-    const user = this.authService.getCurrentUser();
-    if (user) this.currentUser.set(user);
+  ngOnDestroy() {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
+  loadUserData(user: User | null) {
+    if (user) {
+      const initials = user.displayName?.trim()
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+
+      this.currentUser.set({
+        id: user.uid,
+        email: user.email,
+        name: user.displayName,
+        photo: user.photoURL,
+        initials: initials,
+      });
+    }
   }
 
   toggleMenu() {
@@ -41,7 +67,7 @@ export class UserProfile implements OnInit {
 
   closeMenuOnClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.user-profile')) {
+    if (!target.closest('.user-info-wrapper')) {
       this.showMenu.set(false);
       document.removeEventListener('click', this.closeMenuOnClickOutside.bind(this));
     }

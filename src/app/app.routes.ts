@@ -6,9 +6,11 @@ import { EditPage } from './pages/edit/edit';
 import { DashboardPage } from './pages/dash/dashboard';
 import { LoginPage } from './pages/login/login';
 import { loginGuard } from './core/login.guard';
+import { UserProfile } from './pages/profile/user-profile';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage, canActivate: [loginGuard] },
+  { path: 'profile', component: UserProfile, canActivate: [authGuard] },
   { path: '', redirectTo: '/tasks/dashboard', pathMatch: 'full' },
   { path: 'tasks/dashboard', component: DashboardPage, canActivate: [authGuard] },
   { path: 'tasks', component: ListPage, canActivate: [authGuard] },
