@@ -9,8 +9,6 @@ import { TitleService } from '../../core/title.service';
 import Swal from 'sweetalert2';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { filter, switchMap } from 'rxjs';
-import { Auth, authState } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-list',
@@ -26,8 +24,6 @@ export class ListPage implements OnInit, AfterViewInit {
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
-
-  protected auth = inject(Auth);
 
   searchTitle = signal('');
 
@@ -78,10 +74,7 @@ export class ListPage implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.titleService.setTitle('Tasks');
-    authState(this.auth).pipe(
-      filter((user) => !!user),
-      switchMap(() => this.applyFilters()),
-    );
+    this.applyFilters();
   }
 
   ngAfterViewInit() {
@@ -176,8 +169,8 @@ export class ListPage implements OnInit, AfterViewInit {
     this.applyFilters();
   }
 
- private async applyFilters() {
-    await this.taskService.search(
+  applyFilters() {
+     this.taskService.search(
       this.searchTitle() || undefined,
       this.selectedStatuses().length > 0 ? this.selectedStatuses() : undefined,
       this.estimatedHoursMin(),

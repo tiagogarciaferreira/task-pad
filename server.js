@@ -52,7 +52,7 @@ const probes = setupProbes(app, database);
 
 app.post('/api/tasks', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.uid
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const validation = TaskSchema.safeParse(req.body);
@@ -100,7 +100,7 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
 
 app.get('/api/tasks/search', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.uid
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const {
@@ -165,7 +165,7 @@ app.get('/api/tasks/search', authMiddleware, async (req, res) => {
 
 app.get('/api/tasks/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.uid
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { id } = req.params;
@@ -182,7 +182,7 @@ app.get('/api/tasks/:id', authMiddleware, async (req, res) => {
 
 app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.uid
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { id } = req.params;
@@ -243,7 +243,7 @@ app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
 
 app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.uid
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { id } = req.params;

@@ -5,8 +5,6 @@ import { TaskService } from '../../services/task';
 import { Task } from '../../models/task';
 import { TaskModalComponent } from '../detail/task-modal';
 import { TitleService } from '../../core/title.service';
-import { Auth, authState } from '@angular/fire/auth';
-import { filter, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,13 +14,12 @@ import { filter, switchMap } from 'rxjs';
   styleUrls: ['./dashboard.scss'],
 })
 export class DashboardPage implements OnInit {
+
   protected titleService = inject(TitleService);
 
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
-
-  protected auth = inject(Auth);
 
   selectedTask = signal<Task | null>(null);
 
@@ -30,10 +27,7 @@ export class DashboardPage implements OnInit {
 
   ngOnInit() {
     this.titleService.setTitle('Dashboard');
-    authState(this.auth).pipe(
-      filter((user) => !!user),
-      switchMap(() => this.taskService.search()),
-    );
+    this.taskService.search();
   }
 
   metrics = computed(() => {
