@@ -28,7 +28,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
             "styles": ["src/styles.scss", "node_modules/flatpickr/dist/flatpickr.css"],
             "allowedCommonJsDependencies": ["sweetalert2"]

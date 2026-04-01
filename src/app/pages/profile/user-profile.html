@@ -1,0 +1,21 @@
+<div class="user-profile" (click)="toggleMenu()">
+  <div class="user-avatar">
+      <img [src]="currentUser()?.photoURL" alt="Avatar">
+  </div>
+
+  <div class="user-name">{{ currentUser()?.name }}</div>
+
+  <div class="dropdown-icon">▼</div>
+
+  @if (showMenu()) {
+    <div class="dropdown-menu">
+      <div class="user-info">
+        <div class="user-email">{{ currentUser()?.email }}</div>
+      </div>
+      <div class="menu-divider"></div>
+      <button (click)="logout()" class="logout-btn">
+        🚪 Sign Out
+      </button>
+    </div>
+  }
+</div>

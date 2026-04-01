@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const dotenvFlow = require('dotenv-flow');
 const { randomUUID } = require('crypto');
 const { setupProbes } = require('./src/probes');
+const { authMiddleware } = require('./src/middlewares/auth.middleware');
 
 const {
   eq,
@@ -42,21 +43,21 @@ app.use(
     },
   }),
 );
+
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.SERVER_PORT || 4000;
 const probes = setupProbes(app, database);
 
-app.post('/api/tasks', async (req, res) => {
+app.post('/api/tasks', authMiddleware, async (req, res) => {
   try {
-    const userId = await getUserIdFromToken(req);
+    const userId = req.user.id;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const validation = TaskSchema.safeParse(req.body);
 
     if (!validation.success) {
-
       const errors = validation.error.issues.map((issue) => ({
         message: issue.message,
         field: issue.path.join('.'),
@@ -65,16 +66,19 @@ app.post('/api/tasks', async (req, res) => {
       return res.status(400).json({ errors: errors });
     }
 
-    const { title, description, estimatedHours, tags, status, priority, dueDate} = validation.data;
+    const { title, description, estimatedHours, tags, status, priority, dueDate } = validation.data;
 
-    const [existingTask] = await database.select()
+    const [existingTask] = await database
+      .select()
       .from(tb_tasks)
       .where(and(eq(tb_tasks.title, title.trim()), eq(tb_tasks.userId, userId)))
       .limit(1);
 
-    if (existingTask) return res.status(409).json({ error: 'Task with this title already exists.' });
+    if (existingTask)
+      return res.status(409).json({ error: 'Task with this title already exists.' });
 
-    const [task] = await database.insert(tb_tasks)
+    const [task] = await database
+      .insert(tb_tasks)
       .values({
         id: randomUUID(),
         title: title.trim(),
@@ -94,9 +98,9 @@ app.post('/api/tasks', async (req, res) => {
   }
 });
 
-app.get('/api/tasks/search', async (req, res) => {
+app.get('/api/tasks/search', authMiddleware, async (req, res) => {
   try {
-    const userId = await getUserIdFromToken(req);
+    const userId = req.user.id;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const {
@@ -138,13 +142,17 @@ app.get('/api/tasks/search', async (req, res) => {
     if (title) conditions.push(ilike(tb_tasks.title, `%${title}%`));
     if (statusArray.length > 0) conditions.push(inArray(tb_tasks.status, statusArray));
     if (priorityArray.length > 0) conditions.push(inArray(tb_tasks.priority, priorityArray));
-    if (tagsArray.length > 0) conditions.push(sql`${tb_tasks.tags} && ${tagsArray.map((t) => t.trim().toUpperCase())}`);
-    if (estimatedHoursMin !== undefined) conditions.push(gte(tb_tasks.estimatedHours, Number(estimatedHoursMin)));
-    if (estimatedHoursMax !== undefined) conditions.push(lte(tb_tasks.estimatedHours, Number(estimatedHoursMax)));
+    if (tagsArray.length > 0)
+      conditions.push(sql`${tb_tasks.tags} && ${tagsArray.map((t) => t.trim().toUpperCase())}`);
+    if (estimatedHoursMin !== undefined)
+      conditions.push(gte(tb_tasks.estimatedHours, Number(estimatedHoursMin)));
+    if (estimatedHoursMax !== undefined)
+      conditions.push(lte(tb_tasks.estimatedHours, Number(estimatedHoursMax)));
     if (dueDateMin !== undefined) conditions.push(gte(tb_tasks.dueDate, new Date(dueDateMin)));
     if (dueDateMax !== undefined) conditions.push(lte(tb_tasks.dueDate, new Date(dueDateMax)));
 
-    const tasks = await database.select()
+    const tasks = await database
+      .select()
       .from(tb_tasks)
       .where(and(...conditions))
       .orderBy(desc(tb_tasks.createdAt));
@@ -155,9 +163,9 @@ app.get('/api/tasks/search', async (req, res) => {
   }
 });
 
-app.get('/api/tasks/:id', async (req, res) => {
+app.get('/api/tasks/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = await getUserIdFromToken(req);
+    const userId = req.user.id;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { id } = req.params;
@@ -172,13 +180,14 @@ app.get('/api/tasks/:id', async (req, res) => {
   }
 });
 
-app.put('/api/tasks/:id', async (req, res) => {
+app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = await getUserIdFromToken(req);
+    const userId = req.user.id;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { id } = req.params;
-    const [existingTask] = await database.select()
+    const [existingTask] = await database
+      .select()
       .from(tb_tasks)
       .where(eq(tb_tasks.id, id))
       .limit(1);
@@ -200,15 +209,20 @@ app.put('/api/tasks/:id', async (req, res) => {
     const { title, description, estimatedHours, tags, status, priority, dueDate } = validation.data;
 
     if (title.trim() !== existingTask.title) {
-        const [duplicateTask] = await database.select()
-          .from(tb_tasks)
-          .where(and(eq(tb_tasks.title, title.trim()), eq(tb_tasks.userId, userId), ne(tb_tasks.id, id)),)
-          .limit(1);
+      const [duplicateTask] = await database
+        .select()
+        .from(tb_tasks)
+        .where(
+          and(eq(tb_tasks.title, title.trim()), eq(tb_tasks.userId, userId), ne(tb_tasks.id, id)),
+        )
+        .limit(1);
 
-      if (duplicateTask) return res.status(409).json({ error: 'Task with this title already exists.' });
+      if (duplicateTask)
+        return res.status(409).json({ error: 'Task with this title already exists.' });
     }
 
-    const [task] = await database.update(tb_tasks)
+    const [task] = await database
+      .update(tb_tasks)
       .set({
         title: title.trim(),
         description: description.trim(),
@@ -216,7 +230,7 @@ app.put('/api/tasks/:id', async (req, res) => {
         tags: tags.map((tag) => tag.trim().toUpperCase()),
         status: status,
         priority: priority,
-        dueDate: new Date(dueDate)
+        dueDate: new Date(dueDate),
       })
       .where(eq(tb_tasks.id, id))
       .returning();
@@ -227,13 +241,14 @@ app.put('/api/tasks/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/tasks/:id', async (req, res) => {
+app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = await getUserIdFromToken(req);
+    const userId = req.user.id;
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { id } = req.params;
-    const [existingTask] = await database.select()
+    const [existingTask] = await database
+      .select()
       .from(tb_tasks)
       .where(eq(tb_tasks.id, id))
       .limit(1);
@@ -248,12 +263,6 @@ app.delete('/api/tasks/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete task' });
   }
 });
-
-async function getUserIdFromToken(req) {
-  const authHeader = req.headers.authorization;
-  console.log(authHeader);
-  return '29b533c6-9446-4e33-88a3-9a5bad425954';
-}
 
 if (process.env.NODE_ENV === 'production') {
 

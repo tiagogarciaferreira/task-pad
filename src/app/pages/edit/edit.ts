@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { TaskService } from '../../services/task';
+import { TitleService } from '../../core/title.service';
 import Swal from 'sweetalert2';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
@@ -15,6 +16,9 @@ import 'flatpickr/dist/flatpickr.css';
   styleUrls: ['./edit.scss'],
 })
 export class EditPage implements OnInit, AfterViewInit {
+
+  protected titleService = inject(TitleService);
+
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
@@ -35,6 +39,7 @@ export class EditPage implements OnInit, AfterViewInit {
   priorityOptions = ['Low', 'Medium', 'High'];
 
   ngOnInit() {
+    this.titleService.setTitle('Edit Task');
     this.id = this.route.snapshot.paramMap.get('id') || '';
     if (this.id) {
       this.loadTask();

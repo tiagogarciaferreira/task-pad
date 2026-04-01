@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TaskService } from '../../services/task';
+import { TitleService } from '../../core/title.service';
 import Swal from 'sweetalert2';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
@@ -14,7 +15,10 @@ import 'flatpickr/dist/flatpickr.css';
   templateUrl: './create.html',
   styleUrls: ['./create.scss'],
 })
-export class FormPage implements AfterViewInit {
+export class FormPage implements OnInit, AfterViewInit {
+
+  protected titleService = inject(TitleService);
+
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
@@ -27,9 +31,12 @@ export class FormPage implements AfterViewInit {
   dueDate = new Date();
   tags: string[] = [];
   tagInput = '';
-
   statusOptions = ['To Do', 'In Progress'];
   priorityOptions = ['Low', 'Medium', 'High'];
+
+  ngOnInit() {
+    this.titleService.setTitle('Create Task');
+  }
 
   ngAfterViewInit() {
     flatpickr('#dueDate', {

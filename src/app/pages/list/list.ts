@@ -5,9 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../services/task';
 import { Task } from '../../models/task';
 import { TaskModalComponent } from '../detail/task-modal';
+import { TitleService } from '../../core/title.service';
 import Swal from 'sweetalert2';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
+import { filter, switchMap } from 'rxjs';
+import { Auth, authState } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-list',
@@ -17,9 +20,14 @@ import 'flatpickr/dist/flatpickr.css';
   styleUrls: ['./list.scss'],
 })
 export class ListPage implements OnInit, AfterViewInit {
+
+  private titleService = inject(TitleService);
+
   protected taskService = inject(TaskService);
 
   private router = inject(Router);
+
+  protected auth = inject(Auth);
 
   searchTitle = signal('');
 
@@ -69,7 +77,11 @@ export class ListPage implements OnInit, AfterViewInit {
   });
 
   ngOnInit() {
-    this.applyFilters();
+    this.titleService.setTitle('Tasks');
+    authState(this.auth).pipe(
+      filter((user) => !!user),
+      switchMap(() => this.applyFilters()),
+    );
   }
 
   ngAfterViewInit() {
@@ -164,8 +176,8 @@ export class ListPage implements OnInit, AfterViewInit {
     this.applyFilters();
   }
 
-  private applyFilters() {
-    this.taskService.search(
+ private async applyFilters() {
+    await this.taskService.search(
       this.searchTitle() || undefined,
       this.selectedStatuses().length > 0 ? this.selectedStatuses() : undefined,
       this.estimatedHoursMin(),
