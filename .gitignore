@@ -51,5 +51,6 @@ Thumbs.db
 .env.development
 .env.staging
 !.env.example
-firebase-key.json
+firebase-key-prod.json
+firebase-key-dev.json
 /src/environments
