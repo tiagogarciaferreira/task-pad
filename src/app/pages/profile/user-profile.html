@@ -1,12 +1,12 @@
 <div class="user-profile">
   <div class="system-name">
-    TaskPad
+    <a routerLink="/">TaskPad</a>
   </div>
 
   <div class="user-info-wrapper" (click)="toggleMenu()">
     <div class="user-avatar">
       @if (currentUser()?.photo) {
-        <img [src]="currentUser()?.photo" alt="Avatar">
+        <img [ngSrc]="userPhoto()" height="32" width="32" alt="Avatar" (error)="onImageError()">
       } @else {
         <div class="avatar-placeholder">
           {{ currentUser()?.initials }}

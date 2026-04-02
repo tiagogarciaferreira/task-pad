@@ -31,7 +31,7 @@
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
-    "@angular/fire": "^19.0.0",
+    "@angular/fire": "^21.0.0-rc.0",
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
@@ -65,5 +65,19 @@
     "ts-node": "^10.9.2",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
-  }
+  },
+  "description": "This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.3.",
+  "main": "drizzle.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiagogarciaferreira/task-pad.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tiagogarciaferreira/task-pad/issues"
+  },
+  "homepage": "https://github.com/tiagogarciaferreira/task-pad#readme"
 }

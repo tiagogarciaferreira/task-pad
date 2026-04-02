@@ -6,7 +6,7 @@ dotenvFlow.config({
 });
 
 module.exports = {
-  schema: './src/database/schema.js',
+  schema: './src/config/database/schema.js',
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {

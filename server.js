@@ -18,14 +18,14 @@ const {
   ne,
   sql } = require('drizzle-orm');
 
-const { tb_tasks } = require('./src/database/schema');
+const { tb_tasks } = require('./src/config/database/schema');
 
 dotenvFlow.config({
   node_env: process.env.NODE_ENV || 'development',
   default_node_env: 'development',
 });
 
-const { database } = require('./src/database/client');
+const { database } = require('./src/config/database/client');
 const app = express();
 
 const {
@@ -38,9 +38,30 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://*.googleapis.com'],
+        scriptSrcElem: [
+          "'self'",
+          "'unsafe-inline'",
+          'https://*.googleapis.com',
+          'https://apis.google.com',
+        ],
         scriptSrcAttr: ["'unsafe-inline'"],
+        connectSrc: [
+          "'self'",
+          'https://*.googleapis.com',
+          'https://*.firebaseio.com',
+          'https://identitytoolkit.googleapis.com',
+          'https://securetoken.googleapis.com',
+          'wss://*.firebaseio.com',
+        ],
+        frameSrc: ['https://*.firebaseapp.com', 'https://accounts.google.com'],
+        imgSrc: ["'self'", 'data:', 'https://*.googleusercontent.com'],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        fontSrc: ["'self'", 'data:'],
       },
     },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
   }),
 );
 

@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit, HostListener, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { AuthUser } from '../../core/auth.user';
 import { Subscription } from 'rxjs';
@@ -9,12 +9,11 @@ import { User } from '@angular/fire/auth';
 @Component({
   selector: 'user-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgOptimizedImage, RouterLink],
   templateUrl: './user-profile.html',
   styleUrls: ['./user-profile.scss'],
 })
 export class UserProfile implements OnInit, OnDestroy {
-
   private authService = inject(AuthService);
 
   private router = inject(Router);
@@ -24,6 +23,8 @@ export class UserProfile implements OnInit, OnDestroy {
   currentUser = signal<AuthUser | null>(null);
 
   private userSubscription!: Subscription;
+
+  imageError = false;
 
   ngOnInit() {
     this.userSubscription = this.authService.user$.subscribe((user) => {
@@ -39,7 +40,8 @@ export class UserProfile implements OnInit, OnDestroy {
 
   loadUserData(user: User | null) {
     if (user) {
-      const initials = user.displayName?.trim()
+      const initials = user.displayName
+        ?.trim()
         .split(' ')
         .map((n) => n[0])
         .join('')
@@ -54,6 +56,13 @@ export class UserProfile implements OnInit, OnDestroy {
         initials: initials,
       });
     }
+  }
+
+  userPhoto(): string {
+    const user = this.currentUser();
+    if (!this.imageError && user?.photo) return user.photo;
+    const name = encodeURIComponent(user?.name ?? 'User');
+    return `https://ui-avatars.com/api/?name=${name}&background=random`;
   }
 
   toggleMenu() {
@@ -76,5 +85,9 @@ export class UserProfile implements OnInit, OnDestroy {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  onImageError() {
+    this.imageError = true;
   }
 }

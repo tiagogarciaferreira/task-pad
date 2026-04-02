@@ -9,12 +9,11 @@ import {
   browserLocalPersistence,
   setPersistence,
 } from '@angular/fire/auth';
-import { AuthUser } from './auth.user';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
   private auth = inject(Auth);
 
   loading = signal(false);
@@ -37,12 +36,12 @@ export class AuthService {
 
     try {
       await setPersistence(this.auth, browserLocalPersistence);
-
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
 
       const credential = await signInWithPopup(this.auth, provider);
       return credential.user;
+
     } catch (err: any) {
       this.error.set('Login failed');
       return null;
