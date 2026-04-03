@@ -4,10 +4,12 @@ npm-debug.log*
 
 # Ambiente
 .env
-.env.*
-!.env.template
+.env.local
+.env.*.local
 .env.production
 .env.development
+.env.staging
+.env.template
 
 # Git
 .git/
