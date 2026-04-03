@@ -17,8 +17,8 @@ RUN npm ci --include=dev
 COPY src/ ./src/
 COPY public/ ./public/
 
-# Build production bundle and strip source maps
-RUN npm run build -- --configuration=production && \
+# Build and strip source maps to reduce artifact size
+RUN npm run build -- --configuration=development && \
     find dist/task-pad/browser -name "*.map" -delete
 
 
@@ -37,15 +37,13 @@ COPY src/middlewares ./src/middlewares
 COPY drizzle         ./drizzle
 COPY drizzle.config.js ./
 
-# Copy and minify server entrypoint before pruning devDeps
-# (terser is a devDependency — must run before prune)
-COPY server.js ./
-
-# Install all deps → minify → prune to production-only → clean cache
-RUN npm ci && \
-    npx terser server.js -c -m -o dist/server.js && \
-    npm prune --omit=dev --omit=optional && \
+# Install production dependencies and clean npm cache
+RUN npm ci --omit=dev && \
     npm cache clean --force 2>/dev/null || true
+
+# Copy and minify server entrypoint
+COPY server.js ./
+RUN npx terser server.js -c -m -o dist/server.js
 
 
 # ============================================================
@@ -54,7 +52,7 @@ RUN npm ci && \
 FROM node:22.14-alpine AS runtime
 
 # Align TZ env with the actual localtime configured below
-ENV NODE_ENV=production \
+ENV NODE_ENV=development \
     NODE_OPTIONS="--max-old-space-size=256" \
     TZ=America/Sao_Paulo
 
@@ -70,22 +68,22 @@ RUN addgroup -g 1001 -S nodejs && \
 WORKDIR /app
 
 # --- Backend artifacts ---
-COPY --from=backend-builder --chown=nodejs:nodejs /app/dist/server.js   ./server.js
-COPY --from=backend-builder --chown=nodejs:nodejs /app/node_modules      ./node_modules
-COPY --from=backend-builder --chown=nodejs:nodejs /app/src/config        ./src/config
-COPY --from=backend-builder --chown=nodejs:nodejs /app/src/schemas       ./src/schemas
-COPY --from=backend-builder --chown=nodejs:nodejs /app/src/middlewares   ./src/middlewares
-COPY --from=backend-builder --chown=nodejs:nodejs /app/drizzle           ./drizzle
+COPY --from=backend-builder --chown=nodejs:nodejs /app/dist/server.js  ./server.js
+COPY --from=backend-builder --chown=nodejs:nodejs /app/node_modules     ./node_modules
+COPY --from=backend-builder --chown=nodejs:nodejs /app/src/config       ./src/config
+COPY --from=backend-builder --chown=nodejs:nodejs /app/src/schemas      ./src/schemas
+COPY --from=backend-builder --chown=nodejs:nodejs /app/src/middlewares  ./src/middlewares
+COPY --from=backend-builder --chown=nodejs:nodejs /app/drizzle          ./drizzle
 COPY --from=backend-builder --chown=nodejs:nodejs /app/drizzle.config.js ./drizzle.config.js
 
 # --- Frontend compiled output ---
 COPY --from=angular-builder --chown=nodejs:nodejs /app/dist/task-pad/browser ./public
 
 # --- Runtime source references (used by backend at runtime) ---
-COPY --chown=nodejs:nodejs src/probes   ./src/probes
-COPY --chown=nodejs:nodejs src/metrics  ./src/metrics
-COPY --chown=nodejs:nodejs src/app/core ./src/app/core
-COPY --chown=nodejs:nodejs src/assets   ./src/assets
+COPY --chown=nodejs:nodejs src/probes      ./src/probes
+COPY --chown=nodejs:nodejs src/metrics     ./src/metrics
+COPY --chown=nodejs:nodejs src/app/core    ./src/app/core
+COPY --chown=nodejs:nodejs src/assets      ./src/assets
 
 EXPOSE 4000
 

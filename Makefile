@@ -2,10 +2,13 @@ IMAGE_NAME = tiagogferreirainfnet/task-pad
 TAG = latest
 
 build:
-	docker build --no-cache -t $(IMAGE_NAME):$(TAG) .
+	-docker build --no-cache -t $(IMAGE_NAME):$(TAG) .
+
+build-dev:
+	-docker build -f Dockerfile.development --no-cache -t $(IMAGE_NAME):$(TAG) .
 
 push:
-	docker push $(IMAGE_NAME):$(TAG)
+	-docker push $(IMAGE_NAME):$(TAG)
 
 deploy:
 	-docker compose up
@@ -28,3 +31,22 @@ clean:
 
 	@echo "Cleaning build cache related..."
 	-docker builder prune -f
+
+drizzle-reset:
+	@echo "Cleaning migrations..."
+	find drizzle -mindepth 1 -delete
+
+	@echo "Generating migrations..."
+	npx drizzle-kit generate
+
+	@echo "Applying migrations..."
+	npx drizzle-kit migrate
+
+	@echo "Applying changes..."
+	npx drizzle-kit push
+
+	@echo "Pulling info..."
+	npx drizzle-kit pull
+
+	@echo "Done!"
+

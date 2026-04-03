@@ -5,7 +5,7 @@ npm-debug.log*
 # Ambiente
 .env
 .env.*
-!.env.example
+!.env.template
 .env.production
 .env.development
 
@@ -65,3 +65,4 @@ src/  # Não! Precisamos do src para build
 proxy.conf.js
 tasks.json
 docker-compose.yaml
+/src/environments

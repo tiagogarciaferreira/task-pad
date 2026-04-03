@@ -50,7 +50,11 @@ Thumbs.db
 .env.production
 .env.development
 .env.staging
-!.env.example
+!.env.template
 firebase-key-prod.json
 firebase-key-dev.json
-/src/environments
+src/environments/environment.ts
+src/environments/environment.production.ts
+src/environments/environment.*.ts
+!src/environments/environment.template.ts
+!src/environments/environment.production.template.ts

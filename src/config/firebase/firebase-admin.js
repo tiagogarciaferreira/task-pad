@@ -1,7 +1,13 @@
 const admin = require('firebase-admin');
-const path = require('path');
+const dotenvFlow = require('dotenv-flow');
 
-const serviceAccount = require(path.resolve(__dirname, '../../../firebase-key.json'));
+dotenvFlow.config({
+  node_env: process.env.NODE_ENV || 'development',
+  default_node_env: 'development',
+});
+
+const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+const serviceAccount = JSON.parse(serviceAccountJson);
 
 if (!admin.apps.length) {
   admin.initializeApp({

@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const dotenvFlow = require('dotenv-flow');
 const { randomUUID } = require('crypto');
 const { setupProbes } = require('./src/probes');
+const { setupMetrics } = require('./src/metrics');
 const { authMiddleware } = require('./src/middlewares/auth.middleware');
 
 const {
@@ -69,7 +70,9 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.SERVER_PORT || 4000;
+
 const probes = setupProbes(app, database);
+setupMetrics(app);
 
 app.post('/api/tasks', authMiddleware, async (req, res) => {
   try {
@@ -180,6 +183,7 @@ app.get('/api/tasks/search', authMiddleware, async (req, res) => {
 
     res.json(tasks);
   } catch (error) {
+    console.error('Error searching tasks:', error);
     res.status(500).json({ error: 'Failed to search tasks' });
   }
 });
@@ -285,39 +289,11 @@ app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
   }
 });
 
-if (process.env.NODE_ENV === 'production') {
+app.use(express.static(path.join(__dirname, 'public')));
 
-  app.get(/.*\.js\.gz$/, (req, res, next) => {
-    res.set('Content-Encoding', 'gzip');
-    res.set('Content-Type', 'application/javascript');
-    next();
-  });
-
-  app.get(/.*\.css\.gz$/, (req, res, next) => {
-    res.set('Content-Encoding', 'gzip');
-    res.set('Content-Type', 'text/css');
-    next();
-  });
-
-  app.use(
-    express.static(path.join(__dirname, 'public'), {
-      setHeaders: (res, filePath) => {
-        if (filePath.endsWith('.gz')) {
-          res.set('Content-Encoding', 'gzip');
-          if (filePath.endsWith('.js.gz')) {
-            res.set('Content-Type', 'application/javascript');
-          } else if (filePath.endsWith('.css.gz')) {
-            res.set('Content-Type', 'text/css');
-          }
-        }
-      },
-    }),
-  );
-
-  app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  });
-}
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.listen(PORT, async () => {
   const dbOk = await probes.checkDb();
@@ -330,6 +306,7 @@ app.listen(PORT, async () => {
   console.log(`📡 Live: http://localhost:${PORT}/live`);
   console.log(`📡 Ready: http://localhost:${PORT}/ready`);
   console.log(`📡 Health: http://localhost:${PORT}/health`);
+  console.log(`📊 Metrics: http://localhost:${PORT}/metrics`);
 
   setTimeout(() => {
     probes.setReady();
