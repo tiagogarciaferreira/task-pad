@@ -124,6 +124,7 @@ jobs:
           build-args: |
             NODE_ENV=${{ env.ENVIRONMENT }}
             BUILD_MODE=${{ env.ENVIRONMENT }}
+          outputs: type=image,name=${{ env.DOCKER_HUB_REPO }},push-by-digest=true
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
