@@ -140,10 +140,12 @@ jobs:
 
       - name: Sign Docker image
         env:
-          DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: cosign sign --key cosign.key ${{ steps.build.outputs.digest }}
-        #${{ env.DOCKER_HUB_REPO }}@
-
-      - name: Verify signature
-        run: cosign verify --key cosign.pub ${{ env.DOCKER_HUB_REPO }}@${{ steps.build.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.build.outputs.digest  }}
+        run: |
+          images=""
+          for tag in ${TAGS}; do
+            images+="${tag}@${DIGEST} "
+          done
+          cosign sign --yes --key cosign.key ${images}
