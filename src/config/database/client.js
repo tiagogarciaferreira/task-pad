@@ -1,13 +1,21 @@
 const postgres = require('postgres');
 const { drizzle } = require('drizzle-orm/postgres-js');
+const { migrate } = require('drizzle-orm/postgres-js/migrator');
 const { readFileSync } = require('node:fs');
 const fs = require('fs');
+const path = require('path');
 const { tb_tasks } = require('./schema');
 
-const client = postgres(process.env.DATABASE_URL);
+const client = postgres(process.env.DATABASE_URL, { max: 1 });
 const database = drizzle(client);
 
-async function importTasks() {
+async function runMigrations() {
+  await migrate(database, {
+      migrationsFolder: path.join(__dirname, '../../../drizzle'),
+  });
+}
+
+async function runImportData() {
   const filePath = 'tasks.json';
   if (!fs.existsSync(filePath)) return;
   const tasksData = JSON.parse(readFileSync(filePath, 'utf8'));
@@ -17,11 +25,13 @@ async function importTasks() {
   await database.insert(tb_tasks).values(formattedData);
 }
 
-if (process.env.NODE_ENV === 'development') {
-  importTasks()
-    .catch((err) => {
-      console.error('Error importing tasks:', err);
-    });
-}
+runMigrations()
+  .then(() => {
+    if (process.env.NODE_ENV === 'development') return runImportData();
+  })
+  .catch((err) => {
+    console.error('[db] Fatal error during initialization:', err);
+    process.exit(1);
+  });
 
 module.exports = { database };

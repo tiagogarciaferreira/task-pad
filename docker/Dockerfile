@@ -7,19 +7,20 @@ WORKDIR /app
 
 # Copy dependency files first (layer cache optimization)
 COPY package*.json ./
-COPY angular.json ./
+COPY ../angular.json ./
 COPY tsconfig*.json ./
 
 # Install all dependencies (dev included for build tooling)
 RUN npm ci --include=dev
 
 # Copy Angular source
-COPY src/ ./src/
-COPY public/ ./public/
+COPY ../src ./src/
+COPY ../public ./public/
 
 # Build production bundle and strip source maps
 RUN npm run build -- --configuration=production && \
-    find dist/task-pad/browser -name "*.map" -delete
+    find dist/task-pad/browser -name "*.map" -delete && \
+    rm -rf src/environments
 
 
 # ============================================================
@@ -31,15 +32,15 @@ WORKDIR /app
 
 # Copy only what's needed for dependency resolution
 COPY package*.json ./
-COPY src/config      ./src/config
-COPY src/schemas     ./src/schemas
-COPY src/middlewares ./src/middlewares
-COPY drizzle         ./drizzle
-COPY drizzle.config.js ./
+COPY ../src/config      ./src/config
+COPY ../src/schemas     ./src/schemas
+COPY ../src/middlewares ./src/middlewares
+COPY ../drizzle         ./drizzle
+COPY ../drizzle.config.js ./
 
 # Copy and minify server entrypoint before pruning devDeps
 # (terser is a devDependency — must run before prune)
-COPY server.js ./
+COPY ../server.js ./
 
 # Install all deps → minify → prune to production-only → clean cache
 RUN npm ci && \
@@ -82,10 +83,10 @@ COPY --from=backend-builder --chown=nodejs:nodejs /app/drizzle.config.js ./drizz
 COPY --from=angular-builder --chown=nodejs:nodejs /app/dist/task-pad/browser ./public
 
 # --- Runtime source references (used by backend at runtime) ---
-COPY --chown=nodejs:nodejs src/probes   ./src/probes
-COPY --chown=nodejs:nodejs src/metrics  ./src/metrics
-COPY --chown=nodejs:nodejs src/app/core ./src/app/core
-COPY --chown=nodejs:nodejs src/assets   ./src/assets
+COPY --chown=nodejs:nodejs ../src/probes   ./src/probes
+COPY --chown=nodejs:nodejs ../src/metrics  ./src/metrics
+COPY --chown=nodejs:nodejs ../src/app/core ./src/app/core
+COPY --chown=nodejs:nodejs ../src/assets   ./src/assets
 
 EXPOSE 4000
 

@@ -1,5 +1,5 @@
 # Dependências
-node_modules/
+../node_modules/
 npm-debug.log*
 
 # Ambiente
@@ -29,7 +29,6 @@ Thumbs.db
 # Logs
 logs/
 *.log
-npm-debug.log*
 
 # Testes
 coverage/
@@ -46,6 +45,7 @@ build/
 
 # Docker
 Dockerfile
+Dockerfile.development
 .dockerignore
 
 # CI/CD
@@ -58,8 +58,6 @@ docs/
 
 # Angular específico
 .angular/
-src/  # Não! Precisamos do src para build
-# OBS: src NÃO pode ser ignorado!
 
 # Arquivos de configuração (não necessários no container)
 .editorconfig
@@ -67,4 +65,3 @@ src/  # Não! Precisamos do src para build
 proxy.conf.js
 tasks.json
 docker-compose.yaml
-/src/environments
