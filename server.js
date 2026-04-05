@@ -7,33 +7,19 @@ const { randomUUID } = require('crypto');
 const { setupProbes } = require('./src/probes');
 const { setupMetrics } = require('./src/metrics');
 const { authMiddleware } = require('./src/middlewares/auth.middleware');
-
-const {
-  eq,
-  and,
-  ilike,
-  inArray,
-  gte,
-  lte,
-  desc,
-  ne,
-  sql } = require('drizzle-orm');
-
+const { resolveHost } = require('./src/utils/resolveHost');
 const { tb_tasks } = require('./src/config/database/schema');
 
-dotenvFlow.config({
-  node_env: process.env.NODE_ENV || 'development',
-  default_node_env: 'development',
-});
+const {
+  eq, and, ilike, inArray, gte, lte, desc, ne, sql
+} = require('drizzle-orm');
+
+dotenvFlow.config({ node_env: process.env.NODE_ENV || 'development', default_node_env: 'development', });
 
 const { database } = require('./src/config/database/client');
 const app = express();
 
-const {
-  TaskSchema,
-  TaskUpdateSchema,
-  SearchSchema
-} = require('./src/schemas/task.schema');
+const { TaskSchema, TaskUpdateSchema, SearchSchema } = require('./src/schemas/task.schema');
 
 app.use(
   helmet({
@@ -69,7 +55,7 @@ app.use(
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.SERVER_PORT || 4000;
+const PORT = process.env.PORT || 4000;
 
 const probes = setupProbes(app, database);
 setupMetrics(app);
@@ -289,24 +275,27 @@ app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
   }
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
 
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+  app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
 
 app.listen(PORT, async () => {
   const dbOk = await probes.checkDb();
   const frontendOk = probes.checkFrontend();
+  const hostName = resolveHost().trim();
 
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on ${hostName}:${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
   console.log(`🗄️ Database: ${dbOk ? 'connected' : 'disconnected'}`);
   console.log(`🎨 Frontend: ${frontendOk ? 'built' : 'not found (dev mode)'}`);
-  console.log(`📡 Live: http://localhost:${PORT}/live`);
-  console.log(`📡 Ready: http://localhost:${PORT}/ready`);
-  console.log(`📡 Health: http://localhost:${PORT}/health`);
-  console.log(`📊 Metrics: http://localhost:${PORT}/metrics`);
+  console.log(`📡 Live: ${hostName}:${PORT}/live`);
+  console.log(`📡 Ready: ${hostName}:${PORT}/ready`);
+  console.log(`📡 Health: ${hostName}:${PORT}/health`);
+  console.log(`📊 Metrics: ${hostName}:${PORT}/metrics`);
 
   setTimeout(() => {
     probes.setReady();

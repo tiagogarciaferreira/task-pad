@@ -31,11 +31,12 @@ FROM node:22.14-alpine AS backend-builder
 WORKDIR /app
 
 # Copy only what's needed for dependency resolution
-COPY package*.json ./
-COPY ../src/config      ./src/config
-COPY ../src/schemas     ./src/schemas
-COPY ../src/middlewares ./src/middlewares
-COPY ../drizzle         ./drizzle
+COPY package*.json        ./
+COPY ../src/config        ./src/config
+COPY ../src/schemas       ./src/schemas
+COPY ../src/middlewares   ./src/middlewares
+COPY ../src/utils         ./src/utils
+COPY ../drizzle           ./drizzle
 COPY ../drizzle.config.js ./
 
 # Copy and minify server entrypoint before pruning devDeps
@@ -71,13 +72,14 @@ RUN addgroup -g 1001 -S nodejs && \
 WORKDIR /app
 
 # --- Backend artifacts ---
-COPY --from=backend-builder --chown=nodejs:nodejs /app/dist/server.js   ./server.js
+COPY --from=backend-builder --chown=nodejs:nodejs /app/dist/server.js    ./server.js
 COPY --from=backend-builder --chown=nodejs:nodejs /app/node_modules      ./node_modules
 COPY --from=backend-builder --chown=nodejs:nodejs /app/src/config        ./src/config
 COPY --from=backend-builder --chown=nodejs:nodejs /app/src/schemas       ./src/schemas
 COPY --from=backend-builder --chown=nodejs:nodejs /app/src/middlewares   ./src/middlewares
 COPY --from=backend-builder --chown=nodejs:nodejs /app/drizzle           ./drizzle
 COPY --from=backend-builder --chown=nodejs:nodejs /app/drizzle.config.js ./drizzle.config.js
+COPY --from=backend-builder --chown=nodejs:nodejs /app/src/utils         ./src/utils
 
 # --- Frontend compiled output ---
 COPY --from=angular-builder --chown=nodejs:nodejs /app/dist/task-pad/browser ./public

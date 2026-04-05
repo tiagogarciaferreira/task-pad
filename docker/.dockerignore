@@ -45,7 +45,6 @@ build/
 
 # Docker
 Dockerfile
-Dockerfile.development
 .dockerignore
 
 # CI/CD
