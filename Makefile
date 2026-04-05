@@ -1,6 +1,6 @@
 IMAGE_NAME = tiagogferreirainfnet/task-pad
 TAG ?= latest
-VERSION ?=1.1.10
+VERSION ?=1.1.0
 FULL_IMAGE = $(IMAGE_NAME):$(TAG)
 
 # Colors for output
