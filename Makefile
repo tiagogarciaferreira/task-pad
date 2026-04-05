@@ -17,25 +17,32 @@ NC := \033[0m # No Color
 # 🏗️ Build image
 build:
 	@echo "$(BLUE)🔨 Building production image...$(NC)"
-	-docker build -f docker/Dockerfile --no-cache -t $(FULL_IMAGE) .
+	docker build -f docker/Dockerfile --no-cache -t $(FULL_IMAGE) .
 	@echo "$(GREEN)✅ Production image built: $(FULL_IMAGE)$(NC)"
 
 # 🏷️ Tag image
 tag:
 	@echo "$(BLUE)🏷️ Tagging production image...$(NC)"
 	docker tag $(FULL_IMAGE) $(IMAGE_NAME):$(VERSION)
-	@echo "$(GREEN)✅ Tagged as: $(IMAGE_NAME):production$(NC)"
+	@echo "$(GREEN)✅ Tagged as: $(IMAGE_NAME):$(VERSION)$(NC)"
+
+signature:
+	@echo "$(BLUE)🔐 Signing Docker image by digest...$(NC)"
+	$(eval DIGEST=$(shell docker inspect $(FULL_IMAGE) --format='{{index .RepoDigests 0}}'))
+	@echo "$(YELLOW)📋 Digest: $(DIGEST)$(NC)"
+	cosign sign --key .cosign/cosign.key $(DIGEST)
+	@echo "$(GREEN)✅ Image signed: $(FULL_IMAGE)$(NC)"
 
 # 📤 Push image to registry
 push:
 	@echo "$(BLUE)📤 Pushing production image to registry...$(NC)"
-	-docker push $(IMAGE_NAME) -a
+	docker push $(IMAGE_NAME) -a
 	@echo "$(GREEN)✅ Production image pushed$(NC)"
 
 # 🚀 Deploy
 deploy:
 	@echo "$(BLUE)🚀 Deploying environment...$(NC)"
-	-docker compose -p "taskpad" -f docker/docker-compose.yaml --env-file ./.env.production up -d
+	docker compose -p "taskpad" -f docker/docker-compose.yaml --env-file ./.env.production up -d
 	@echo "$(GREEN)✅ Deployment complete$(NC)"
 
 # ============================================
@@ -71,7 +78,7 @@ info:
 	@docker images --filter reference=$(IMAGE_NAME) --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}" 2>/dev/null || echo "  ⚠️ No images found"
 
 # 🔄 Full pipeline
-full: clean build tag info push deploy
+full: clean build tag push signature info deploy
 	@echo "$(GREEN)🎉 Pipeline complete!$(NC)"
 
 # ❓ Show available commands

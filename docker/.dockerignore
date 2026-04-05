@@ -64,3 +64,4 @@ docs/
 proxy.conf.js
 tasks.json
 docker-compose.yaml
+.cosign
