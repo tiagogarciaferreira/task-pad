@@ -148,4 +148,7 @@ jobs:
           for tag in ${TAGS}; do
             images+="${tag}@${DIGEST} "
           done
+          echo "===> Images: ${images}"
+          echo "===> Tags: ${TAGS}"
+          echo "===> Digest: ${DIGEST}"
           cosign sign --yes --key cosign.key ${images}
