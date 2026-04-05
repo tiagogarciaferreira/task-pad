@@ -1,0 +1,124 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: ['feature/**']
+    paths-ignore:
+      - 'k8s/**'
+      - '.angular/**'
+      - '.editorconfig'
+      - '.prettierrc'
+      - '.gitignore'
+      - '.env.template'
+      - 'dist/**'
+      - 'docker/docker-compose*.yml'
+      - 'docker/.dockerignore'
+      - 'tasks.json'
+      - 'proxy.conf.js'
+      - 'Makefile'
+      - 'README.md'
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '24.14.1'
+  ENVIRONMENT: 'production'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      image_digest: ${{ steps.push.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --only=production
+        env:
+          NODE_ENV: ${{ env.ENVIRONMENT }}
+
+      - name: Create environment files
+        run: |
+          mkdir -p src/environments
+          cp src/environments/environment.template.ts src/environments/environment.ts
+
+          cat > src/environments/environment.production.ts << EOF
+          export const environment = {
+            production: true,
+            firebase: {
+              apiKey: '${{ secrets.FIREBASE_API_KEY }}',
+              authDomain: '${{ secrets.FIREBASE_AUTH_DOMAIN }}',
+              projectId: '${{ secrets.FIREBASE_PROJECT_ID }}',
+              storageBucket: '${{ secrets.FIREBASE_STORAGE_BUCKET }}',
+              messagingSenderId: '${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}',
+              appId: '${{ secrets.FIREBASE_APP_ID }}'
+            }
+          };
+          EOF
+
+          test -f src/environments/environment.ts || exit 1
+          test -f src/environments/environment.production.ts || exit 1
+
+      - name: Build application
+        run: npm run build:prod
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Get version
+        id: package-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Found version: $VERSION"
+
+      - name: Extract metadata for Docker
+        id: meta
+        env:
+          DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.DOCKER_HUB_REPO }}
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ steps.package-version.outputs.version }}
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=${{ env.ENVIRONMENT }}
+            BUILD_MODE=${{ env.ENVIRONMENT }}
