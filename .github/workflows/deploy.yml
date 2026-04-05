@@ -53,16 +53,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci #--only=production
-        #env:
-        #  NODE_ENV: ${{ env.ENVIRONMENT }}
+        run: npm ci
 
       - name: Install Angular CLI
         run: npm install -g @angular/cli@21.2.6
-        #run: |
-        #  npm install -g @angular/cli@21.2.6
-        #  npm install @angular/build --save-dev
-
 
       - name: Create environment files
         run: |
@@ -148,7 +142,8 @@ jobs:
         env:
           DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: cosign sign --key cosign.key ${{ env.DOCKER_HUB_REPO }}@${{ steps.build.outputs.digest }}
+        run: cosign sign --key cosign.key ${{ steps.build.outputs.digest }}
+        #${{ env.DOCKER_HUB_REPO }}@
 
       - name: Verify signature
         run: cosign verify --key cosign.pub ${{ env.DOCKER_HUB_REPO }}@${{ steps.build.outputs.digest }}
