@@ -1,7 +1,7 @@
 IMAGE_NAME = tiagogferreirainfnet/task-pad
 TAG ?= latest
-VERSION ?=local
 FULL_IMAGE = $(IMAGE_NAME):$(TAG)
+VERSION := $(shell node -p "require('./package.json').version")
 
 # Colors for output
 GREEN := \033[0;32m
