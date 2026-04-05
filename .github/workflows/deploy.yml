@@ -53,7 +53,9 @@ jobs:
           cache: 'npm'
 
       - name: Install Angular CLI
-        run: npm install -g @angular/cli@21.2.6
+        run: |
+          npm install -g @angular/cli@21.2.6
+          npm install @angular/build --save-dev
 
       - name: Install dependencies
         run: npm ci --only=production
@@ -83,7 +85,8 @@ jobs:
           test -f src/environments/environment.production.ts || exit 1
 
       - name: Build application
-        run: npm run build:prod
+        #run: npm run build:prod
+        run: ng build --configuration=${{ env.ENVIRONMENT }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
