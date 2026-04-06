@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: ['feature/**']
+    branches: ['main']
     paths-ignore:
       - 'k8s/**'
       - '.angular/**'
@@ -10,6 +10,7 @@ on:
       - '.prettierrc'
       - '.gitignore'
       - '.env.template'
+      - '.github/**'
       - 'dist/**'
       - 'docker/docker-compose*.yml'
       - 'docker/.dockerignore'
