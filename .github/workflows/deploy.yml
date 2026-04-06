@@ -24,13 +24,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
-env:
-  NODE_VERSION: '24.14.1'
-  ENVIRONMENT: 'production'
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
+    env:
+      NODE_VERSION: '24.14.1'
+      ENVIRONMENT: 'production'
+      DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
+
     permissions:
       contents: read
       packages: read
@@ -101,13 +103,11 @@ jobs:
 
       - name: Extract metadata for Docker
         id: meta
-        env:
-          DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.DOCKER_HUB_REPO }}
           tags: |
-            type=sha,format=long
+            type=sha
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=${{ steps.package-version.outputs.version }}
 
@@ -124,26 +124,25 @@ jobs:
           build-args: |
             NODE_ENV=${{ env.ENVIRONMENT }}
             BUILD_MODE=${{ env.ENVIRONMENT }}
-          outputs: type=image,name=${{ env.DOCKER_HUB_REPO }},push-by-digest=true
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
         with:
           cosign-release: 'v3.0.3'
 
-      - name: Decode private key
+      - name: Decode Cosign private key
         run: |
           echo "${{ secrets.COSIGN_PRIVATE_KEY }}" | base64 -d > cosign.key
-          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" | base64 -d > cosign.pub
+          chmod 600 cosign.key
 
-      - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | cosign login docker.io -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+      #- name: Login to Docker Hub
+      #  run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | cosign login docker.io -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
       - name: Sign Docker image
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.build.outputs.digest  }}
+          DIGEST: ${{ steps.push.outputs.digest  }}
         run: |
           images=""
           for tag in ${TAGS}; do
@@ -153,3 +152,7 @@ jobs:
           echo "===> Tags: ${TAGS}"
           echo "===> Digest: ${DIGEST}"
           cosign sign --yes --key cosign.key ${images}
+
+      - name: Cleanup signing key
+        if: always()
+        run: rm -f cosign.key
