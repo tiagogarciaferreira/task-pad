@@ -38,10 +38,6 @@ jobs:
       packages: read
       id-token: write
 
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
-      image_digest: ${{ steps.push.outputs.digest }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -107,7 +103,7 @@ jobs:
         with:
           images: ${{ env.DOCKER_HUB_REPO }}
           tags: |
-            type=sha
+            type=sha,format=long
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=${{ steps.package-version.outputs.version }}
 
@@ -130,13 +126,13 @@ jobs:
         with:
           cosign-release: 'v3.0.3'
 
-      - name: Decode Cosign private key
+      - name: Decode Cosign signing key
         run: |
           echo "${{ secrets.COSIGN_PRIVATE_KEY }}" | base64 -d > cosign.key
           chmod 600 cosign.key
 
-      #- name: Login to Docker Hub
-      #  run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | cosign login docker.io -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" | base64 -d > cosign.pub
+          chmod 600 cosign.pub
 
       - name: Sign Docker image
         env:
@@ -144,15 +140,23 @@ jobs:
           TAGS: ${{ steps.meta.outputs.tags }}
           DIGEST: ${{ steps.push.outputs.digest  }}
         run: |
+          readarray -t tag_array <<< "${TAGS}"
           images=""
-          for tag in ${TAGS}; do
-            images+="${tag}@${DIGEST} "
+          for tag in "${tag_array[@]}"; do
+            [[ -n "$tag" ]] && images+="${tag}@${DIGEST} "
           done
-          echo "===> Images: ${images}"
-          echo "===> Tags: ${TAGS}"
-          echo "===> Digest: ${DIGEST}"
           cosign sign --yes --key cosign.key ${images}
+
+      - name: Verify Docker image signature
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.push.outputs.digest  }}
+        run: |
+          first_tag=$(echo "${TAGS}" | head -n1)
+          cosign verify --key cosign.pub "${first_tag}@${DIGEST}"
 
       - name: Cleanup signing key
         if: always()
-        run: rm -f cosign.key
+        run: |
+          rm -f cosign.key
+          rm -f cosign.pub
