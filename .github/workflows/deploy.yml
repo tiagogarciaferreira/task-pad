@@ -168,5 +168,6 @@ jobs:
       - name: Cleanup signing key
         if: always()
         run: |
+          rm -f src/environments/environment.production.ts
           rm -f cosign.key
           rm -f cosign.pub
