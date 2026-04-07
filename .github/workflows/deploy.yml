@@ -121,6 +121,16 @@ jobs:
             NODE_ENV=${{ env.ENVIRONMENT }}
             BUILD_MODE=${{ env.ENVIRONMENT }}
 
+      - name: Dive analyze
+        uses: dzhunli/godive-action@v2.0.8
+        with:
+          image_name: ${{ steps.push.outputs.digest  }}
+          use_config: true
+          ci_config: docker/analyze/.dive.yaml
+          continue_on_fail: false
+          report: false
+          summary: false
+
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
         with:
@@ -128,10 +138,10 @@ jobs:
 
       - name: Decode Cosign signing key
         run: |
-          echo "${{ secrets.COSIGN_PRIVATE_KEY }}" | base64 -d > cosign.key
+          echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
           chmod 600 cosign.key
 
-          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" | base64 -d > cosign.pub
+          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" > cosign.pub
           chmod 600 cosign.pub
 
       - name: Sign Docker image
