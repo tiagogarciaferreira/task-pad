@@ -12,8 +12,7 @@ on:
       - '.env.template'
       - '.github/**'
       - 'dist/**'
-      - 'docker/docker-compose*.yml'
-      - 'docker/.dockerignore'
+      - 'docker/**'
       - 'tasks.json'
       - 'proxy.conf.js'
       - 'Makefile'
@@ -52,7 +51,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm analyze
 
       - name: Install Angular CLI
         run: npm install -g @angular/cli@21.2.6
