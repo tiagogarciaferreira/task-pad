@@ -11,7 +11,7 @@ const database = drizzle(client);
 
 async function runMigrations() {
   await migrate(database, {
-      migrationsFolder: path.join(__dirname, '../../../drizzle'),
+    migrationsFolder: path.join(process.cwd(), 'drizzle'),
   });
 }
 

@@ -1,0 +1,3 @@
+rules:
+  lowestEfficiency: 0.98
+  highestUserWastedPercent: 0.02
