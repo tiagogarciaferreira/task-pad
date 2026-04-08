@@ -1,0 +1,46 @@
+rbac:
+  create: true
+
+server:
+  retention: "24h"
+  logLevel: warn
+  persistence:
+    enabled: true
+    size: "2Gi"
+  containerPorts:
+    http: "${PROMETHEUS_PORT}"
+  service:
+    type: ClusterIP
+
+  extraScrapeConfigs:
+    - job_name: taskpad-manager
+      scrape_interval: 30s
+      metrics_path: /metrics
+
+      kubernetes_sd_configs:
+        - role: endpoints
+          namespaces:
+            names:
+              - app
+
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_service_label_app]
+          action: keep
+          regex: taskpad-app
+
+        - source_labels: [__meta_kubernetes_endpoint_port_number]
+          action: keep
+          regex: "4000"
+
+      metric_relabel_configs:
+        - action: keep
+          source_labels: [__name__]
+          regex: process_cpu_seconds_total|process_resident_memory_bytes|nodejs_eventloop_lag_seconds|nodejs_active_handles_total|nodejs_gc_duration_seconds_sum|process_start_time_seconds|nodejs_version_info
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "300m"
+      memory: "256Mi"
