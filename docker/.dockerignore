@@ -13,6 +13,7 @@ npm-debug.log*
 
 # Git
 .git/
+.github
 .gitignore
 .gitattributes
 
@@ -44,7 +45,9 @@ build/
 .tmp/
 
 # Docker
+docker/
 Dockerfile
+docker-compose.yaml
 .dockerignore
 
 # CI/CD
@@ -63,5 +66,5 @@ docs/
 .prettierrc
 proxy.conf.js
 tasks.json
-docker-compose.yaml
 .cosign
+k8s/
