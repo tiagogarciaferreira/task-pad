@@ -1,0 +1,21 @@
+admin:
+  user: "${GRAFANA_SECURITY_ADMIN_USER}"
+  existingSecret: "grafana-secret"
+  existingSecretPasswordKey: "password"
+
+grafana:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "300m"
+      memory: "256Mi"
+
+service:
+  type: NodePort
+  ports:
+    grafana: "${GRAFANA_PORT}"
+  nodePorts:
+    grafana: "32000"
+
