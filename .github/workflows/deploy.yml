@@ -51,7 +51,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm analyze
+        run: npm ci
 
       - name: Install Angular CLI
         run: npm install -g @angular/cli@21.2.6
