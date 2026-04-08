@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taskpad-app
+  namespace: app
+  labels:
+    app: taskpad-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taskpad-app
+  template:
+    metadata:
+      labels:
+        app: taskpad-app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: taskpad-app
+          image: tiagogferreirainfnet/task-pad:sha-f02436a2aa902b25680bae097f2d4d28563f83ac
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+          startupProbe:
+            httpGet:
+              path: /live
+              port: 4000
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 4000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 4000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config-map
+                  key: NODE_ENV
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config-map
+                  key: PORT
+            - name: FIREBASE_SERVICE_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: FIREBASE_SERVICE_ACCOUNT
+            - name: POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: POSTGRES_URL
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: taskpad-app-hpa
+  namespace: app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: taskpad-app
+  minReplicas: 1
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 85

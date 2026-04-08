@@ -1,0 +1,30 @@
+architecture: "standalone"
+
+auth:
+  existingSecret: "postgres-secret"
+  database: "${POSTGRES_DB}"
+  username: "${POSTGRES_USER}"
+  secretKeys:
+    userPasswordKey: "password"
+    postgresPasswordKey: "postgres-password"
+
+primary:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "300m"
+      memory: "256Mi"
+
+  persistence:
+    enabled: true
+    volumeName: "postgres_data"
+    size: 5Gi
+
+service:
+  type: ClusterIP
+  port: "${POSTGRES_PORT}"
+
+metrics:
+  enabled: false
