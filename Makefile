@@ -103,7 +103,7 @@ info:
 full: clean build analyze tag push signature info deploy
 	@echo "$(GREEN)🎉 Pipeline complete!$(NC)"
 
-# ❓ Show available commands
+# ❓ Show available commands.sh
 help:
 	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
 	@echo "$(BLUE)║           TASK-PAD DOCKER COMMANDS                           ║$(NC)"
