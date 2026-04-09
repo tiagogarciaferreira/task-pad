@@ -10,7 +10,7 @@ on:
       - '.prettierrc'
       - '.gitignore'
       - '.env.template'
-      - '.github/**'
+      #- '.github/**'
       - 'dist/**'
       - 'docker/**'
       - 'tasks.json'
