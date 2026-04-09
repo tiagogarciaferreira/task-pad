@@ -24,6 +24,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -31,7 +34,6 @@ jobs:
     env:
       NODE_VERSION: '24.14.1'
       ENVIRONMENT: 'production'
-      DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
 
     permissions:
       id-token: write
@@ -39,7 +41,7 @@ jobs:
       packages: read
 
     outputs:
-      new-image: ${{ steps.push.outputs.digest }}
+      image-digest: ${{ steps.push.outputs.digest }}
       image-tags: ${{ steps.meta.outputs.tags }}
 
     steps:
@@ -143,14 +145,10 @@ jobs:
             NODE_ENV=${{ env.ENVIRONMENT }}
             BUILD_MODE=${{ env.ENVIRONMENT }}
 
-      - name: Print build info
-        run: |
-          echo "Image digest ------> : ${{ steps.push.outputs.digest  }}"
-
       - name: Dive analyze
         uses: dzhunli/godive-action@v2.0.8
         with:
-          image_name: ${{ steps.push.outputs.digest  }}
+          image_name: "${{env.DOCKER_HUB_REPO}}@${{ steps.push.outputs.digest }}"
           use_config: true
           ci_config: docker/analyze/.dive.yaml
           continue_on_fail: false
@@ -191,7 +189,7 @@ jobs:
     needs: build-and-push
 
     env:
-      NEW_IMAGE: ${{ needs.build-and-push.outputs.new-image }}
+      IMAGE_DIGEST: ${{ needs.build-and-push.outputs.image-digest }}
       IMAGE_TAGS: ${{ needs.build-and-push.outputs.image-tags }}
 
     permissions:
@@ -200,7 +198,6 @@ jobs:
     steps:
       - name: Print env vars
         run: |
-          echo "New image: ${env.NEW_IMAGE}"
           echo "Image tags: ${env.IMAGE_TAGS}"
 
       - name: Generate token do App
@@ -243,19 +240,17 @@ jobs:
       - name: Verify Docker image signature
         run: |
           first_tag=$(echo "${env.IMAGE_TAGS}" | head -n1)
-          cosign verify --key cosign.pub "${first_tag}@${env.NEW_IMAGE}"
+          cosign verify --key cosign.pub "${first_tag}@${env.IMAGE_DIGEST}"
 
       #- name: Deploy on EKS
       #  run: |
-      #    kubectl set image deployment/taskpad-app taskpad-app="${env.NEW_IMAGE}" -n app
+      #    kubectl set image deployment/taskpad-app taskpad-app="${env.IMAGE_DIGEST????}" -n app
       #    kubectl rollout status deployment/taskpad-app -n app --timeout=5m
 
       - name: Update image in deployment
         run: |
           CURRENT_IMAGE="tiagogferreirainfnet/task-pad@sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b16e"
-          echo "Image to update: ${env.NEW_IMAGE}"
-          echo "Current image: ${CURRENT_IMAGE}"
-          echo "Image tags: ${env.IMAGE_TAGS}"
+          NEW_IMAGE="${{ env.DOCKER_HUB_REPO }}${env.IMAGE_DIGEST}"
 
           sed -i "s|image: ${CURRENT_IMAGE}|image: ${env.NEW_IMAGE}|g" k8s/namespace/app/deployment.yaml
           git config user.name "app-auto-commit-bot[bot]"
