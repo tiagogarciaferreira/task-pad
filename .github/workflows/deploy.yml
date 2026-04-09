@@ -143,6 +143,10 @@ jobs:
             NODE_ENV=${{ env.ENVIRONMENT }}
             BUILD_MODE=${{ env.ENVIRONMENT }}
 
+      - name: Print build info
+        run: |
+          echo "Image digest ------> : ${{ steps.push.outputs.digest  }}"
+
       - name: Dive analyze
         uses: dzhunli/godive-action@v2.0.8
         with:
