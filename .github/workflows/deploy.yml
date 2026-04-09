@@ -147,14 +147,15 @@ jobs:
             BUILD_MODE=${{ env.ENVIRONMENT }}
 
       - name: Dive analyze
-        uses: dzhunli/godive-action@v2.0.8
+        uses: MaxymVlasov/dive-action@v1.6.0
         with:
-          image_name: ${{ steps.push.outputs.image }}
-          use_config: true
-          ci_config: docker/analyze/.dive.yaml
-          continue_on_fail: false
-          report: false
-          summary: false
+          image: ${{ steps.push.outputs.image }}
+          config-file: ${{ github.workspace }}/docker/analyze/.dive.yaml
+          #use_config: true
+          #ci_config: docker/analyze/.dive.yaml
+          #continue_on_fail: false
+          #report: false
+          #summary: false
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
