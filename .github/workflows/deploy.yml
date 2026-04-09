@@ -231,8 +231,6 @@ jobs:
 
       - name: Verify Docker image signature
         run: |
-        #  first_tag=$(echo "${env.IMAGE_TAGS}" | head -n1)
-        #  cosign verify --key cosign.pub "${first_tag}@${env.IMAGE_DIGEST}"
           echo "Verifying image signature --------> ${env.DOCKER_HUB_REPO}@${env.IMAGE_DIGEST}"
           cosign verify --key cosign.pub "${env.DOCKER_HUB_REPO}@${env.IMAGE_DIGEST}"
 
