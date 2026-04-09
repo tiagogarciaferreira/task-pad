@@ -189,6 +189,7 @@ jobs:
       #IMAGE_TAGS: ${{ needs.build-and-push.outputs.image-tags }}
 
     permissions:
+      id-token: write
       contents: write
 
     steps:
