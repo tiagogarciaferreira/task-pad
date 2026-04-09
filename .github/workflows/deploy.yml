@@ -41,6 +41,7 @@ jobs:
       packages: read
 
     outputs:
+      image-name: ${{ steps.push.outputs.image }}
       image-digest: ${{ steps.push.outputs.digest }}
       image-tags: ${{ steps.meta.outputs.tags }}
 
@@ -148,7 +149,7 @@ jobs:
       - name: Dive analyze
         uses: dzhunli/godive-action@v2.0.8
         with:
-          image_name: "${{env.DOCKER_HUB_REPO}}@${{ steps.push.outputs.digest }}"
+          image_name: ${{ steps.push.outputs.image }}"
           use_config: true
           ci_config: docker/analyze/.dive.yaml
           continue_on_fail: false
