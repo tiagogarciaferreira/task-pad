@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: ['disable']
+    branches: ['feature/**']
     paths-ignore:
       - 'k8s/**'
       - '.angular/**'
@@ -34,9 +34,13 @@ jobs:
       DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
 
     permissions:
+      id-token: write
       contents: read
       packages: read
-      id-token: write
+
+    outputs:
+      new-image: ${{ steps.push.outputs.digest }}
+      image-tags: ${{ steps.meta.outputs.tags }}
 
     steps:
       - name: Checkout code
@@ -159,9 +163,6 @@ jobs:
           echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
           chmod 600 cosign.key
 
-          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" > cosign.pub
-          chmod 600 cosign.pub
-
       - name: Sign Docker image
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
@@ -175,17 +176,85 @@ jobs:
           done
           cosign sign --yes --key cosign.key ${images}
 
-      - name: Verify Docker image signature
-        env:
-          TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.push.outputs.digest  }}
-        run: |
-          first_tag=$(echo "${TAGS}" | head -n1)
-          cosign verify --key cosign.pub "${first_tag}@${DIGEST}"
-
       - name: Cleanup signing key
         if: always()
         run: |
           rm -f src/environments/environment.production.ts
           rm -f cosign.key
-          rm -f cosign.pub
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    env:
+      NEW_IMAGE: ${{ needs.build-and-push.outputs.new-image }}
+      IMAGE_TAGS: ${{ needs.build-and-push.outputs.image-tags }}
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Generate token do App
+        uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::733544352970:role/github-actions-eks-role
+          aws-region: us-east-1
+
+      #- name: Update kubeconfig
+      #  run: aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
+
+      #- name: Extract current image
+      #  run: |
+      #    CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
+      #    echo "CURRENT_IMAGE=${CURRENT_IMAGE}" >> $GITHUB_ENV
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.1.0
+        with:
+          cosign-release: 'v3.0.3'
+
+      - name: Decode Cosign signing key
+        run: |
+          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" > cosign.pub
+          chmod 600 cosign.pub
+
+      - name: Verify Docker image signature
+        run: |
+          first_tag=$(echo "${env.IMAGE_TAGS}" | head -n1)
+          cosign verify --key cosign.pub "${first_tag}@${env.NEW_IMAGE}"
+
+      #- name: Deploy on EKS
+      #  run: |
+      #    kubectl set image deployment/taskpad-app taskpad-app="${env.NEW_IMAGE}" -n app
+      #    kubectl rollout status deployment/taskpad-app -n app --timeout=5m
+
+      - name: Update image in deployment
+        run: |
+          CURRENT_IMAGE="tiagogferreirainfnet/task-pad@sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b16e"
+          echo "Image to update: ${env.NEW_IMAGE}"
+          echo "Current image: ${CURRENT_IMAGE}"
+          echo "Image tags: ${env.IMAGE_TAGS}"
+
+          sed -i "s|image: ${CURRENT_IMAGE}|image: ${env.NEW_IMAGE}|g" k8s/namespace/app/deployment.yaml
+          git config user.name "app-auto-commit-bot[bot]"
+          git config user.email "app-auto-commit-bot@github.com"
+          git add deployment.yaml
+          git commit -m "Update image to ${env.NEW_IMAGE}"
+          git push
+
+      - name: Cleanup signing key
+        if: always()
+        run: rm -f cosign.pub
