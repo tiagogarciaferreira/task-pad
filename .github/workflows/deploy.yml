@@ -149,7 +149,7 @@ jobs:
         uses: MaxymVlasov/dive-action@v1.6.0
         with:
           image: "${{ env.DOCKER_HUB_REPO }}@${{ steps.push.outputs.digest }}"
-          config-file: docker/analyze/.dive.yaml
+          config-file: "${{ github.workspace }}/docker/analyze/.dive.yaml"
           #use_config: true
           #ci_config: docker/analyze/.dive.yaml
           #continue_on_fail: false
