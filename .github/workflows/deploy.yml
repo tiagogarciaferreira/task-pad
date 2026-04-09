@@ -185,7 +185,7 @@ jobs:
     needs: build-and-push
 
     env:
-      IMAGE_DIGEST: ${{ needs.build-and-push.outputs.image-digest }}
+      NEW_IMAGE_DIGEST: ${{ needs.build-and-push.outputs.image-digest }}
       #IMAGE_TAGS: ${{ needs.build-and-push.outputs.image-tags }}
 
     permissions:
@@ -215,10 +215,11 @@ jobs:
       #- name: Update kubeconfig
       #  run: aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
 
-      #- name: Extract current image
+      #- name: Extract the current image
       #  run: |
       #    CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
-      #    echo "CURRENT_IMAGE=${CURRENT_IMAGE}" >> $GITHUB_ENV
+      #    OLD_IMAGE_DIGEST="${CURRENT_IMAGE##*@}"
+      #    echo "OLD_IMAGE_DIGEST=${OLD_IMAGE_DIGEST}" >> $GITHUB_ENV
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
@@ -232,8 +233,8 @@ jobs:
 
       - name: Verify Docker image signature
         run: |
-          echo "Verifying image signature --------> ${env.DOCKER_HUB_REPO}@${env.IMAGE_DIGEST}"
-          cosign verify --key cosign.pub "${env.DOCKER_HUB_REPO}@${env.IMAGE_DIGEST}"
+          echo "Verifying image signature --------> $DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST"
+          cosign verify --key cosign.pub "$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST"
 
       #- name: Deploy on EKS
       #  run: |
@@ -242,14 +243,14 @@ jobs:
 
       - name: Update image in deployment
         run: |
-          CURRENT_IMAGE="tiagogferreirainfnet/task-pad@sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b16e"
-          NEW_IMAGE="${ env.DOCKER_HUB_REPO }@${env.IMAGE_DIGEST}"
+          FILE="k8s/namespace/app/deployment.yaml"
+          OLD_IMAGE_DIGEST="sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b99e"
 
-          sed -i "s|image: ${CURRENT_IMAGE}|image: ${env.NEW_IMAGE}|g" k8s/namespace/app/deployment.yaml
+          sed -i "s|$OLD_IMAGE_DIGEST|$NEW_IMAGE_DIGEST|g" "$FILE"
           git config user.name "app-auto-commit-bot[bot]"
           git config user.email "app-auto-commit-bot@github.com"
-          git add deployment.yaml
-          git commit -m "Update image to ${env.NEW_IMAGE}"
+          git add "$FILE"
+          git commit -m "chore: update image to $NEW_IMAGE_DIGEST"
           git push
 
       - name: Cleanup signing key
