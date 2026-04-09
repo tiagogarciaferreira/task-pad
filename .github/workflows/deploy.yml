@@ -28,7 +28,7 @@ env:
   DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     env:
@@ -41,8 +41,7 @@ jobs:
       packages: read
 
     outputs:
-      image-digest: ${{ steps.push.outputs.digest }}
-      #image-tags: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build-push.outputs.digest }}
 
     steps:
       - name: Checkout code
@@ -132,7 +131,7 @@ jobs:
             type=raw,value=${{ steps.package-version.outputs.version }}
 
       - name: Build and push Docker image
-        id: push
+        id: build-push
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -148,7 +147,7 @@ jobs:
       - name: Dive analyze
         uses: MaxymVlasov/dive-action@v1.6.0
         with:
-          image: "${{ env.DOCKER_HUB_REPO }}@${{ steps.push.outputs.digest }}"
+          image: "${{ env.DOCKER_HUB_REPO }}@${{ steps.build-push.outputs.digest }}"
           config-file: "${{ github.workspace }}/docker/analyze/.dive.yaml"
 
       - name: Install Cosign
@@ -165,7 +164,7 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.push.outputs.digest  }}
+          DIGEST: ${{ steps.build-push.outputs.digest  }}
         run: |
           readarray -t tag_array <<< "${TAGS}"
           images=""
@@ -182,11 +181,10 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: build
 
     env:
-      NEW_IMAGE_DIGEST: ${{ needs.build-and-push.outputs.image-digest }}
-      #IMAGE_TAGS: ${{ needs.build-and-push.outputs.image-tags }}
+      NEW_IMAGE_DIGEST: ${{ needs.build.outputs.image-digest }}
 
     permissions:
       id-token: write
@@ -212,14 +210,18 @@ jobs:
           role-to-assume: arn:aws:iam::733544352970:role/github-actions-eks-role
           aws-region: us-east-1
 
-      #- name: Update kubeconfig
-      #  run: aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
 
-      #- name: Extract the current image
-      #  run: |
-      #    CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
-      #    OLD_IMAGE_DIGEST="${CURRENT_IMAGE##*@}"
-      #    echo "OLD_IMAGE_DIGEST=${OLD_IMAGE_DIGEST}" >> $GITHUB_ENV
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
+
+      - name: Extract the current image
+        run: |
+          kubectl get pods -n app
+          CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
+          OLD_IMAGE_DIGEST="${CURRENT_IMAGE##*@}"
+          echo "OLD_IMAGE_DIGEST=${OLD_IMAGE_DIGEST}" >> $GITHUB_ENV
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
@@ -232,26 +234,24 @@ jobs:
           chmod 600 cosign.pub
 
       - name: Verify Docker image signature
-        run: |
-          echo "Verifying image signature --------> $DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST"
-          cosign verify --key cosign.pub "$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST"
+        run: cosign verify --key cosign.pub "$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST"
 
       #- name: Deploy on EKS
       #  run: |
-      #    kubectl set image deployment/taskpad-app taskpad-app="${env.IMAGE_DIGEST????}" -n app
+      #    kubectl set image deployment/taskpad-app taskpad-app="$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST" -n app
       #    kubectl rollout status deployment/taskpad-app -n app --timeout=5m
 
-      - name: Update image in deployment
-        run: |
-          FILE="k8s/namespace/app/deployment.yaml"
-          OLD_IMAGE_DIGEST="sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b99e"
-
-          sed -i "s|$OLD_IMAGE_DIGEST|$NEW_IMAGE_DIGEST|g" "$FILE"
-          git config user.name "app-auto-commit-bot[bot]"
-          git config user.email "app-auto-commit-bot@github.com"
-          git add "$FILE"
-          git commit -m "chore: update image to $NEW_IMAGE_DIGEST"
-          git push
+      #- name: Update image in deployment
+      #  run: |
+      #    FILE="k8s/namespace/app/deployment.yaml"
+      #    OLD_IMAGE_DIGEST="sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b99e"
+#
+      #    sed -i "s|$OLD_IMAGE_DIGEST|$NEW_IMAGE_DIGEST|g" "$FILE"
+      #    git config user.name "app-auto-commit-bot[bot]"
+      #    git config user.email "app-auto-commit-bot@github.com"
+      #    git add "$FILE"
+      #    git commit -m "chore: update image to $NEW_IMAGE_DIGEST"
+      #    git push
 
       - name: Cleanup signing key
         if: always()
