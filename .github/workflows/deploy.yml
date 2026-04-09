@@ -194,6 +194,11 @@ jobs:
       contents: write
 
     steps:
+      - name: Print env vars
+        run: |
+          echo "New image: ${env.NEW_IMAGE}"
+          echo "Image tags: ${env.IMAGE_TAGS}"
+
       - name: Generate token do App
         uses: actions/create-github-app-token@v3
         id: app-token
