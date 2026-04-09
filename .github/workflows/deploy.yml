@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: ['disable']
+    branches: ['feature/**']
     paths-ignore:
       - 'k8s/**'
       - '.angular/**'
@@ -24,19 +24,25 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     env:
-      NODE_VERSION: '24.14.1'
+      NODE_VERSION: '24.14.0'
       ENVIRONMENT: 'production'
-      DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
 
     permissions:
+      id-token: write
       contents: read
       packages: read
-      id-token: write
+
+    outputs:
+      image-digest: ${{ steps.push.outputs.digest }}
+      #image-tags: ${{ steps.meta.outputs.tags }}
 
     steps:
       - name: Checkout code
@@ -50,7 +56,17 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v5
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-
+
       - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Install Angular CLI
@@ -77,6 +93,14 @@ jobs:
 
           test -f src/environments/environment.ts || exit 1
           test -f src/environments/environment.production.ts || exit 1
+
+      - name: Cache Angular build cache
+        uses: actions/cache@v5
+        with:
+          path: .angular/cache
+          key: ng-build-cache-${{ runner.os }}-${{ hashFiles('src/**/*.ts', 'angular.json') }}
+          restore-keys: |
+            ng-build-cache-${{ runner.os }}-
 
       - name: Build application
         run: ng build --configuration=${{ env.ENVIRONMENT }}
@@ -122,14 +146,10 @@ jobs:
             BUILD_MODE=${{ env.ENVIRONMENT }}
 
       - name: Dive analyze
-        uses: dzhunli/godive-action@v2.0.8
+        uses: MaxymVlasov/dive-action@v1.6.0
         with:
-          image_name: ${{ steps.push.outputs.digest  }}
-          use_config: true
-          ci_config: docker/analyze/.dive.yaml
-          continue_on_fail: false
-          report: false
-          summary: false
+          image: "${{ env.DOCKER_HUB_REPO }}@${{ steps.push.outputs.digest }}"
+          config-file: "${{ github.workspace }}/docker/analyze/.dive.yaml"
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
@@ -140,9 +160,6 @@ jobs:
         run: |
           echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
           chmod 600 cosign.key
-
-          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" > cosign.pub
-          chmod 600 cosign.pub
 
       - name: Sign Docker image
         env:
@@ -157,17 +174,85 @@ jobs:
           done
           cosign sign --yes --key cosign.key ${images}
 
-      - name: Verify Docker image signature
-        env:
-          TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.push.outputs.digest  }}
-        run: |
-          first_tag=$(echo "${TAGS}" | head -n1)
-          cosign verify --key cosign.pub "${first_tag}@${DIGEST}"
-
       - name: Cleanup signing key
         if: always()
         run: |
           rm -f src/environments/environment.production.ts
           rm -f cosign.key
-          rm -f cosign.pub
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    env:
+      IMAGE_DIGEST: ${{ needs.build-and-push.outputs.image-digest }}
+      #IMAGE_TAGS: ${{ needs.build-and-push.outputs.image-tags }}
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Generate token do App
+        uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::733544352970:role/github-actions-eks-role
+          aws-region: us-east-1
+
+      #- name: Update kubeconfig
+      #  run: aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
+
+      #- name: Extract current image
+      #  run: |
+      #    CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
+      #    echo "CURRENT_IMAGE=${CURRENT_IMAGE}" >> $GITHUB_ENV
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.1.0
+        with:
+          cosign-release: 'v3.0.3'
+
+      - name: Decode Cosign signing key
+        run: |
+          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" > cosign.pub
+          chmod 600 cosign.pub
+
+      - name: Verify Docker image signature
+        run: |
+        #  first_tag=$(echo "${env.IMAGE_TAGS}" | head -n1)
+        #  cosign verify --key cosign.pub "${first_tag}@${env.IMAGE_DIGEST}"
+          echo "Verifying image signature... ${env.DOCKER_HUB_REPO}@${env.IMAGE_DIGEST}"
+          cosign verify --key cosign.pub "${env.DOCKER_HUB_REPO}@${env.IMAGE_DIGEST}"
+
+      #- name: Deploy on EKS
+      #  run: |
+      #    kubectl set image deployment/taskpad-app taskpad-app="${env.IMAGE_DIGEST????}" -n app
+      #    kubectl rollout status deployment/taskpad-app -n app --timeout=5m
+
+      - name: Update image in deployment
+        run: |
+          CURRENT_IMAGE="tiagogferreirainfnet/task-pad@sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b16e"
+          NEW_IMAGE="${ env.DOCKER_HUB_REPO }@${env.IMAGE_DIGEST}"
+
+          sed -i "s|image: ${CURRENT_IMAGE}|image: ${env.NEW_IMAGE}|g" k8s/namespace/app/deployment.yaml
+          git config user.name "app-auto-commit-bot[bot]"
+          git config user.email "app-auto-commit-bot@github.com"
+          git add deployment.yaml
+          git commit -m "Update image to ${env.NEW_IMAGE}"
+          git push
+
+      - name: Cleanup signing key
+        if: always()
+        run: rm -f cosign.pub
