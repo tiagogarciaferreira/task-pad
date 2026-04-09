@@ -149,7 +149,7 @@ jobs:
       - name: Dive analyze
         uses: dzhunli/godive-action@v2.0.8
         with:
-          image_name: ${{ steps.push.outputs.image }}"
+          image_name: ${{ steps.push.outputs.image }}
           use_config: true
           ci_config: docker/analyze/.dive.yaml
           continue_on_fail: false
