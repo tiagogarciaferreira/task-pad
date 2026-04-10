@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: ['feature/**', 'refactor/**']
+    branches: ['disable-ci']
     paths-ignore:
       - 'k8s/**'
       - '.angular/**'
