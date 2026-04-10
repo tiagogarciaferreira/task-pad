@@ -10,7 +10,7 @@ on:
       - '.prettierrc'
       - '.gitignore'
       - '.env.template'
-      #- '.github/**'
+      - '.github/**'
       - 'dist/**'
       - 'docker/**'
       - 'tasks.json'
@@ -218,14 +218,6 @@ jobs:
 
       - name: Extract the current image
         run: |
-          aws sts get-caller-identity
-          kubectl config current-context
-          kubectl config view
-
-          kubectl get namespaces
-          kubectl get pods -n app
-          kubectl get nodes
-
           CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
           OLD_IMAGE_DIGEST="${CURRENT_IMAGE##*@}"
           echo "OLD_IMAGE_DIGEST=${OLD_IMAGE_DIGEST}" >> $GITHUB_ENV
@@ -243,22 +235,20 @@ jobs:
       - name: Verify Docker image signature
         run: cosign verify --key cosign.pub "$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST"
 
-      #- name: Deploy on EKS
-      #  run: |
-      #    kubectl set image deployment/taskpad-app taskpad-app="$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST" -n app
-      #    kubectl rollout status deployment/taskpad-app -n app --timeout=5m
+      - name: Deploy on EKS
+        run: |
+          kubectl set image deployment/taskpad-app taskpad-app="$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST" -n app
+          kubectl rollout status deployment/taskpad-app -n app --timeout=5m
 
-      #- name: Update image in deployment
-      #  run: |
-      #    FILE="k8s/namespace/app/deployment.yaml"
-      #    OLD_IMAGE_DIGEST="sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b99e"
-#
-      #    sed -i "s|$OLD_IMAGE_DIGEST|$NEW_IMAGE_DIGEST|g" "$FILE"
-      #    git config user.name "app-auto-commit-bot[bot]"
-      #    git config user.email "app-auto-commit-bot@github.com"
-      #    git add "$FILE"
-      #    git commit -m "chore: update image to $NEW_IMAGE_DIGEST"
-      #    git push
+      - name: Update image in deployment
+        run: |
+          FILE="k8s/namespace/app/deployment.yaml"
+          sed -i "s|$OLD_IMAGE_DIGEST|$NEW_IMAGE_DIGEST|g" "$FILE"
+          git config user.name "app-auto-commit-bot[bot]"
+          git config user.email "app-auto-commit-bot@github.com"
+          git add "$FILE"
+          git commit -m "chore: update image to $NEW_IMAGE_DIGEST"
+          git push
 
       - name: Cleanup signing key
         if: always()
