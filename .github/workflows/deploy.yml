@@ -218,7 +218,10 @@ jobs:
 
       - name: Extract the current image
         run: |
-          kubectl get pods -n app
+          aws sts get-caller-identity
+          kubectl config current-context
+          kubectl config view
+
           CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
           OLD_IMAGE_DIGEST="${CURRENT_IMAGE##*@}"
           echo "OLD_IMAGE_DIGEST=${OLD_IMAGE_DIGEST}" >> $GITHUB_ENV
