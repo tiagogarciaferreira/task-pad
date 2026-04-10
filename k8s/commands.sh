@@ -8,9 +8,6 @@ kubectl create namespace app
 kubectl create namespace monitoring
 
 # Storage Class
+kubectl get storageclass
 kubectl apply -f storage/storage-class.yaml
 kubectl get storageclass
-
-kubectl delete deployment taskpad-app --namespace app
-kubectl delete hpa taskpad-app-hpa --namespace app
-kubectl delete service taskpad-app-service --namespace app

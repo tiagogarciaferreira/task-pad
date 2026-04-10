@@ -9,9 +9,6 @@ envsubst < postgres/postgres-secret-template.yaml > postgres/postgres-secret.yam
 envsubst < postgres/postgres-values-template.yaml > postgres/postgres-values.yaml
 kubectl apply -f postgres/postgres-secret.yaml --namespace app
 
-helm uninstall taskpad-postgres --namespace app
-kubectl delete pvc postgres-data-taskpad-postgres-postgresql-0 --namespace app
-kubectl delete pvc --namespace app -l app.kubernetes.io/instance=taskpad-postgres
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install -f postgres/postgres-values.yaml taskpad-postgres bitnami/postgresql --version 18.5.15 --namespace app
 
