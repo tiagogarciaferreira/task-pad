@@ -17,9 +17,10 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
+        runAsUser: 65532
       containers:
         - name: taskpad-app
-          image: tiagogferreirainfnet/task-pad@sha256:220e59ade55fa42f631b4ae7b7feaaedd26599fa8662aee61751d977a9174b1f
+          image: tiagogferreirainfnet/task-pad@sha256:cefaa103e4d7c38bc68aec35f18644749ccdfee5608493a5a393c3857ab73744
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
@@ -89,5 +90,5 @@ spec:
     kind: Deployment
     name: taskpad-app
   minReplicas: 1
-  maxReplicas: 4
+  maxReplicas: 1
   targetCPUUtilizationPercentage: 85

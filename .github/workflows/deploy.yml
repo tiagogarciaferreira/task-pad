@@ -97,7 +97,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .angular/cache
-          key: ng-build-cache-${{ runner.os }}-${{ hashFiles('src/**/*.ts', 'angular.json') }}
+          key: ng-build-cache-${{ runner.os }}-${{ hashFiles('src/**/*.ts', 'src/**/*.js', 'angular.json') }}
           restore-keys: |
             ng-build-cache-${{ runner.os }}-
 

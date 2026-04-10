@@ -1,11 +1,6 @@
 # Steps
 kubectl get namespaces
 kubectl create namespace app
-
-# Required Role with: 'AmazonEBSCSIDriverPolicy'
-#kubectl get pods -n kube-system | grep ebs
-#kubectl rollout restart deployment ebs-csi-controller -n kube-system
-
 kubectl apply -f config/app-config-map.yaml --namespace app
 
 source ../../../.env.production
@@ -33,12 +28,6 @@ kubectl apply -f deployment.yaml --namespace app
 kubectl apply -f service.yaml --namespace app
 kubectl get pods --namespace app
 
-kubectl get storageclass
-kubectl patch storageclass gp2 -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-kubectl patch storageclass gp3 -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-kubectl get pods -n kube-system | grep ebs
-kubectl rollout restart deployment ebs-csi-controller -n kube-system
-kubectl delete deployment taskpad-app --namespace app
-
-
-
+kubectl delete deployment taskpad-app
+kubectl delete hpa taskpad-app-hpa
+kubectl delete service taskpad-app
