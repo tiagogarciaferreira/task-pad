@@ -8,7 +8,9 @@ kubectl create namespace app
 kubectl create namespace monitoring
 
 # Storage Class
+kubectl apply -f storage/storage-class.yaml
 kubectl get storageclass
-kubectl apply -f storage-class.yaml
-kubectl patch storageclass gp2 -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-kubectl patch storageclass gp3 -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+kubectl delete deployment taskpad-app --namespace app
+kubectl delete hpa taskpad-app-hpa --namespace app
+kubectl delete service taskpad-app-service --namespace app

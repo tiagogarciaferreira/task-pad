@@ -5,7 +5,7 @@ let isReady = false;
 let angularBuilt = false;
 
 function checkAngularAssets() {
-  const angularIndexPath = path.join(__dirname, '../../public', 'index.html');
+  const angularIndexPath = path.join(process.cwd(), 'public', 'index.html');
   angularBuilt = fs.existsSync(angularIndexPath);
   return angularBuilt;
 }

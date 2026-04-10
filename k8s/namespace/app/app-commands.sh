@@ -28,7 +28,3 @@ kubectl get pods --namespace app
 kubectl apply -f deployment.yaml --namespace app
 kubectl apply -f service.yaml --namespace app
 kubectl get pods --namespace app
-
-kubectl delete deployment taskpad-app --namespace app
-kubectl delete hpa taskpad-app-hpa --namespace app
-kubectl delete service taskpad-app-service --namespace app
