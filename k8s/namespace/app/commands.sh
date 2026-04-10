@@ -1,22 +1,44 @@
-# Namespace
+# Steps
+kubectl get namespaces
 kubectl create namespace app
 
-# Envs
-cd k8s/namespace/app || false
+# Required Role with: 'AmazonEBSCSIDriverPolicy'
+#kubectl get pods -n kube-system | grep ebs
+#kubectl rollout restart deployment ebs-csi-controller -n kube-system
+
+kubectl apply -f config/app-config-map.yaml --namespace app
+
 source ../../../.env.production
+export POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
+envsubst < postgres/postgres-secret-template.yaml > postgres/postgres-secret.yaml
+envsubst < postgres/postgres-values-template.yaml > postgres/postgres-values.yaml
+kubectl apply -f postgres/postgres-secret.yaml --namespace app
+
+helm uninstall taskpad-postgres --namespace app
+kubectl delete pvc postgres-data-taskpad-postgres-postgresql-0 --namespace app
+kubectl delete pvc --namespace app -l app.kubernetes.io/instance=taskpad-postgres
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install -f postgres/postgres-values.yaml taskpad-postgres bitnami/postgresql --version 18.5.15 --namespace app
+
+kubectl get pvc --namespace app
+kubectl get pods --namespace app
 
 export FIREBASE_SERVICE_ACCOUNT POSTGRES_PORT POSTGRES_DB POSTGRES_USER DATABASE_URL
 export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
-
 envsubst < config/app-secrets-template.yaml > config/app-secrets.yaml
-envsubst < postgres/postgres-values-template.yaml > postgres/postgres-values.yaml
-envsubst < postgres/postgres-secret-template.yaml > postgres/postgres-secret.yaml
-
-# Secrets
-kubectl apply -f config/app-config-map.yaml --namespace app
 kubectl apply -f config/app-secrets.yaml --namespace app
-kubectl apply -f postgres/postgres-secret.yaml --namespace app
+kubectl get pods --namespace app
 
-# Postgres
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install -f postgres/postgres-values.yaml taskpad-postgres bitnami/postgresql --version 18.5.15 --namespace app
+kubectl apply -f deployment.yaml --namespace app
+kubectl apply -f service.yaml --namespace app
+kubectl get pods --namespace app
+
+kubectl get storageclass
+kubectl patch storageclass gp2 -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+kubectl patch storageclass gp3 -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+kubectl get pods -n kube-system | grep ebs
+kubectl rollout restart deployment ebs-csi-controller -n kube-system
+kubectl delete deployment taskpad-app --namespace app
+
+
+

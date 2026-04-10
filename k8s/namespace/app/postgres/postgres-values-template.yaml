@@ -19,8 +19,8 @@ primary:
 
   persistence:
     enabled: true
-    volumeName: "postgres_data"
-    size: 5Gi
+    storageClass: "gp3"
+    size: 2Gi
 
 service:
   type: ClusterIP

@@ -19,7 +19,7 @@ spec:
         runAsNonRoot: true
       containers:
         - name: taskpad-app
-          image: tiagogferreirainfnet/task-pad@sha256:726868974273b36edc325292c304c61da89cbc9918271661073fef226468955e
+          image: tiagogferreirainfnet/task-pad@sha256:220e59ade55fa42f631b4ae7b7feaaedd26599fa8662aee61751d977a9174b1f
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
