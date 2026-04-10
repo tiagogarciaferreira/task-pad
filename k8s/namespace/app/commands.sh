@@ -18,7 +18,8 @@ helm install -f postgres/postgres-values.yaml taskpad-postgres bitnami/postgresq
 kubectl get pvc --namespace app
 kubectl get pods --namespace app
 
-export FIREBASE_SERVICE_ACCOUNT POSTGRES_PORT POSTGRES_DB POSTGRES_USER DATABASE_URL
+source ../../../.env.production
+export FIREBASE_SERVICE_ACCOUNT POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_URL
 export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
 envsubst < config/app-secrets-template.yaml > config/app-secrets.yaml
 kubectl apply -f config/app-secrets.yaml --namespace app
@@ -28,6 +29,6 @@ kubectl apply -f deployment.yaml --namespace app
 kubectl apply -f service.yaml --namespace app
 kubectl get pods --namespace app
 
-kubectl delete deployment taskpad-app
-kubectl delete hpa taskpad-app-hpa
-kubectl delete service taskpad-app
+kubectl delete deployment taskpad-app --namespace app
+kubectl delete hpa taskpad-app-hpa --namespace app
+kubectl delete service taskpad-app-service --namespace app
