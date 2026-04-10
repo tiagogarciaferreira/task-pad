@@ -13,6 +13,10 @@ kubectl delete -f k8s/namespace/app/config/app-config-map.yaml --namespace app -
 kubectl delete -f k8s/namespace/app/postgres/postgres-secret.yaml --namespace app --ignore-not-found
 kubectl delete -f k8s/namespace/monitoring/grafana/grafana-secret.yaml --namespace monitoring --ignore-not-found
 
+kubectl delete deployment taskpad-app --namespace app --ignore-not-found
+kubectl delete hpa taskpad-app-hpa --namespace app --ignore-not-found
+kubectl delete service taskpad-app-service --namespace app --ignore-not-found
+
 # 3. Delete PVCs
 kubectl delete pvc --all --namespace app
 kubectl delete pvc --all --namespace monitoring
