@@ -4,9 +4,9 @@ services:
     container_name: app
     image: tiagogferreirainfnet/task-pad:latest
     restart: unless-stopped
-    #depends_on:
-    #  postgres:
-    #    condition: service_healthy
+    depends_on:
+      postgres:
+        condition: service_healthy
     env_file:
       - ../.env.production
     ports:
@@ -30,35 +30,35 @@ services:
     networks:
       - task-network
 
-  #postgres:
-  #  container_name: postgres
-  #  image: postgres:17.1-alpine
-  #  restart: unless-stopped
-  #  shm_size: 64mb
-  #  env_file:
-  #    - ../.env.production
-  #  ports:
-  #    - "127.0.0.1:${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
-  #  volumes:
-  #    - postgres_data:/var/lib/postgresql/data
-  #  healthcheck:
-  #    test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-d", "${POSTGRES_DB:-postgres}"]
-  #    interval: 10s
-  #    timeout: 5s
-  #    retries: 5
-  #    start_period: 10s
-  #  deploy:
-  #    resources:
-  #      limits:
-  #        cpus: "0.50"
-  #        memory: 256M
-  #      reservations:
-  #        cpus: "0.10"
-  #        memory: 64M
-  #  security_opt:
-  #    - no-new-privileges:true
-  #  networks:
-  #    - task-network
+  postgres:
+    container_name: postgres
+    image: postgres:17.1-alpine
+    restart: unless-stopped
+    shm_size: 64mb
+    env_file:
+      - ../.env.production
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-d", "${POSTGRES_DB:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - task-network
 
   prometheus:
     container_name: prometheus
