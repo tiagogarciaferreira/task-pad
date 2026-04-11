@@ -34,7 +34,7 @@ logs/
 # Testes
 coverage/
 .nyc_output/
-test/
+tests/
 *.test.js
 *.spec.js
 **/*.spec.ts
