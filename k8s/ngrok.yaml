@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taskpad-ngrok
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taskpad-ngrok
+  template:
+    metadata:
+      labels:
+        app: taskpad-ngrok
+    spec:
+      containers:
+        - name: ngrok
+          image: ngrok/ngrok:latest
+          env:
+            - name: NGROK_AUTHTOKEN
+              value: "COLE_SEU_TOKEN_AQUI"
+          command:
+            - "ngrok"
+            - "http"
+            - "taskpad-app-service.app.svc.cluster.local:4000"
+            - "--domain=SEU_DOMINIO_ESTATICO_AQUI.ngrok-free.app"
