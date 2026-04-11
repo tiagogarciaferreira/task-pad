@@ -6,12 +6,13 @@ dotenvFlow.config({
   default_node_env: 'development',
 });
 
-const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
-const serviceAccount = JSON.parse(serviceAccountJson);
+const base64ServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+const decodedJsonString = Buffer.from(base64ServiceAccount, 'base64').toString('utf-8');
+const serviceAccountCredential = JSON.parse(decodedJsonString);
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccountCredential),
   });
 }
 

@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { tb_tasks } = require('./schema');
 
-const client = postgres(process.env.DATABASE_URL, { max: 1 });
+const client = postgres(process.env.POSTGRES_URL, { max: 1 });
 const database = drizzle(client);
 
 async function runMigrations() {

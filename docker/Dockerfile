@@ -64,5 +64,5 @@ COPY --from=angular-builder --chown=nonroot:nonroot /app/dist/task-pad/browser .
 COPY --chown=nonroot:nonroot ../src/assets   ./src/assets
 
 EXPOSE 4000
-USER nonroot
+USER 65532
 CMD ["server.js"]

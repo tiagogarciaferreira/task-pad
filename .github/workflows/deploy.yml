@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: ['feature/**']
+    branches: ['disable-ci']
     paths-ignore:
       - 'k8s/**'
       - '.angular/**'
@@ -28,7 +28,7 @@ env:
   DOCKER_HUB_REPO: ${{ secrets.DOCKER_HUB_USERNAME }}/task-pad
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     env:
@@ -41,8 +41,7 @@ jobs:
       packages: read
 
     outputs:
-      image-digest: ${{ steps.push.outputs.digest }}
-      #image-tags: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build-push.outputs.digest }}
 
     steps:
       - name: Checkout code
@@ -98,7 +97,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .angular/cache
-          key: ng-build-cache-${{ runner.os }}-${{ hashFiles('src/**/*.ts', 'angular.json') }}
+          key: ng-build-cache-${{ runner.os }}-${{ hashFiles('src/**/*.ts', 'src/**/*.js', 'angular.json') }}
           restore-keys: |
             ng-build-cache-${{ runner.os }}-
 
@@ -132,7 +131,7 @@ jobs:
             type=raw,value=${{ steps.package-version.outputs.version }}
 
       - name: Build and push Docker image
-        id: push
+        id: build-push
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -148,7 +147,7 @@ jobs:
       - name: Dive analyze
         uses: MaxymVlasov/dive-action@v1.6.0
         with:
-          image: "${{ env.DOCKER_HUB_REPO }}@${{ steps.push.outputs.digest }}"
+          image: "${{ env.DOCKER_HUB_REPO }}@${{ steps.build-push.outputs.digest }}"
           config-file: "${{ github.workspace }}/docker/analyze/.dive.yaml"
 
       - name: Install Cosign
@@ -165,7 +164,7 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.push.outputs.digest  }}
+          DIGEST: ${{ steps.build-push.outputs.digest  }}
         run: |
           readarray -t tag_array <<< "${TAGS}"
           images=""
@@ -182,13 +181,13 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: build
 
     env:
-      IMAGE_DIGEST: ${{ needs.build-and-push.outputs.image-digest }}
-      #IMAGE_TAGS: ${{ needs.build-and-push.outputs.image-tags }}
+      NEW_IMAGE_DIGEST: ${{ needs.build.outputs.image-digest }}
 
     permissions:
+      id-token: write
       contents: write
 
     steps:
@@ -211,13 +210,17 @@ jobs:
           role-to-assume: arn:aws:iam::733544352970:role/github-actions-eks-role
           aws-region: us-east-1
 
-      #- name: Update kubeconfig
-      #  run: aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
 
-      #- name: Extract current image
-      #  run: |
-      #    CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
-      #    echo "CURRENT_IMAGE=${CURRENT_IMAGE}" >> $GITHUB_ENV
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
+
+      - name: Extract the current image
+        run: |
+          CURRENT_IMAGE=$(kubectl get deployment taskpad-app -n app -o jsonpath='{.spec.template.spec.containers[0].image}')
+          OLD_IMAGE_DIGEST="${CURRENT_IMAGE##*@}"
+          echo "OLD_IMAGE_DIGEST=${OLD_IMAGE_DIGEST}" >> $GITHUB_ENV
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.1.0
@@ -230,27 +233,21 @@ jobs:
           chmod 600 cosign.pub
 
       - name: Verify Docker image signature
-        run: |
-        #  first_tag=$(echo "${env.IMAGE_TAGS}" | head -n1)
-        #  cosign verify --key cosign.pub "${first_tag}@${env.IMAGE_DIGEST}"
-          echo "Verifying image signature... ${env.DOCKER_HUB_REPO}@${env.IMAGE_DIGEST}"
-          cosign verify --key cosign.pub "${env.DOCKER_HUB_REPO}@${env.IMAGE_DIGEST}"
+        run: cosign verify --key cosign.pub "$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST"
 
-      #- name: Deploy on EKS
-      #  run: |
-      #    kubectl set image deployment/taskpad-app taskpad-app="${env.IMAGE_DIGEST????}" -n app
-      #    kubectl rollout status deployment/taskpad-app -n app --timeout=5m
+      - name: Deploy on EKS
+        run: |
+          kubectl set image deployment/taskpad-app taskpad-app="$DOCKER_HUB_REPO@$NEW_IMAGE_DIGEST" -n app
+          kubectl rollout status deployment/taskpad-app -n app --timeout=5m
 
       - name: Update image in deployment
         run: |
-          CURRENT_IMAGE="tiagogferreirainfnet/task-pad@sha256:c85989256dd6c28afd213a89970b73b99b4607dff8813da48e686b629535b16e"
-          NEW_IMAGE="${ env.DOCKER_HUB_REPO }@${env.IMAGE_DIGEST}"
-
-          sed -i "s|image: ${CURRENT_IMAGE}|image: ${env.NEW_IMAGE}|g" k8s/namespace/app/deployment.yaml
+          FILE="k8s/namespace/app/deployment.yaml"
+          sed -i "s|$OLD_IMAGE_DIGEST|$NEW_IMAGE_DIGEST|g" "$FILE"
           git config user.name "app-auto-commit-bot[bot]"
           git config user.email "app-auto-commit-bot@github.com"
-          git add deployment.yaml
-          git commit -m "Update image to ${env.NEW_IMAGE}"
+          git add "$FILE"
+          git commit -m "chore: update image to $NEW_IMAGE_DIGEST"
           git push
 
       - name: Cleanup signing key
