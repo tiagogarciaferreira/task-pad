@@ -6,7 +6,7 @@
     "estimatedHours": 4.5,
     "tags": ["DOCKER", "SETUP", "ENVIRONMENT"],
     "priority": "High",
-    "dueDate": "2026-03-27T12:00:00Z"
+    "dueDate": "2026-04-15T12:00:00Z"
   },
   {
     "title": "Study Spring Boot fundamentals",
@@ -15,7 +15,7 @@
     "estimatedHours": 6,
     "tags": ["SPRING BOOT", "FUNDAMENTALS", "STUDY"],
     "priority": "Medium",
-    "dueDate": "2026-04-03T12:00:00Z"
+    "dueDate": "2026-04-18T12:00:00Z"
   },
   {
     "title": "Create base project with Spring Initializr",
@@ -24,7 +24,7 @@
     "estimatedHours": 2,
     "tags": ["SPRING BOOT", "SETUP", "INITIALIZR"],
     "priority": "High",
-    "dueDate": "2026-03-28T12:00:00Z"
+    "dueDate": "2026-04-14T12:00:00Z"
   },
   {
     "title": "Implement user CRUD with JPA",
@@ -33,7 +33,7 @@
     "estimatedHours": 8,
     "tags": ["JPA", "CRUD", "BACKEND"],
     "priority": "Medium",
-    "dueDate": "2026-04-05T12:00:00Z"
+    "dueDate": "2026-04-20T12:00:00Z"
   },
   {
     "title": "Configure PostgreSQL database",
@@ -42,7 +42,7 @@
     "estimatedHours": 3.5,
     "tags": ["POSTGRESQL", "FLYWAY", "DATABASE"],
     "priority": "Low",
-    "dueDate": "2026-04-08T12:00:00Z"
+    "dueDate": "2026-04-16T12:00:00Z"
   },
   {
     "title": "Develop JWT authentication",
@@ -51,7 +51,7 @@
     "estimatedHours": 10,
     "tags": ["JWT", "SECURITY", "AUTHENTICATION"],
     "priority": "High",
-    "dueDate": "2026-03-29T12:00:00Z"
+    "dueDate": "2026-04-13T12:00:00Z"
   },
   {
     "title": "Create RESTful endpoints with best practices",
@@ -60,7 +60,7 @@
     "estimatedHours": 7.5,
     "tags": ["REST API", "BEST PRACTICES", "SPRING MVC"],
     "priority": "High",
-    "dueDate": "2026-03-30T12:00:00Z"
+    "dueDate": "2026-04-14T12:00:00Z"
   },
   {
     "title": "Implement unit tests with JUnit and Mockito",
@@ -69,7 +69,7 @@
     "estimatedHours": 12,
     "tags": ["JUNIT", "MOCKITO", "TESTING"],
     "priority": "Medium",
-    "dueDate": "2026-04-04T12:00:00Z"
+    "dueDate": "2026-04-17T12:00:00Z"
   },
   {
     "title": "Configure logging with SLF4J and Logback",
@@ -78,7 +78,7 @@
     "estimatedHours": 3,
     "tags": ["LOGGING", "SLF4J", "LOGBACK"],
     "priority": "Low",
-    "dueDate": "2026-03-27T12:00:00Z"
+    "dueDate": "2026-04-12T12:00:00Z"
   },
   {
     "title": "Implement caching with Redis",
@@ -87,7 +87,7 @@
     "estimatedHours": 5.5,
     "tags": ["REDIS", "CACHE", "PERFORMANCE"],
     "priority": "Medium",
-    "dueDate": "2026-04-01T12:00:00Z"
+    "dueDate": "2026-04-15T12:00:00Z"
   },
   {
     "title": "Review code and apply code review feedback",
@@ -96,7 +96,7 @@
     "estimatedHours": 4,
     "tags": ["CODE REVIEW", "REFACTORING", "QUALITY"],
     "priority": "High",
-    "dueDate": "2026-03-27T12:00:00Z"
+    "dueDate": "2026-04-10T12:00:00Z"
   },
   {
     "title": "Document API with OpenAPI/Swagger",
@@ -105,7 +105,7 @@
     "estimatedHours": 3,
     "tags": ["SWAGGER", "OPENAPI", "DOCUMENTATION"],
     "priority": "Medium",
-    "dueDate": "2026-03-28T12:00:00Z"
+    "dueDate": "2026-04-09T12:00:00Z"
   },
   {
     "title": "Run integration tests",
@@ -114,7 +114,7 @@
     "estimatedHours": 6,
     "tags": ["INTEGRATION TESTS", "TESTCONTAINERS", "QUALITY"],
     "priority": "High",
-    "dueDate": "2026-03-29T12:00:00Z"
+    "dueDate": "2026-04-10T12:00:00Z"
   },
   {
     "title": "Validate performance with load tests",
@@ -123,7 +123,7 @@
     "estimatedHours": 5,
     "tags": ["PERFORMANCE", "JMETER", "LOAD TESTING"],
     "priority": "Medium",
-    "dueDate": "2026-03-30T12:00:00Z"
+    "dueDate": "2026-04-08T12:00:00Z"
   },
   {
     "title": "Check test coverage in SonarQube",
@@ -132,7 +132,7 @@
     "estimatedHours": 2.5,
     "tags": ["SONARQUBE", "QUALITY GATES", "METRICS"],
     "priority": "Low",
-    "dueDate": "2026-03-31T12:00:00Z"
+    "dueDate": "2026-04-07T12:00:00Z"
   },
   {
     "title": "Deploy to staging environment",
@@ -141,7 +141,7 @@
     "estimatedHours": 8,
     "tags": ["CI/CD", "DEPLOY", "DEVOPS"],
     "priority": "High",
-    "dueDate": "2026-03-20T12:00:00Z"
+    "dueDate": "2026-04-01T12:00:00Z"
   },
   {
     "title": "Set up monitoring with Actuator and Prometheus",
@@ -150,7 +150,7 @@
     "estimatedHours": 6.5,
     "tags": ["ACTUATOR", "PROMETHEUS", "MONITORING"],
     "priority": "Medium",
-    "dueDate": "2026-03-18T12:00:00Z"
+    "dueDate": "2026-03-30T12:00:00Z"
   },
   {
     "title": "Implement messaging with RabbitMQ",
@@ -159,7 +159,7 @@
     "estimatedHours": 9,
     "tags": ["RABBITMQ", "MESSAGING", "ASYNC"],
     "priority": "High",
-    "dueDate": "2026-03-15T12:00:00Z"
+    "dueDate": "2026-03-28T12:00:00Z"
   },
   {
     "title": "Create admin dashboard with Angular",
@@ -168,7 +168,7 @@
     "estimatedHours": 14,
     "tags": ["ANGULAR", "FRONTEND", "DASHBOARD"],
     "priority": "Medium",
-    "dueDate": "2026-03-10T12:00:00Z"
+    "dueDate": "2026-03-25T12:00:00Z"
   },
   {
     "title": "Prepare technical documentation and training",
@@ -177,6 +177,6 @@
     "estimatedHours": 5,
     "tags": ["DOCUMENTATION", "TRAINING", "KNOWLEDGE TRANSFER"],
     "priority": "Low",
-    "dueDate": "2026-03-05T12:00:00Z"
+    "dueDate": "2026-03-22T12:00:00Z"
   }
 ]

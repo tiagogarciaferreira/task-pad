@@ -36,6 +36,7 @@ COPY ../src/metrics       ./src/metrics
 COPY ../src/app/core      ./src/app/core
 COPY ../drizzle           ./drizzle
 COPY ../drizzle.config.js ./
+COPY ../tasks.json        ./
 
 RUN npm ci
 
@@ -60,6 +61,7 @@ COPY --from=backend-builder --chown=nonroot:nonroot /app/dist/server.js        .
 COPY --from=backend-builder --chown=nonroot:nonroot /app/drizzle               ./drizzle
 COPY --from=backend-builder --chown=nonroot:nonroot /app/drizzle.config.js     ./drizzle.config.js
 COPY --from=angular-builder --chown=nonroot:nonroot /app/dist/task-pad/browser ./public
+COPY --from=backend-builder --chown=nonroot:nonroot /app/tasks.json            ./tasks.json
 COPY --chown=nonroot:nonroot ../src/assets   ./src/assets
 
 EXPOSE 4000
