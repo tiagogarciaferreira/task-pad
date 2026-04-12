@@ -65,6 +65,5 @@ docs/
 .editorconfig
 .prettierrc
 proxy.conf.js
-#tasks.json
 .cosign
 k8s/
