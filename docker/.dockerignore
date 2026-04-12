@@ -67,3 +67,4 @@ docs/
 proxy.conf.js
 .cosign
 k8s/
+certs/
