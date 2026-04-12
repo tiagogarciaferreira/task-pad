@@ -15,13 +15,13 @@ async function runMigrations() {
   });
 }
 
-async function runImportData() {
+async function runImportData(userId) {
   const filePath = 'tasks.json';
   if (!fs.existsSync(filePath)) return;
   const tasksData = JSON.parse(readFileSync(filePath, 'utf8'));
 
   await database.delete(tb_tasks);
-  const formattedData = tasksData.map((task) => ({ ...task, dueDate: new Date(task.dueDate) }));
+  const formattedData = tasksData.map((task) => ({ ...task, userId: userId, dueDate: new Date(task.dueDate) }));
   await database.insert(tb_tasks).values(formattedData);
 }
 
@@ -34,4 +34,4 @@ runMigrations()
     process.exit(1);
   });
 
-module.exports = { database };
+module.exports = { database, runImportData };

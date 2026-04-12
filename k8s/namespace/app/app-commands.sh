@@ -16,10 +16,14 @@ kubectl get pvc --namespace app
 kubectl get pods --namespace app
 
 source ../../../.env.production
-export FIREBASE_SERVICE_ACCOUNT POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_URL
+export FIREBASE_SERVICE_ACCOUNT POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_URL TLS_CRT TLS_KEY POSTGRES_URL_AWS_EKS
 export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
+
 envsubst < config/app-secrets-template.yaml > config/app-secrets.yaml
+envsubst < config/app-tls-secret-template.yaml > config/app-tls-secret.yaml
+
 kubectl apply -f config/app-secrets.yaml --namespace app
+kubectl apply -f config/app-tls-secret.yaml --namespace app
 kubectl get pods --namespace app
 
 kubectl apply -f deployment.yaml --namespace app

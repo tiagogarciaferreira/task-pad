@@ -1,24 +1,26 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenvFlow = require('dotenv-flow');
 const { randomUUID } = require('crypto');
+const { createServer } = require('node:https');
 const { setupProbes } = require('./src/probes');
 const { setupMetrics } = require('./src/metrics');
-const { authMiddleware } = require('./src/middlewares/auth.middleware');
 const { resolveHost } = require('./src/utils/resolveHost');
+const { authMiddleware } = require('./src/middlewares/auth.middleware');
+const { runImportData } = require('./src/config/database/client');
 const { tb_tasks } = require('./src/config/database/schema');
 
-const {
-  eq, and, ilike, inArray, gte, lte, desc, ne, sql
-} = require('drizzle-orm');
-
-dotenvFlow.config({ node_env: process.env.NODE_ENV || 'development', default_node_env: 'development', });
+const { eq, and, ilike, inArray, gte, lte, desc, ne, sql } = require('drizzle-orm');
+dotenvFlow.config({
+  node_env: process.env.NODE_ENV || 'development',
+  default_node_env: 'development',
+});
 
 const { database } = require('./src/config/database/client');
 const app = express();
-
 const { TaskSchema, TaskUpdateSchema, SearchSchema } = require('./src/schemas/task.schema');
 
 app.use(
@@ -149,6 +151,15 @@ app.get('/api/tasks/search', authMiddleware, async (req, res) => {
     }
 
     const conditions = [eq(tb_tasks.userId, userId)];
+
+    const existing = await database
+      .select()
+      .from(tb_tasks)
+      .where(and(...conditions))
+      .limit(1);
+
+    if (existing.length === 0) await runImportData(userId);
+
     if (title) conditions.push(ilike(tb_tasks.title, `%${title}%`));
     if (statusArray.length > 0) conditions.push(inArray(tb_tasks.status, statusArray));
     if (priorityArray.length > 0) conditions.push(inArray(tb_tasks.priority, priorityArray));
@@ -275,30 +286,41 @@ app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
   }
 });
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(process.cwd(), 'public')));
+const isProduction = process.env.NODE_ENV === 'production';
 
+if (isProduction) {
+  app.use(express.static(path.join(process.cwd(), 'public')));
   app.get(/.*/, (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
   });
 }
 
-app.listen(PORT, async () => {
+const server = (() => {
+  if (!isProduction) return app;
+  const key = fs.readFileSync('/certs/tls.key', 'utf8');
+  const cert = fs.readFileSync('/certs/tls.crt', 'utf8');
+  return createServer({ key, cert }, app);
+})();
+
+server.listen(PORT, async () => {
   const dbOk = await probes.checkDb();
   const frontendOk = probes.checkFrontend();
-  const hostName = resolveHost().trim();
 
-  console.log(`🚀 Server running on ${hostName}:${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🗄️ Database: ${dbOk ? 'connected' : 'disconnected'}`);
-  console.log(`🎨 Frontend: ${frontendOk ? 'built' : 'not found (dev mode)'}`);
-  console.log(`📡 Live: ${hostName}:${PORT}/live`);
-  console.log(`📡 Ready: ${hostName}:${PORT}/ready`);
-  console.log(`📡 Health: ${hostName}:${PORT}/health`);
-  console.log(`📊 Metrics: ${hostName}:${PORT}/metrics`);
+  if (!isProduction){
+    const hostName = resolveHost().trim();
+    const protocol = 'http';
+    console.log(`🚀 Server running on ${protocol}://${hostName}:${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+    console.log(`🗄️ Database: ${dbOk ? 'connected' : 'disconnected'}`);
+    console.log(`🎨 Frontend: ${frontendOk ? 'built' : 'not found (dev mode)'}`);
+    console.log(`📡 Live: ${protocol}://${hostName}:${PORT}/live`);
+    console.log(`📡 Ready: ${protocol}://${hostName}:${PORT}/ready`);
+    console.log(`📡 Health: ${protocol}://${hostName}:${PORT}/health`);
+    console.log(`📊 Metrics: ${protocol}://${hostName}:${PORT}/metrics`);
+  }
 
   setTimeout(() => {
     probes.setReady();
-    console.log('✅ Application is ready to accept traffic');
-  }, 3000);
+    console.log('[Internal] ✅ Application is ready to accept traffic');
+  }, 5000);
 });

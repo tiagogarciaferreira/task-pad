@@ -37,6 +37,7 @@ COPY ../src/metrics       ./src/metrics
 COPY ../src/app/core      ./src/app/core
 COPY ../drizzle           ./drizzle
 COPY ../drizzle.config.js ./
+COPY ../tasks.json        ./
 
 RUN npm ci
 
@@ -60,6 +61,7 @@ WORKDIR /app
 COPY --from=backend-builder --chown=nonroot:nonroot /app/dist/server.js        ./server.js
 COPY --from=backend-builder --chown=nonroot:nonroot /app/drizzle               ./drizzle
 COPY --from=backend-builder --chown=nonroot:nonroot /app/drizzle.config.js     ./drizzle.config.js
+COPY --from=backend-builder --chown=nonroot:nonroot /app/tasks.json            ./tasks.json
 COPY --from=angular-builder --chown=nonroot:nonroot /app/dist/task-pad/browser ./public
 COPY --chown=nonroot:nonroot ../src/assets   ./src/assets
 

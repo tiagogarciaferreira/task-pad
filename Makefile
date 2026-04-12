@@ -59,11 +59,11 @@ analyze:
 				$(DIGEST)
 	@echo "$(GREEN)✅ Analysis complete$(NC)"
 
-# 🚀 Deploy
-deploy:
-	@echo "$(BLUE)🚀 Deploying environment...$(NC)"
+# 🚀 Up
+up:
+	@echo "$(BLUE)🚀 Rising environment...$(NC)"
 	docker compose -p "taskpad" -f docker/docker-compose.yaml --env-file ./.env.production up -d
-	@echo "$(GREEN)✅ Deployment complete$(NC)"
+	@echo "$(GREEN)✅ Environment is up$(NC)"
 
 # ============================================
 # UTILITY TARGETS
@@ -100,7 +100,7 @@ info:
 	echo  "  🔐  Signature: $(GREEN)$$SIGN_STATUS $(NC)"
 
 # 🔄 Full pipeline
-full: clean build analyze tag push signature info deploy
+full: clean build analyze tag push signature info up
 	@echo "$(GREEN)🎉 Pipeline complete!$(NC)"
 
 # ❓ Show available commands
@@ -113,10 +113,10 @@ help:
 	@echo "  make build     🏗️ Build image"
 	@echo "  make tag       🏷️ Tag image"
 	@echo "  make push      📤 Push image to registry"
-	@echo "  make deploy    🚀 Deploy environment"
+	@echo "  make up        🚀 Environment up"
 	@echo ""
 	@echo "$(GREEN)Pipeline Commands:$(NC)"
-	@echo "  make full            🔄 Full pipeline (clean → build → tag → push → deploy)"
+	@echo "  make full            🔄 Full pipeline (clean → build → tag → push → up)"
 	@echo ""
 	@echo "$(GREEN)Utility Commands:$(NC)"
 	@echo "  make clean          🧹 Remove containers, images, and build cache"
@@ -127,4 +127,4 @@ help:
 	@echo "  make help           ❓ Show this help message"
 	@echo ""
 
-.PHONY: build tag push deploy clean signature analyze drizzle-migrate info full help
+.PHONY: build tag push up clean signature analyze drizzle-migrate info full help
