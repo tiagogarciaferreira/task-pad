@@ -74,11 +74,6 @@ spec:
                 configMapKeyRef:
                   name: app-config-map
                   key: PORT
-            - name: FIREBASE_SERVICE_ACCOUNT
-              valueFrom:
-                secretKeyRef:
-                  name: app-secret
-                  key: FIREBASE_SERVICE_ACCOUNT
             - name: POSTGRES_URL
               valueFrom:
                 secretKeyRef:

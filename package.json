@@ -1,6 +1,6 @@
 {
   "name": "task-pad",
-  "version": "1.1.10",
+  "version": "1.2.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -27,7 +27,6 @@
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
-    "@angular/fire": "^21.0.0-rc.0",
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
@@ -37,8 +36,6 @@
     "dotenv-flow": "^4.1.0",
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
-    "firebase": "^11.0.0",
-    "firebase-admin": "^13.7.0",
     "flatpickr": "^4.6.13",
     "helmet": "^8.1.0",
     "postgres": "^3.4.8",

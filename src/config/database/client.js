@@ -20,6 +20,9 @@ async function runImportData(userId) {
   if (!fs.existsSync(filePath)) return;
   const tasksData = JSON.parse(readFileSync(filePath, 'utf8'));
 
+  const existing = await database.select().from(tb_tasks).limit(1);
+  if (existing.length > 0) return;
+
   await database.delete(tb_tasks);
   const formattedData = tasksData.map((task) => ({ ...task, userId: userId, dueDate: new Date(task.dueDate) }));
   await database.insert(tb_tasks).values(formattedData);
@@ -27,7 +30,7 @@ async function runImportData(userId) {
 
 runMigrations()
   .then(() => {
-    if (process.env.NODE_ENV === 'development') return runImportData();
+    return runImportData();
   })
   .catch((err) => {
     console.error('[db] Fatal error during initialization:', err);

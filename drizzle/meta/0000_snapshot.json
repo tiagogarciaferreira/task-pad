@@ -1,5 +1,5 @@
 {
-  "id": "53bcd325-16ed-4de7-8649-06ba803e224a",
+  "id": "11fa5915-f20c-400c-ac89-89555a8a234c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -46,12 +46,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'To Do'"
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
         },
         "priority": {
           "name": "priority",
