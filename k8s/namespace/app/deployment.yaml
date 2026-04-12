@@ -20,8 +20,12 @@ spec:
         runAsUser: 65532
       containers:
         - name: taskpad-app
-          image: tiagogferreirainfnet/task-pad@sha256:154be1561413fc630e098cdf8be7bd2e41f0488be1691c4ba42cb2442d620d74
+          image: tiagogferreirainfnet/task-pad@sha256:b926e5d64402c3cf80672c24439d57efd6b4c13f95da8013496fb14a590ad931
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /certs
+              readOnly: true
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
@@ -29,6 +33,7 @@ spec:
             httpGet:
               path: /live
               port: 4000
+              scheme: HTTPS
             periodSeconds: 10
             timeoutSeconds: 3
             successThreshold: 1
@@ -37,6 +42,7 @@ spec:
             httpGet:
               path: /live
               port: 4000
+              scheme: HTTPS
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
@@ -45,6 +51,7 @@ spec:
             httpGet:
               path: /ready
               port: 4000
+              scheme: HTTPS
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
@@ -72,7 +79,10 @@ spec:
                 secretKeyRef:
                   name: app-secret
                   key: POSTGRES_URL
-
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: app-tls-secret
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler

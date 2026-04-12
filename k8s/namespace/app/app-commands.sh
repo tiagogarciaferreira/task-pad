@@ -17,9 +17,13 @@ kubectl get pods --namespace app
 
 source ../../../.env.production
 export POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_URL_AWS_EKS POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
-export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD
+export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD TLS_CRT TLS_KEY
+
 envsubst < config/app-secrets-template.yaml > config/app-secrets.yaml
+envsubst < config/app-tls-secret-template.yaml > config/app-tls-secret.yaml
+
 kubectl apply -f config/app-secrets.yaml --namespace app
+kubectl apply -f config/app-tls-secret.yaml --namespace app
 kubectl get pods --namespace app
 
 kubectl apply -f deployment.yaml --namespace app
