@@ -16,8 +16,7 @@ COPY ../public ./public/
 
 RUN npm run build -- --configuration=production && \
     find dist/task-pad/browser -name "*.map" -delete && \
-    rm -rf dist/task-pad/browser/*.LICENSE.txt 2>/dev/null || true && \
-    rm -rf src/environments
+    rm -rf dist/task-pad/browser/*.LICENSE.txt 2>/dev/null || true
 
 # ============================================================
 # STAGE 2: Backend Builder
