@@ -16,7 +16,7 @@ kubectl get pvc --namespace app
 kubectl get pods --namespace app
 
 source ../../../.env.production
-export POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_URL POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
+export POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_URL_AWS_EKS POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
 export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD
 envsubst < config/app-secrets-template.yaml > config/app-secrets.yaml
 kubectl apply -f config/app-secrets.yaml --namespace app
