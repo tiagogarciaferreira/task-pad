@@ -5,9 +5,8 @@
     "status": "To Do",
     "estimatedHours": 4.5,
     "tags": ["DOCKER", "SETUP", "ENVIRONMENT"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "High",
-    "dueDate": "2026-03-27T12:00:00Z"
+    "dueDate": "2026-04-15T12:00:00Z"
   },
   {
     "title": "Study Spring Boot fundamentals",
@@ -15,9 +14,8 @@
     "status": "To Do",
     "estimatedHours": 6,
     "tags": ["SPRING BOOT", "FUNDAMENTALS", "STUDY"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Medium",
-    "dueDate": "2026-04-03T12:00:00Z"
+    "dueDate": "2026-04-18T12:00:00Z"
   },
   {
     "title": "Create base project with Spring Initializr",
@@ -25,9 +23,8 @@
     "status": "To Do",
     "estimatedHours": 2,
     "tags": ["SPRING BOOT", "SETUP", "INITIALIZR"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "High",
-    "dueDate": "2026-03-28T12:00:00Z"
+    "dueDate": "2026-04-14T12:00:00Z"
   },
   {
     "title": "Implement user CRUD with JPA",
@@ -35,9 +32,8 @@
     "status": "To Do",
     "estimatedHours": 8,
     "tags": ["JPA", "CRUD", "BACKEND"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Medium",
-    "dueDate": "2026-04-05T12:00:00Z"
+    "dueDate": "2026-04-20T12:00:00Z"
   },
   {
     "title": "Configure PostgreSQL database",
@@ -45,9 +41,8 @@
     "status": "To Do",
     "estimatedHours": 3.5,
     "tags": ["POSTGRESQL", "FLYWAY", "DATABASE"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Low",
-    "dueDate": "2026-04-08T12:00:00Z"
+    "dueDate": "2026-04-16T12:00:00Z"
   },
   {
     "title": "Develop JWT authentication",
@@ -55,9 +50,8 @@
     "status": "In Progress",
     "estimatedHours": 10,
     "tags": ["JWT", "SECURITY", "AUTHENTICATION"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "High",
-    "dueDate": "2026-03-29T12:00:00Z"
+    "dueDate": "2026-04-13T12:00:00Z"
   },
   {
     "title": "Create RESTful endpoints with best practices",
@@ -65,9 +59,8 @@
     "status": "In Progress",
     "estimatedHours": 7.5,
     "tags": ["REST API", "BEST PRACTICES", "SPRING MVC"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "High",
-    "dueDate": "2026-03-30T12:00:00Z"
+    "dueDate": "2026-04-14T12:00:00Z"
   },
   {
     "title": "Implement unit tests with JUnit and Mockito",
@@ -75,9 +68,8 @@
     "status": "In Progress",
     "estimatedHours": 12,
     "tags": ["JUNIT", "MOCKITO", "TESTING"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Medium",
-    "dueDate": "2026-04-04T12:00:00Z"
+    "dueDate": "2026-04-17T12:00:00Z"
   },
   {
     "title": "Configure logging with SLF4J and Logback",
@@ -85,9 +77,8 @@
     "status": "In Progress",
     "estimatedHours": 3,
     "tags": ["LOGGING", "SLF4J", "LOGBACK"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Low",
-    "dueDate": "2026-03-27T12:00:00Z"
+    "dueDate": "2026-04-12T12:00:00Z"
   },
   {
     "title": "Implement caching with Redis",
@@ -95,9 +86,8 @@
     "status": "In Progress",
     "estimatedHours": 5.5,
     "tags": ["REDIS", "CACHE", "PERFORMANCE"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Medium",
-    "dueDate": "2026-04-01T12:00:00Z"
+    "dueDate": "2026-04-15T12:00:00Z"
   },
   {
     "title": "Review code and apply code review feedback",
@@ -105,9 +95,8 @@
     "status": "Review",
     "estimatedHours": 4,
     "tags": ["CODE REVIEW", "REFACTORING", "QUALITY"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "High",
-    "dueDate": "2026-03-27T12:00:00Z"
+    "dueDate": "2026-04-10T12:00:00Z"
   },
   {
     "title": "Document API with OpenAPI/Swagger",
@@ -115,9 +104,8 @@
     "status": "Review",
     "estimatedHours": 3,
     "tags": ["SWAGGER", "OPENAPI", "DOCUMENTATION"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Medium",
-    "dueDate": "2026-03-28T12:00:00Z"
+    "dueDate": "2026-04-09T12:00:00Z"
   },
   {
     "title": "Run integration tests",
@@ -125,9 +113,8 @@
     "status": "Review",
     "estimatedHours": 6,
     "tags": ["INTEGRATION TESTS", "TESTCONTAINERS", "QUALITY"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "High",
-    "dueDate": "2026-03-29T12:00:00Z"
+    "dueDate": "2026-04-10T12:00:00Z"
   },
   {
     "title": "Validate performance with load tests",
@@ -135,9 +122,8 @@
     "status": "Review",
     "estimatedHours": 5,
     "tags": ["PERFORMANCE", "JMETER", "LOAD TESTING"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Medium",
-    "dueDate": "2026-03-30T12:00:00Z"
+    "dueDate": "2026-04-08T12:00:00Z"
   },
   {
     "title": "Check test coverage in SonarQube",
@@ -145,9 +131,8 @@
     "status": "Review",
     "estimatedHours": 2.5,
     "tags": ["SONARQUBE", "QUALITY GATES", "METRICS"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Low",
-    "dueDate": "2026-03-31T12:00:00Z"
+    "dueDate": "2026-04-07T12:00:00Z"
   },
   {
     "title": "Deploy to staging environment",
@@ -155,9 +140,8 @@
     "status": "Done",
     "estimatedHours": 8,
     "tags": ["CI/CD", "DEPLOY", "DEVOPS"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "High",
-    "dueDate": "2026-03-20T12:00:00Z"
+    "dueDate": "2026-04-01T12:00:00Z"
   },
   {
     "title": "Set up monitoring with Actuator and Prometheus",
@@ -165,9 +149,8 @@
     "status": "Done",
     "estimatedHours": 6.5,
     "tags": ["ACTUATOR", "PROMETHEUS", "MONITORING"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Medium",
-    "dueDate": "2026-03-18T12:00:00Z"
+    "dueDate": "2026-03-30T12:00:00Z"
   },
   {
     "title": "Implement messaging with RabbitMQ",
@@ -175,9 +158,8 @@
     "status": "Done",
     "estimatedHours": 9,
     "tags": ["RABBITMQ", "MESSAGING", "ASYNC"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "High",
-    "dueDate": "2026-03-15T12:00:00Z"
+    "dueDate": "2026-03-28T12:00:00Z"
   },
   {
     "title": "Create admin dashboard with Angular",
@@ -185,9 +167,8 @@
     "status": "Done",
     "estimatedHours": 14,
     "tags": ["ANGULAR", "FRONTEND", "DASHBOARD"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Medium",
-    "dueDate": "2026-03-10T12:00:00Z"
+    "dueDate": "2026-03-25T12:00:00Z"
   },
   {
     "title": "Prepare technical documentation and training",
@@ -195,8 +176,7 @@
     "status": "Done",
     "estimatedHours": 5,
     "tags": ["DOCUMENTATION", "TRAINING", "KNOWLEDGE TRANSFER"],
-    "userId": "S64FQDCl9HX1DMIJ70BwjFvvJM43",
     "priority": "Low",
-    "dueDate": "2026-03-05T12:00:00Z"
+    "dueDate": "2026-03-22T12:00:00Z"
   }
 ]

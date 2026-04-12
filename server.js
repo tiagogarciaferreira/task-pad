@@ -6,7 +6,6 @@ const dotenvFlow = require('dotenv-flow');
 const { randomUUID } = require('crypto');
 const { setupProbes } = require('./src/probes');
 const { setupMetrics } = require('./src/metrics');
-const { authMiddleware } = require('./src/middlewares/auth.middleware');
 const { resolveHost } = require('./src/utils/resolveHost');
 const { tb_tasks } = require('./src/config/database/schema');
 
@@ -25,30 +24,9 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", 'https://*.googleapis.com'],
-        scriptSrcElem: [
-          "'self'",
-          "'unsafe-inline'",
-          'https://*.googleapis.com',
-          'https://apis.google.com',
-        ],
         scriptSrcAttr: ["'unsafe-inline'"],
-        connectSrc: [
-          "'self'",
-          'https://*.googleapis.com',
-          'https://*.firebaseio.com',
-          'https://identitytoolkit.googleapis.com',
-          'https://securetoken.googleapis.com',
-          'wss://*.firebaseio.com',
-        ],
-        frameSrc: ['https://*.firebaseapp.com', 'https://accounts.google.com'],
-        imgSrc: ["'self'", 'data:', 'https://*.googleusercontent.com'],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        fontSrc: ["'self'", 'data:'],
       },
     },
-    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
   }),
 );
 
@@ -60,11 +38,8 @@ const PORT = process.env.PORT || 4000;
 const probes = setupProbes(app, database);
 setupMetrics(app);
 
-app.post('/api/tasks', authMiddleware, async (req, res) => {
+app.post('/api/tasks', async (req, res) => {
   try {
-    const userId = req.user.uid
-    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-
     const validation = TaskSchema.safeParse(req.body);
 
     if (!validation.success) {
@@ -81,7 +56,7 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
     const [existingTask] = await database
       .select()
       .from(tb_tasks)
-      .where(and(eq(tb_tasks.title, title.trim()), eq(tb_tasks.userId, userId)))
+      .where(and(eq(tb_tasks.title, title.trim())))
       .limit(1);
 
     if (existingTask)
@@ -96,7 +71,6 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
         estimatedHours: Number(estimatedHours),
         tags: tags.map((tag) => tag.trim().toUpperCase()),
         status: status,
-        userId: userId,
         priority: priority,
         dueDate: new Date(dueDate),
       })
@@ -108,11 +82,8 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
   }
 });
 
-app.get('/api/tasks/search', authMiddleware, async (req, res) => {
+app.get('/api/tasks/search', async (req, res) => {
   try {
-    const userId = req.user.uid
-    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-
     const {
       title,
       status,
@@ -148,7 +119,7 @@ app.get('/api/tasks/search', authMiddleware, async (req, res) => {
       return res.status(400).json({ errors: errors });
     }
 
-    const conditions = [eq(tb_tasks.userId, userId)];
+    const conditions = [];
     if (title) conditions.push(ilike(tb_tasks.title, `%${title}%`));
     if (statusArray.length > 0) conditions.push(inArray(tb_tasks.status, statusArray));
     if (priorityArray.length > 0) conditions.push(inArray(tb_tasks.priority, priorityArray));
@@ -174,16 +145,11 @@ app.get('/api/tasks/search', authMiddleware, async (req, res) => {
   }
 });
 
-app.get('/api/tasks/:id', authMiddleware, async (req, res) => {
+app.get('/api/tasks/:id', async (req, res) => {
   try {
-    const userId = req.user.uid
-    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-
     const { id } = req.params;
     const [task] = await database.select().from(tb_tasks).where(eq(tb_tasks.id, id)).limit(1);
-
     if (!task) return res.status(404).json({ error: 'Task not found' });
-    if (task.userId !== userId) return res.status(403).json({ error: 'Access denied' });
 
     res.json(task);
   } catch (error) {
@@ -191,11 +157,8 @@ app.get('/api/tasks/:id', authMiddleware, async (req, res) => {
   }
 });
 
-app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
+app.put('/api/tasks/:id', async (req, res) => {
   try {
-    const userId = req.user.uid
-    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-
     const { id } = req.params;
     const [existingTask] = await database
       .select()
@@ -204,8 +167,6 @@ app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
       .limit(1);
 
     if (!existingTask) return res.status(404).json({ error: 'Task not found' });
-    if (existingTask.userId !== userId) return res.status(403).json({ error: 'Access denied' });
-
     const validation = TaskUpdateSchema.safeParse(req.body);
 
     if (!validation.success) {
@@ -224,7 +185,7 @@ app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
         .select()
         .from(tb_tasks)
         .where(
-          and(eq(tb_tasks.title, title.trim()), eq(tb_tasks.userId, userId), ne(tb_tasks.id, id)),
+          and(eq(tb_tasks.title, title.trim()), ne(tb_tasks.id, id)),
         )
         .limit(1);
 
@@ -252,11 +213,8 @@ app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
   }
 });
 
-app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
+app.delete('/api/tasks/:id',async (req, res) => {
   try {
-    const userId = req.user.uid
-    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-
     const { id } = req.params;
     const [existingTask] = await database
       .select()
@@ -265,8 +223,6 @@ app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
       .limit(1);
 
     if (!existingTask) return res.status(404).json({ error: 'Task not found' });
-    if (existingTask.userId !== userId) return res.status(403).json({ error: 'Access denied' });
-
     await database.delete(tb_tasks).where(eq(tb_tasks.id, id));
 
     res.status(204).send();
@@ -284,21 +240,24 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, async () => {
+
   const dbOk = await probes.checkDb();
   const frontendOk = probes.checkFrontend();
-  const hostName = resolveHost().trim();
 
-  console.log(`🚀 Server running on ${hostName}:${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🗄️ Database: ${dbOk ? 'connected' : 'disconnected'}`);
-  console.log(`🎨 Frontend: ${frontendOk ? 'built' : 'not found (dev mode)'}`);
-  console.log(`📡 Live: ${hostName}:${PORT}/live`);
-  console.log(`📡 Ready: ${hostName}:${PORT}/ready`);
-  console.log(`📡 Health: ${hostName}:${PORT}/health`);
-  console.log(`📊 Metrics: ${hostName}:${PORT}/metrics`);
+  if (process.env.NODE_ENV === 'development') {
+    const hostName = resolveHost().trim();
+    console.log(`🚀 Server running on ${hostName}:${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+    console.log(`🗄️ Database: ${dbOk ? 'connected' : 'disconnected'}`);
+    console.log(`🎨 Frontend: ${frontendOk ? 'built' : 'not found (dev mode)'}`);
+    console.log(`📡 Live: ${hostName}:${PORT}/live`);
+    console.log(`📡 Ready: ${hostName}:${PORT}/ready`);
+    console.log(`📡 Health: ${hostName}:${PORT}/health`);
+    console.log(`📊 Metrics: ${hostName}:${PORT}/metrics`);
+  }
 
   setTimeout(() => {
     probes.setReady();
-    console.log('✅ Application is ready to accept traffic');
+    if (process.env.NODE_ENV === 'development') console.log('✅ Application is ready to accept traffic');
   }, 3000);
 });
