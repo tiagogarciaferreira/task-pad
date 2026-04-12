@@ -30,7 +30,6 @@ COPY package*.json        ./
 COPY ../server.js         ./
 COPY ../src/config        ./src/config
 COPY ../src/schemas       ./src/schemas
-COPY ../src/middlewares   ./src/middlewares
 COPY ../src/utils         ./src/utils
 COPY ../src/probes        ./src/probes
 COPY ../src/metrics       ./src/metrics
