@@ -1,21 +1,38 @@
 admin:
-  user: "${GRAFANA_SECURITY_ADMIN_USER}"
   existingSecret: "grafana-secret"
-  existingSecretPasswordKey: "password"
+  userKey: username
+  passwordKey: password
 
-grafana:
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "128Mi"
-    limits:
-      cpu: "300m"
-      memory: "256Mi"
+persistence:
+  type: pvc
+  enabled: true
+  storageClassName: "gp3"
+  accessModes:
+    - ReadWriteOnce
+  size: 2Gi
+
+deploymentStrategy:
+  type: Recreate
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://taskpad-prometheus-server.monitoring.svc.cluster.local:80
+        access: proxy
+        isDefault: true
+        editable: false
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "300m"
+    memory: "256Mi"
 
 service:
   type: NodePort
-  ports:
-    grafana: "${GRAFANA_PORT}"
-  nodePorts:
-    grafana: "32000"
-
+  nodePort: 32000

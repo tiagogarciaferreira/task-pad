@@ -7,7 +7,6 @@ kubectl get namespaces
 kubectl create namespace app
 kubectl create namespace monitoring
 
-# Storage Class
-kubectl get storageclass
-kubectl apply -f storage/storage-class.yaml
-kubectl get storageclass
+# Cluster
+kubectl apply -f cluster/storage-class.yaml
+kubectl apply -f cluster/rbac.yaml

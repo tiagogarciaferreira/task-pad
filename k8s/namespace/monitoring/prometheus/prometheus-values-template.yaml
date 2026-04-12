@@ -1,41 +1,37 @@
 rbac:
   create: true
 
+alertmanager:
+  enabled: false
+prometheus-node-exporter:
+  enabled: false
+prometheus-pushgateway:
+  enabled: false
+kube-state-metrics:
+  enabled: false
+
+configmapReload:
+  prometheus:
+    enabled: false
+
+scrapeConfigFiles: []
+
 server:
+  strategy:
+    type: Recreate
+  tolerations:
+    - operator: "Exists"
+
   retention: "24h"
-  logLevel: warn
-  persistence:
+  retentionSize: "2GB"
+
+  persistentVolume:
     enabled: true
+    storageClass: "gp3"
     size: "2Gi"
-  containerPorts:
-    http: "${PROMETHEUS_PORT}"
+
   service:
     type: ClusterIP
-
-  extraScrapeConfigs:
-    - job_name: taskpad-manager
-      scrape_interval: 30s
-      metrics_path: /metrics
-
-      kubernetes_sd_configs:
-        - role: endpoints
-          namespaces:
-            names:
-              - app
-
-      relabel_configs:
-        - source_labels: [__meta_kubernetes_service_label_app]
-          action: keep
-          regex: taskpad-app
-
-        - source_labels: [__meta_kubernetes_endpoint_port_number]
-          action: keep
-          regex: "4000"
-
-      metric_relabel_configs:
-        - action: keep
-          source_labels: [__name__]
-          regex: process_cpu_seconds_total|process_resident_memory_bytes|nodejs_eventloop_lag_seconds|nodejs_active_handles_total|nodejs_gc_duration_seconds_sum|process_start_time_seconds|nodejs_version_info
 
   resources:
     requests:
@@ -44,3 +40,41 @@ server:
     limits:
       cpu: "300m"
       memory: "256Mi"
+
+extraScrapeConfigs: |
+  - job_name: taskpad-manager
+    scrape_interval: 30s
+    metrics_path: /metrics
+    scheme: https
+
+    tls_config:
+      insecure_skip_verify: true
+
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - app
+
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: keep
+        regex: "true"
+
+      - source_labels: [__address__]
+        action: replace
+        target_label: __address__
+        regex: (.+):\d+
+        replacement: $1:4000
+
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_service_name]
+        target_label: service
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
+
+    metric_relabel_configs:
+      - action: keep
+        source_labels: [__name__]
+        regex: "process_cpu_seconds_total|process_resident_memory_bytes|nodejs_eventloop_lag_seconds|nodejs_active_handles_total|nodejs_gc_duration_seconds_sum|process_start_time_seconds|nodejs_version_info"

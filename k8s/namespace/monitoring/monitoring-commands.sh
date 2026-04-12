@@ -5,7 +5,7 @@ kubectl create namespace monitoring
 cd k8s/namespace/monitoring || false
 source ../../../.env.production
 
-export PROMETHEUS_PORT GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD GRAFANA_PORT
+export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD
 envsubst < prometheus/prometheus-values-template.yaml > prometheus/prometheus-values.yaml
 envsubst < grafana/grafana-secret-template.yaml > grafana/grafana-secret.yaml
 envsubst < grafana/grafana-values-template.yaml > grafana/grafana-values.yaml
@@ -14,9 +14,17 @@ envsubst < grafana/grafana-values-template.yaml > grafana/grafana-values.yaml
 kubectl apply -f grafana/grafana-secret.yaml --namespace monitoring
 
 # Prometheus
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install -f prometheus/prometheus-values.yaml taskpad-prometheus pbitnami/prometheus --version 2.1.23 --namespace monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install -f prometheus/prometheus-values.yaml taskpad-prometheus prometheus-community/prometheus --version 29.2.0 --namespace monitoring
+helm upgrade -f prometheus/prometheus-values.yaml taskpad-prometheus prometheus-community/prometheus --version 29.2.0 --namespace monitoring
+
+kubectl get pvc --namespace monitoring
+kubectl get pods --namespace monitoring
 
 # Grafana
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install -f grafana/grafana-values.yaml taskpad-grafana bitnami/grafana --version 12.1.8 --namespace monitoring
+helm repo add grafana-community https://grafana-community.github.io/helm-charts/
+helm install -f grafana/grafana-values.yaml taskpad-grafana grafana-community/grafana --version 11.6.0 --namespace monitoring
+helm upgrade -f grafana/grafana-values.yaml taskpad-grafana grafana-community/grafana --version 11.6.0 --namespace monitoring
+
+# taskpad-prometheus-server.monitoring.svc.cluster.local:80
+# kubectl port-forward -n monitoring svc/taskpad-prometheus-server 9090:80

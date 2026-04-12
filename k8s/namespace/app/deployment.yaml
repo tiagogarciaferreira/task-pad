@@ -89,6 +89,28 @@ spec:
           secret:
             secretName: app-tls-secret
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: taskpad-app-service
+  namespace: app
+  labels:
+    app: taskpad-app
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/scheme: "https"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "4000"
+spec:
+  type: NodePort
+  selector:
+    app: taskpad-app
+  ports:
+    - name: https
+      port: 4000
+      targetPort: 4000
+      nodePort: 30080
+---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:

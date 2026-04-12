@@ -86,7 +86,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "Prometheus"
       },
       "description": "process_start_time_seconds — time elapsed since process start. Metric(process_start_time_seconds).",
       "fieldConfig": {
@@ -138,7 +138,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
           "expr": "time() - process_start_time_seconds{job=~\"$job\", instance=~\"$instance\"}",
@@ -153,7 +153,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "Prometheus"
       },
       "description": "nodejs_version_info — version labels exposed by prom-client. Metric(nodejs_version_info).",
       "fieldConfig": {
@@ -206,7 +206,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
           "expr": "nodejs_version_info{job=~\"$job\", instance=~\"$instance\"}",
@@ -221,7 +221,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "Prometheus"
       },
       "description": "rate(process_cpu_seconds_total[1m]) — percentage of CPU time used. Metric(process_cpu_seconds_total).",
       "fieldConfig": {
@@ -283,7 +283,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
           "expr": "rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
@@ -298,7 +298,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "Prometheus"
       },
       "description": "process_resident_memory_bytes — physical memory in use. Metric(process_resident_memory_bytes)",
       "fieldConfig": {
@@ -358,7 +358,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
           "expr": "process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}",
@@ -373,7 +373,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "Prometheus"
       },
       "description": "nodejs_eventloop_lag_seconds — delay in the Node.js event loop. Metric(nodejs_eventloop_lag_seconds).",
       "fieldConfig": {
@@ -433,7 +433,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
           "expr": "nodejs_eventloop_lag_seconds{job=~\"$job\", instance=~\"$instance\"}",
@@ -458,7 +458,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "rate(process_cpu_seconds_total[rate_interval]) — instantaneous CPU usage as a fraction of one core (1.0 = 100% of one core). Metric(process_cpu_seconds_total).",
           "fieldConfig": {
@@ -547,7 +547,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
               "legendFormat": "{{instance}} — CPU rate",
@@ -560,7 +560,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "Current CPU usage visualised as a gauge. Metric(process_cpu_seconds_total).",
           "fieldConfig": {
@@ -619,7 +619,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "rate(process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
               "legendFormat": "CPU",
@@ -632,7 +632,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "Total CPU seconds consumed since process start (counter value). Metrcis(process_cpu_seconds_total).",
           "fieldConfig": {
@@ -685,7 +685,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "process_cpu_seconds_total{job=~\"$job\", instance=~\"$instance\"}",
               "legendFormat": "CPU seconds",
@@ -712,7 +712,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "RSS memory over time. Steady growth indicates a memory leak. Metric(process_resident_memory_bytes).",
           "fieldConfig": {
@@ -805,7 +805,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}",
               "legendFormat": "{{instance}} — RSS",
@@ -818,7 +818,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "Current RSS vs thresholds (256 MB warning / 512 MB critical). Metric(process_resident_memory_bytes).",
           "fieldConfig": {
@@ -877,7 +877,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "expr": "process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}",
@@ -906,7 +906,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "Delay in the Node.js event loop. Values > 100ms indicate blocking I/O or CPU-bound code. Metric(nodejs_eventloop_lag_seconds).",
           "fieldConfig": {
@@ -999,7 +999,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "nodejs_eventloop_lag_seconds{job=~\"$job\", instance=~\"$instance\"}",
               "legendFormat": "{{instance}} — lag",
@@ -1012,7 +1012,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "Current lag vs SLO thresholds. Metric(nodejs_eventloop_lag_seconds).",
           "fieldConfig": {
@@ -1102,7 +1102,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "expr": "nodejs_eventloop_lag_seconds{job=~\"$job\", instance=~\"$instance\"}",
@@ -1131,7 +1131,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "Total active libuv handles. Sustained growth = handle leak (unclosed sockets, timers, etc.). Metric(nodejs_active_handles_total).",
           "fieldConfig": {
@@ -1224,7 +1224,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "nodejs_active_handles_total{job=~\"$job\", instance=~\"$instance\"}",
               "legendFormat": "{{instance}} — handles",
@@ -1237,7 +1237,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "Total GC pause time per GC kind (Scavenge, MarkSweepCompact, IncrementalMarking, WeakCallbacks). High MarkSweepCompact = heap pressure. Metric(nodejs_gc_duration_seconds_sum).",
           "fieldConfig": {
@@ -1321,7 +1321,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "increase(nodejs_gc_duration_seconds_sum{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
               "legendFormat": "{{kind}}",
@@ -1334,7 +1334,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "GC pause time per kind in the last interval. Metric(nodejs_gc_duration_seconds_sum).",
           "fieldConfig": {
@@ -1399,7 +1399,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "increase(nodejs_gc_duration_seconds_sum{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
               "format": "table",
@@ -1439,7 +1439,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "Unix timestamp when the process started. Restarts appear as a value reset. Metric(process_start_time_seconds).",
           "fieldConfig": {
@@ -1520,7 +1520,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "process_start_time_seconds{job=~\"$job\", instance=~\"$instance\"}",
               "legendFormat": "{{instance}} — start time",
@@ -1533,7 +1533,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "Prometheus"
           },
           "description": "All labels exposed by nodejs_version_info. Metric(nodejs_version_info).",
           "fieldConfig": {
@@ -1582,7 +1582,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "Prometheus"
               },
               "expr": "nodejs_version_info{job=~\"$job\", instance=~\"$instance\"}",
               "format": "table",
@@ -1632,7 +1632,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "uid": "Prometheus"
         },
         "definition": "label_values(process_cpu_seconds_total, job)",
         "includeAll": true,
@@ -1654,7 +1654,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "uid": "Prometheus"
         },
         "definition": "label_values(process_cpu_seconds_total{job=~\"$job\"}, instance)",
         "includeAll": true,
