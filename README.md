@@ -57,3 +57,31 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+############## Steps
+
+Gerar os arquivos .env.production e .env.development na raiz do projeto com os devidos valores.
+
+Foi utilizado:
+Nodejs
+Angular CLI
+Angular
+Intelij
+Postgresql
+Drizzle
+Prometheus
+Grafana
+Dive
+Cosign
+Docker
+Docker compose
+Conta na AWS FREE
+AWS cli
+AWS EKS
+Helm
+kubectl
+k6
+GitHub
+GitHub Actions
+Makefile
