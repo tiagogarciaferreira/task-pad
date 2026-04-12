@@ -36,7 +36,7 @@ signature:
 	@echo "$(GREEN)✅ Image signed: $(FULL_IMAGE)$(NC)"
 
 	@echo "$(BLUE)🔍 Verifying signature...$(NC)"
-	@sleep 15
+	@sleep 20
 	cosign verify --key .cosign/cosign.pub $(DIGEST)
 	@echo "$(GREEN)✅ Signature verified successfully$(NC)"
 
