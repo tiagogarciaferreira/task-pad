@@ -6,7 +6,7 @@ metadata:
   labels:
     app: taskpad-app
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: taskpad-app
@@ -20,7 +20,7 @@ spec:
         runAsUser: 65532
       containers:
         - name: taskpad-app
-          image: tiagogferreirainfnet/task-pad@sha256:0b571bf0ce016eefed7bdac3b18567ced7d7c7b30f136942b51656ff6c445d13
+          image: tiagogferreirainfnet/task-pad@sha256:de4953b052b17cdf5520c8b6ddb92fdd8c41e3fb0b907c5c6bfd88b8c0c06716
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: tls-certs

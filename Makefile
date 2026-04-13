@@ -16,13 +16,13 @@ NC := \033[0m # No Color
 
 # 🏗️ Build image
 build:
-	@echo "$(BLUE)🔨 Building production image...$(NC)"
-	docker build -f docker/Dockerfile --no-cache -t $(FULL_IMAGE) .
-	@echo "$(GREEN)✅ Production image built: $(FULL_IMAGE)$(NC)"
+	@echo "$(BLUE)🔨 Building image...$(NC)"
+	@docker build -f docker/Dockerfile --no-cache -t $(FULL_IMAGE) . --quiet
+	@echo "$(GREEN)✅ Image built$(NC)"
 
 # 🏷️ Tag image
 tag:
-	@echo "$(BLUE)🏷️ Tagging production image...$(NC)"
+	@echo "$(BLUE)🏷️ Tagging image...$(NC)"
 	docker tag $(FULL_IMAGE) $(IMAGE_NAME):$(VERSION)
 	@echo "$(GREEN)✅ Tagged as: $(IMAGE_NAME):$(VERSION)$(NC)"
 
@@ -43,14 +43,14 @@ signature:
 # 📤 Push image to registry
 push:
 	@echo "$(BLUE)📤 Pushing image to registry...$(NC)"
-	docker push $(IMAGE_NAME) -a
+	@docker push $(IMAGE_NAME) -a 2>&1 | grep -E "digest:|latest: digest:" || true
 	@echo "$(GREEN)✅ Image pushed$(NC)"
 
 # 🔍 Analyze image
 analyze:
 	@echo "$(BLUE)🔍 Analyzing image: $(FULL_IMAGE)$(NC)"
 	$(eval DIGEST := $(shell docker inspect $(FULL_IMAGE) --format='{{index .RepoDigests 0}}'))
-	docker run --rm \
+	@docker run --rm --quiet \
 				-v /var/run/docker.sock:/var/run/docker.sock \
 				-v "$(CURDIR)/docker/analyze:/ci" \
 				wagoodman/dive:latest \
