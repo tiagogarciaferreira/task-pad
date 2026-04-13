@@ -33,6 +33,11 @@ kubectl get pvc --namespace app
 # Namespace monitoring
 kubectl create namespace monitoring
 
+kubectl create configmap monitoring-config-map \
+  --from-file=taskpad-dashboard-metrics.json=namespace/monitoring/grafana/TaskPad-Dashboard-Metrics.json \
+  --namespace monitoring \
+  --dry-run=client -o yaml > namespace/monitoring/config/monitoring-config-map.yaml
+
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm install -f prometheus/prometheus-values.yaml taskpad-prometheus prometheus-community/prometheus --version 29.2.0 --namespace monitoring
 
@@ -41,17 +46,9 @@ export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD PROMETHEUS_UR
 envsubst < namespace/monitoring/grafana/grafana-secret-template.yaml > namespace/monitoring/grafana/grafana-secret.yaml
 envsubst < namespace/monitoring/grafana/grafana-values-template.yaml > namespace/monitoring/grafana/grafana-values.yaml
 
+kubectl apply -f namespace/monitoring/config/monitoring-config-map.yaml --namespace monitoring
 helm repo add grafana-community https://grafana-community.github.io/helm-charts/
 helm install -f grafana/grafana-values.yaml taskpad-grafana grafana-community/grafana --version 11.6.0 --namespace monitoring
 
 kubectl get pods --namespace app
 kubectl get pvc --namespace app
-
-# Comandos para retornar só os ips externos nos Nodes
-cosign generate-key-pair ../.cosign
-openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365 -config ../certs/openssl.cnf
-
-# Liberar portas no ecs
-# Liberar Ips no Firebase
-# Criação do cluster AWS Padrão via documentação só next
-# COnfiguração do github actions padrão

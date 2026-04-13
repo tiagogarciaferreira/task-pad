@@ -154,6 +154,40 @@ FIREBASE_SERVICE_ACCOUNT=<BASE64>
 
 > **Nota:** Todos os arquivos devem seguir rigorosamente o padrão definido no template.
 
+## 🔐 Firebase — Liberação de IPs (EKS)
+
+Para que a aplicação em execução no EKS consiga se autenticar corretamente com o Firebase (especialmente em cenários com restrições de segurança), é necessário garantir a liberação dos endpoints e domínios utilizados.
+
+### 🌍 Liberar domínio da aplicação
+
+#### 📍 Caminho:
+
+Firebase Console → Authentication → Settings → Authorized domains
+
+#### ➕ Adicionar:
+
+- URL pública da aplicação (IP público ou DNS do LoadBalancer/NodePort)
+
+> Sem essa configuração, o fluxo de autenticação pode ser bloqueado pelo Firebase.
+
+---
+
+### 🔍 Obtenção dos IPs dos nodes do EKS
+
+Para listar os nodes e seus respectivos IPs:
+
+  ```bash
+kubectl get nodes -o wide
+  ```
+
+#### 📌 Saída esperada:
+
+- **EXTERNAL-IP** → IP público do node
+- **INTERNAL-IP** → IP interno da VPC
+
+> Utilize preferencialmente o DNS do LoadBalancer em vez de IP direto, sempre que disponível.
+> Em ambientes produtivos, evite exposição direta via NodePort quando possível.
+
 ## ⚙️ Variáveis de Ambiente
 
 Na raiz do projeto, gerencie os arquivos de configuração conforme os ambientes:
@@ -256,6 +290,18 @@ Settings → Secrets → Actions
 
 Execute os comandos abaixo dentro da pasta `certs`:
 
+#### ⚙️ Configuração do openssl.conf
+
+O arquivo `openssl.conf` deve conter os IPs dos nodes do cluster EKS para garantir a validade do certificado.
+
+#### Exemplo:
+
+[ alt_names ]  
+IP.1 = <NODE_IP_1>  
+IP.2 = <NODE_IP_2>
+
+> Substitua os valores pelos IPs reais dos nodes do seu cluster.
+
 ```bash
 mkdir -p certs && cd certs
 
@@ -273,17 +319,6 @@ Após a execução, serão criados os seguintes arquivos:
 - key.pem
 - cert.pem
 
-### ⚙️ Configuração do openssl.conf
-
-O arquivo `openssl.conf` deve conter os IPs dos nodes do cluster EKS para garantir a validade do certificado.
-
-#### Exemplo:
-
-[ alt_names ]  
-IP.1 = <NODE_IP_1>  
-IP.2 = <NODE_IP_2>
-
-> Substitua os valores pelos IPs reais dos nodes do seu cluster.
 > Garanta que os arquivos de chave não sejam versionados no repositório.
 
 ## 🔄 Conversão para Base64
@@ -383,11 +418,14 @@ Repository → Settings → Secrets → Actions
 
 ### 📁 Estrutura
 
-O deploy da aplicação deve ser realizado a partir da pasta:
+O deploy da aplicação deve ser realizado a partir da pasta: **k8s/**. Localizada na raiz do projeto.
 
-k8s/
+> Utilizar o arquivo **install.sh** para realizar o deploy completo.
 
-Localizada na raiz do projeto.
+```bash
+chmod +x install.sh
+./install.sh
+```
 
 ### 🚀 Serviços implantados
 
