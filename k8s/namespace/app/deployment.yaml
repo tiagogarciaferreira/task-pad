@@ -20,7 +20,7 @@ spec:
         runAsUser: 65532
       containers:
         - name: taskpad-app
-          image: tiagogferreirainfnet/task-pad@sha256:de4953b052b17cdf5520c8b6ddb92fdd8c41e3fb0b907c5c6bfd88b8c0c06716
+          image: tiagogferreirainfnet/task-pad@sha256:73f78637d179153b22a2b63852b7a2b70a52b80a5b7292997d9e4e23a71b01a3
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: tls-certs
