@@ -421,7 +421,8 @@ Repository → Settings → Secrets → Actions
 O deploy da aplicação deve ser realizado a partir da pasta: **k8s/**. Localizada na raiz do projeto.
 
 > Utilizar o arquivo **install.sh** para realizar o deploy completo.
-
+> Recomenda-se executar em ambiente controlado e validar cada etapa em caso de falhas.
+> Evite utilizar o comando abaixo diretamente no terminal, porque vai dificultar o debug de erros
 ```bash
 chmod +x install.sh
 ./install.sh
@@ -481,6 +482,149 @@ Para garantir o correto funcionamento do sistema, os serviços devem seguir a se
 > Respeitar essa ordem evita falhas de conexão e problemas de inicialização entre os serviços.
 
 ---
+
+## ⚙️ Script de Deploy (EKS + Kubernetes)
+
+Este script automatiza o provisionamento e deploy completo da aplicação no cluster EKS, incluindo banco de dados, aplicação e stack de observabilidade.
+
+> ⚠️ **Importante:** Não altere os comandos abaixo. Eles dependem diretamente das variáveis de ambiente e da estrutura do projeto.
+
+---
+
+## ▶️ Execução
+
+> Recomenda-se executar em ambiente controlado e validar cada etapa em caso de falhas.
+
+#### 🔐 Autenticação na AWS e configuração do kubeconfig
+
+Responsável por autenticar na AWS e configurar o acesso ao cluster EKS:
+
+```bash
+aws login
+aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
+kubectl apply -f cluster/cluster-configs.yaml
+```
+---
+
+#### 📦 Namespace da aplicação e configurações iniciais
+
+Criação do namespace da aplicação e aplicação de configurações base:
+
+# Namespace app
+```bash
+kubectl create namespace app
+kubectl apply -f namespace/app/config/app-config-map.yaml --namespace app
+```
+---
+
+#### 🗄️ Configuração e deploy do PostgreSQL
+
+Geração dinâmica de secrets e values via envsubst e instalação via Helm:
+
+```bash
+source ../.env.production
+export POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
+envsubst < namespace/app/postgres/postgres-secret-template.yaml > namespace/app/postgres/postgres-secret.yaml
+envsubst < namespace/app/postgres/postgres-values-template.yaml > namespace/app/postgres/postgres-values.yaml
+
+kubectl apply -f namespace/app/postgres/postgres-secret.yaml --namespace app
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install -f namespace/app/postgres/postgres-values.yaml taskpad-postgres bitnami/postgresql --version 18.5.15 --namespace app
+```
+---
+
+#### 🔐 Configuração de secrets da aplicação (Firebase, TLS, DB)
+
+Injeção de variáveis sensíveis e criação dos secrets Kubernetes:
+
+```bash
+source ../.env.production
+export FIREBASE_SERVICE_ACCOUNT POSTGRES_PORT POSTGRES_DB POSTGRES_USER TLS_CRT TLS_KEY POSTGRES_URL_AWS_EKS
+export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
+envsubst < namespace/app/config/app-secrets-template.yaml > namespace/app/config/app-secrets.yaml
+envsubst < namespace/app/config/app-tls-secret-template.yaml > namespace/app/config/app-tls-secret.yaml
+
+kubectl apply -f namespace/app/config/app-secrets.yaml --namespace app
+kubectl apply -f namespace/app/config/app-tls-secret.yaml --namespace app
+kubectl apply -f namespace/app/deployment.yaml --namespace app
+```
+---
+
+#### 📊 Validação de recursos da aplicação
+
+Verificação do estado dos pods e volumes persistentes:
+
+```bash
+kubectl get pods --namespace app
+kubectl get pvc --namespace app
+```
+---
+
+#### 📈 Namespace de monitoramento
+
+Criação do namespace dedicado à observabilidade:
+
+# Namespace monitoring
+```bash
+kubectl create namespace monitoring
+```
+
+---
+
+#### 📊 ConfigMap do Grafana (dashboards)
+
+Geração de ConfigMap com dashboards customizados:
+
+```bash
+kubectl create configmap monitoring-config-map \
+--from-file=taskpad-dashboard-metrics.json=namespace/monitoring/grafana/TaskPad-Dashboard-Metrics.json \
+--namespace monitoring \
+--dry-run=client -o yaml > namespace/monitoring/config/monitoring-config-map.yaml
+```
+---
+
+#### 📡 Deploy do Prometheus
+
+Instalação do Prometheus via Helm:
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install -f prometheus/prometheus-values.yaml taskpad-prometheus prometheus-community/prometheus --version 29.2.0 --namespace monitoring
+```
+---
+
+#### 📊 Configuração e deploy do Grafana
+
+Injeção de variáveis e instalação do Grafana com dashboards integrados:
+
+```bash
+source ../.env.production
+export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD PROMETHEUS_URL_AWS_EKS
+envsubst < namespace/monitoring/grafana/grafana-secret-template.yaml > namespace/monitoring/grafana/grafana-secret.yaml
+envsubst < namespace/monitoring/grafana/grafana-values-template.yaml > namespace/monitoring/grafana/grafana-values.yaml
+
+kubectl apply -f namespace/monitoring/config/monitoring-config-map.yaml --namespace monitoring
+helm repo add grafana-community https://grafana-community.github.io/helm-charts/
+helm install -f grafana/grafana-values.yaml taskpad-grafana grafana-community/grafana --version 11.6.0 --namespace monitoring
+```
+---
+
+#### 📊 Validação final
+
+Verificação final dos recursos após deploy completo:
+```bash
+kubectl get pods --namespace app
+kubectl get pvc --namespace app
+```
+---
+
+### 📌 Observações
+
+- O script depende diretamente do arquivo `.env.production`
+- Utiliza `envsubst` para injeção dinâmica de variáveis
+- Requer AWS CLI, kubectl e Helm previamente configurados
+- Charts Helm versionados garantem previsibilidade de deploy
+
+> Recomenda-se executar em ambiente controlado e validar cada etapa em caso de falhas.
 
 ## 🧪 Testes de Carga
 
