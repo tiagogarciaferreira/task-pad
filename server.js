@@ -324,6 +324,6 @@ server.listen(PORT, async () => {
 
   setTimeout(() => {
     probes.setReady();
-    console.log('[Internal] ✅ Application is ready to accept traffic');
+    console.log('[Internal] ✅ Application is ready to accept traffic...');
   }, 5000);
 });
