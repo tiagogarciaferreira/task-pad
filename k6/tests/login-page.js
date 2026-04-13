@@ -9,7 +9,7 @@ const ips = open('../hosts.txt')
 
 export const options = {
   vus: 100, // Simula 100 usuários simultâneos
-  duration: '120s', // Mantém a carga por 120 segundos
+  duration: '300s', // Mantém a carga por 300 segundos
 };
 
 export default function () {
