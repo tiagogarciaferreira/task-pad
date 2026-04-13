@@ -59,6 +59,7 @@ src/environments/environment.*.ts
 .cosign/
 .cosign/cosign.key
 .cosign/cosign.pub
+!.cosign/generate.sh
 certs/
 certs/cert.pem
 certs/key.pem

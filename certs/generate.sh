@@ -48,3 +48,11 @@ for i in "${!IPS[@]}"; do
 done
 echo ""
 echo "2. Convert ../certs/key.pem and ../certs/cert.pem to base64 and update the envs: TLS_CRT | TLS_KEY in .env.production"
+
+echo "TLS_KEY -> "
+echo ""
+iconv -f UTF-8 -t UTF-8 ../certs/key.pem | base64 -w 0
+echo ""
+echo "TLS_CRT -> "
+echo ""
+iconv -f UTF-8 -t UTF-8 ../certs/cert.pem | base64 -w 0

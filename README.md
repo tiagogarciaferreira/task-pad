@@ -44,6 +44,163 @@ Requisitos do projeto:
 - k6
 - Makefile
 
+## ✅ Requisitos (Build e Imagem)
+
+Para executar o pipeline de build, tag, assinatura e push da imagem Docker, é necessário ter os seguintes componentes configurados:
+
+### 🐳 Docker
+
+- Responsável pelo build, tag e push das imagens
+- Utilizado nos comandos:
+>  docker build - docker tag - docker push
+
+- Também utilizado pelo `docker compose` no target `up`
+
+---
+
+### 🔐 Cosign
+
+- Utilizado para assinatura e verificação de imagens
+
+Comandos utilizados:
+>cosign sign - cosign verify
+
+#### 📁 Requisitos:
+
+- Chaves presentes em:
+> .cosign/cosign.key - .cosign/cosign.pub
+
+---
+
+### 🔍 Dive
+
+- Ferramenta para análise de camadas e qualidade da imagem Docker
+- Executado via container:
+
+wagoodman/dive
+
+- Utilizado no target `analyze`
+
+---
+
+### 🟢 Node.js
+
+- Utilizado para obtenção da versão da aplicação
+
+Comando utilizado:
+> node -p "require('./package.json').version"
+
+---
+
+### 🐳 Docker Hub (ou registry compatível)
+
+- Necessário para publicação das imagens
+
+#### 🔐 Requisitos:
+
+- Autenticação via:
+> docker login
+
+- Utilizado no target `push`
+
+---
+
+### 🐧 Make (GNU Make)
+
+- Responsável por orquestrar todo o pipeline
+
+Inclui:
+
+- build
+- tag
+- assinatura
+- análise
+- push
+
+---
+
+## ⚠️ Essencial
+
+Sem esses itens corretamente configurados:
+
+- A imagem não será construída (Docker)
+- Não será versionada corretamente (Node.js)
+- Não será assinada (Cosign)
+- Não será analisada (Dive)
+- Não será publicada (Docker Hub)
+- O pipeline não será executado (Make)
+
+## ✅ Requisitos Deploy
+
+Para executar o deploy no EKS, é necessário ter os seguintes componentes configurados:
+
+### ☁️ AWS CLI
+
+- Responsável pela autenticação e acesso ao cluster EKS
+- Utilizado no comando:
+
+aws eks update-kubeconfig
+
+---
+
+### ☸️ kubectl
+
+- Ferramenta para gerenciamento de recursos no Kubernetes
+- Utilizada durante todo o processo de deploy:
+
+kubectl apply  
+kubectl get
+
+---
+
+### 📦 Helm
+
+- Gerenciador de pacotes para Kubernetes
+- Utilizado para instalação dos serviços:
+
+- PostgreSQL
+- Prometheus
+- Grafana
+
+---
+
+### 🔄 envsubst
+
+- Utilizado para gerar arquivos YAML a partir de templates
+- Permite injetar variáveis do arquivo `.env.production`
+
+---
+
+### 🐧 Bash + `.env.production` configurado
+
+- Necessário para execução dos scripts de automação
+- O arquivo `.env.production` deve conter todas as variáveis obrigatórias:
+
+- Banco de dados (POSTGRES_*)
+- Firebase
+- TLS
+- Grafana
+
+---
+
+### 🔐 OpenSSL
+
+- Utilizado para geração de certificados TLS
+- Executado via script:
+
+certs/generate.sh
+
+---
+
+## ⚠️ Essencial
+
+Sem esses itens corretamente configurados:
+
+- O cluster não será acessado (AWS CLI)
+- Os recursos não serão criados (kubectl / Helm)
+- Os arquivos não serão gerados corretamente (envsubst)
+- A aplicação não será iniciada corretamente (variáveis de ambiente + TLS)
+
 ## 🚀 Setup Inicial
 
 ### 📥 Clonar o repositório
@@ -444,8 +601,13 @@ Para garantir o correto funcionamento do sistema, os serviços devem seguir a se
 ## 🧪 Testes de Carga
 
 Para executar testes de carga utilizando o k6:
+
+- Primeiro, deve ser criado na pasta /k6/ o arquivo hosts.txt, contendo os hosts que serão testados.
+- Atualmente, os testes são simples e consistem apenas no acesso à página de login, devido à complexidade de automatizar a autenticação via Google OAuth(Firebase).
+- Em seguida,
+
 ```bash
-k6 run k6/tests/basic-script.js
+k6 run --insecure-skip-tls-verify k6/tests/login-page.js
 ```
 
 > Certifique-se de que a aplicação esteja acessível antes de iniciar os testes.
