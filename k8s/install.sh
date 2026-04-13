@@ -54,4 +54,4 @@ openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 36
 # Liberar portas no ecs
 # Liberar Ips no Firebase
 # Criação do cluster AWS Padrão via documentação só next
-# COnfiguração
+# COnfiguração do github actions padrão
