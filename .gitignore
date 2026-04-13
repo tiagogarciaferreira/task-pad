@@ -59,6 +59,9 @@ src/environments/environment.*.ts
 .cosign/
 .cosign/cosign.key
 .cosign/cosign.pub
+certs/cert.pem
+certs/key.pem
+certs/openssl.cnf
 
 # K8s
 /k8s/namespace/app/config/app-secrets.yaml

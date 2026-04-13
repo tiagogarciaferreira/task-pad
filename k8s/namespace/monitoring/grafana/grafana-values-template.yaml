@@ -7,8 +7,6 @@ persistence:
   type: pvc
   enabled: true
   storageClassName: "gp3"
-  accessModes:
-    - ReadWriteOnce
   size: 2Gi
 
 deploymentStrategy:
@@ -20,7 +18,7 @@ datasources:
     datasources:
       - name: Prometheus
         type: prometheus
-        url: http://taskpad-prometheus-server.monitoring.svc.cluster.local:80
+        url: ${PROMETHEUS_URL_AWS_EKS}
         access: proxy
         isDefault: true
         editable: false
