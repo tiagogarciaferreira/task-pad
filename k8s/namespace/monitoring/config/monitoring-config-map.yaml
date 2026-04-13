@@ -1,0 +1,591 @@
+apiVersion: v1
+data:
+  taskpad-dashboard-metrics.json: "{\n  \"__inputs\": [\n    {\n      \"name\": \"DS_PROMETHEUS\",\n
+    \     \"label\": \"prometheus\",\n      \"description\": \"\",\n      \"type\":
+    \"datasource\",\n      \"pluginId\": \"prometheus\",\n      \"pluginName\": \"Prometheus\"\n
+    \   }\n  ],\n  \"__elements\": {},\n  \"__requires\": [\n    {\n      \"type\":
+    \"panel\",\n      \"id\": \"gauge\",\n      \"name\": \"Gauge\",\n      \"version\":
+    \"\"\n    },\n    {\n      \"type\": \"grafana\",\n      \"id\": \"grafana\",\n
+    \     \"name\": \"Grafana\",\n      \"version\": \"12.4.2\"\n    },\n    {\n      \"type\":
+    \"datasource\",\n      \"id\": \"prometheus\",\n      \"name\": \"Prometheus\",\n
+    \     \"version\": \"1.0.0\"\n    },\n    {\n      \"type\": \"panel\",\n      \"id\":
+    \"stat\",\n      \"name\": \"Stat\",\n      \"version\": \"\"\n    },\n    {\n
+    \     \"type\": \"panel\",\n      \"id\": \"table\",\n      \"name\": \"Table\",\n
+    \     \"version\": \"\"\n    },\n    {\n      \"type\": \"panel\",\n      \"id\":
+    \"timeseries\",\n      \"name\": \"Time series\",\n      \"version\": \"\"\n    }\n
+    \ ],\n  \"annotations\": {\n    \"list\": [\n      {\n        \"builtIn\": 1,\n
+    \       \"datasource\": {\n          \"type\": \"grafana\",\n          \"uid\":
+    \"-- Grafana --\"\n        },\n        \"enable\": true,\n        \"hide\": true,\n
+    \       \"iconColor\": \"rgba(0, 211, 255, 1)\",\n        \"name\": \"Annotations
+    & Alerts\",\n        \"type\": \"dashboard\"\n      }\n    ]\n  },\n  \"description\":
+    \"Node.js runtime metrics via prom-client — CPU, Memory, Event Loop Lag, Active
+    Handles, GC Duration, Uptime and Version Info\",\n  \"editable\": true,\n  \"fiscalYearStartMonth\":
+    0,\n  \"graphTooltip\": 1,\n  \"links\": [],\n  \"panels\": [\n    {\n      \"collapsed\":
+    false,\n      \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n        \"x\":
+    0,\n        \"y\": 0\n      },\n      \"id\": 100,\n      \"panels\": [],\n      \"title\":
+    \"\U0001F50E Overview\",\n      \"type\": \"row\"\n    },\n    {\n      \"datasource\":
+    {\n        \"type\": \"prometheus\",\n        \"uid\": \"Prometheus\"\n      },\n
+    \     \"description\": \"process_start_time_seconds — time elapsed since process
+    start. Metric(process_start_time_seconds).\",\n      \"fieldConfig\": {\n        \"defaults\":
+    {\n          \"color\": {\n            \"mode\": \"thresholds\"\n          },\n
+    \         \"displayName\": \"Uptime\",\n          \"mappings\": [],\n          \"thresholds\":
+    {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n
+    \               \"color\": \"green\",\n                \"value\": 0\n              }\n
+    \           ]\n          },\n          \"unit\": \"s\"\n        },\n        \"overrides\":
+    []\n      },\n      \"gridPos\": {\n        \"h\": 4,\n        \"w\": 4,\n        \"x\":
+    0,\n        \"y\": 1\n      },\n      \"id\": 1,\n      \"options\": {\n        \"colorMode\":
+    \"background\",\n        \"graphMode\": \"none\",\n        \"justifyMode\": \"center\",\n
+    \       \"orientation\": \"auto\",\n        \"percentChangeColorMode\": \"standard\",\n
+    \       \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n
+    \         ],\n          \"fields\": \"\",\n          \"values\": false\n        },\n
+    \       \"showPercentChange\": false,\n        \"textMode\": \"auto\",\n        \"wideLayout\":
+    true\n      },\n      \"pluginVersion\": \"12.4.2\",\n      \"targets\": [\n        {\n
+    \         \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\":
+    \"Prometheus\"\n          },\n          \"editorMode\": \"code\",\n          \"expr\":
+    \"time() - process_start_time_seconds{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \         \"legendFormat\": \"Uptime\",\n          \"range\": true,\n          \"refId\":
+    \"A\"\n        }\n      ],\n      \"title\": \"Uptime\",\n      \"type\": \"stat\"\n
+    \   },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\":
+    \"Prometheus\"\n      },\n      \"description\": \"nodejs_version_info — version
+    labels exposed by prom-client. Metric(nodejs_version_info).\",\n      \"fieldConfig\":
+    {\n        \"defaults\": {\n          \"color\": {\n            \"fixedColor\":
+    \"blue\",\n            \"mode\": \"fixed\"\n          },\n          \"displayName\":
+    \"${__field.labels.version}\",\n          \"mappings\": [],\n          \"thresholds\":
+    {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n
+    \               \"color\": \"blue\",\n                \"value\": 0\n              }\n
+    \           ]\n          },\n          \"unit\": \"short\"\n        },\n        \"overrides\":
+    []\n      },\n      \"gridPos\": {\n        \"h\": 4,\n        \"w\": 5,\n        \"x\":
+    4,\n        \"y\": 1\n      },\n      \"id\": 2,\n      \"options\": {\n        \"colorMode\":
+    \"background\",\n        \"graphMode\": \"none\",\n        \"justifyMode\": \"center\",\n
+    \       \"orientation\": \"auto\",\n        \"percentChangeColorMode\": \"standard\",\n
+    \       \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n
+    \         ],\n          \"fields\": \"\",\n          \"values\": false\n        },\n
+    \       \"showPercentChange\": false,\n        \"textMode\": \"name\",\n        \"wideLayout\":
+    true\n      },\n      \"pluginVersion\": \"12.4.2\",\n      \"targets\": [\n        {\n
+    \         \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\":
+    \"Prometheus\"\n          },\n          \"editorMode\": \"code\",\n          \"expr\":
+    \"nodejs_version_info{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n          \"legendFormat\":
+    \"Node {{version}}\",\n          \"range\": true,\n          \"refId\": \"A\"\n
+    \       }\n      ],\n      \"title\": \"Node JS Version\",\n      \"type\": \"stat\"\n
+    \   },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\":
+    \"Prometheus\"\n      },\n      \"description\": \"rate(process_cpu_seconds_total[1m])
+    — percentage of CPU time used. Metric(process_cpu_seconds_total).\",\n      \"fieldConfig\":
+    {\n        \"defaults\": {\n          \"color\": {\n            \"mode\": \"thresholds\"\n
+    \         },\n          \"displayName\": \"CPU\",\n          \"mappings\": [],\n
+    \         \"max\": 1,\n          \"min\": 0,\n          \"thresholds\": {\n            \"mode\":
+    \"absolute\",\n            \"steps\": [\n              {\n                \"color\":
+    \"green\",\n                \"value\": 0\n              },\n              {\n
+    \               \"color\": \"yellow\",\n                \"value\": 0.4\n              },\n
+    \             {\n                \"color\": \"red\",\n                \"value\":
+    0.8\n              }\n            ]\n          },\n          \"unit\": \"percentunit\"\n
+    \       },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n        \"h\":
+    4,\n        \"w\": 5,\n        \"x\": 9,\n        \"y\": 1\n      },\n      \"id\":
+    3,\n      \"options\": {\n        \"colorMode\": \"background\",\n        \"graphMode\":
+    \"area\",\n        \"justifyMode\": \"center\",\n        \"orientation\": \"auto\",\n
+    \       \"percentChangeColorMode\": \"standard\",\n        \"reduceOptions\":
+    {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\":
+    \"\",\n          \"values\": false\n        },\n        \"showPercentChange\":
+    false,\n        \"textMode\": \"auto\",\n        \"wideLayout\": true\n      },\n
+    \     \"pluginVersion\": \"12.4.2\",\n      \"targets\": [\n        {\n          \"datasource\":
+    {\n            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n
+    \         },\n          \"editorMode\": \"code\",\n          \"expr\": \"rate(process_cpu_seconds_total{job=~\\\"$job\\\",
+    instance=~\\\"$instance\\\"}[$__rate_interval])\",\n          \"legendFormat\":
+    \"CPU Rate\",\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n
+    \     ],\n      \"title\": \"CPU Usage Rate\",\n      \"type\": \"stat\"\n    },\n
+    \   {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\":
+    \"Prometheus\"\n      },\n      \"description\": \"process_resident_memory_bytes
+    — physical memory in use. Metric(process_resident_memory_bytes)\",\n      \"fieldConfig\":
+    {\n        \"defaults\": {\n          \"color\": {\n            \"mode\": \"thresholds\"\n
+    \         },\n          \"displayName\": \"RSS\",\n          \"mappings\": [],\n
+    \         \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":
+    [\n              {\n                \"color\": \"green\",\n                \"value\":
+    0\n              },\n              {\n                \"color\": \"yellow\",\n
+    \               \"value\": 268435456\n              },\n              {\n                \"color\":
+    \"red\",\n                \"value\": 536870912\n              }\n            ]\n
+    \         },\n          \"unit\": \"bytes\"\n        },\n        \"overrides\":
+    []\n      },\n      \"gridPos\": {\n        \"h\": 4,\n        \"w\": 5,\n        \"x\":
+    14,\n        \"y\": 1\n      },\n      \"id\": 4,\n      \"options\": {\n        \"colorMode\":
+    \"background\",\n        \"graphMode\": \"area\",\n        \"justifyMode\": \"center\",\n
+    \       \"orientation\": \"auto\",\n        \"percentChangeColorMode\": \"standard\",\n
+    \       \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n
+    \         ],\n          \"fields\": \"\",\n          \"values\": false\n        },\n
+    \       \"showPercentChange\": false,\n        \"textMode\": \"auto\",\n        \"wideLayout\":
+    true\n      },\n      \"pluginVersion\": \"12.4.2\",\n      \"targets\": [\n        {\n
+    \         \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\":
+    \"Prometheus\"\n          },\n          \"editorMode\": \"code\",\n          \"expr\":
+    \"process_resident_memory_bytes{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \         \"legendFormat\": \"RSS\",\n          \"range\": true,\n          \"refId\":
+    \"A\"\n        }\n      ],\n      \"title\": \"Resident Memory (RSS)\",\n      \"type\":
+    \"stat\"\n    },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n
+    \       \"uid\": \"Prometheus\"\n      },\n      \"description\": \"nodejs_eventloop_lag_seconds
+    — delay in the Node.js event loop. Metric(nodejs_eventloop_lag_seconds).\",\n
+    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\n            \"mode\":
+    \"thresholds\"\n          },\n          \"displayName\": \"Event Loop Lag\",\n
+    \         \"mappings\": [],\n          \"thresholds\": {\n            \"mode\":
+    \"absolute\",\n            \"steps\": [\n              {\n                \"color\":
+    \"green\",\n                \"value\": 0\n              },\n              {\n
+    \               \"color\": \"yellow\",\n                \"value\": 0.01\n              },\n
+    \             {\n                \"color\": \"red\",\n                \"value\":
+    0.1\n              }\n            ]\n          },\n          \"unit\": \"s\"\n
+    \       },\n        \"overrides\": []\n      },\n      \"gridPos\": {\n        \"h\":
+    4,\n        \"w\": 5,\n        \"x\": 19,\n        \"y\": 1\n      },\n      \"id\":
+    5,\n      \"options\": {\n        \"colorMode\": \"background\",\n        \"graphMode\":
+    \"area\",\n        \"justifyMode\": \"center\",\n        \"orientation\": \"auto\",\n
+    \       \"percentChangeColorMode\": \"standard\",\n        \"reduceOptions\":
+    {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\":
+    \"\",\n          \"values\": false\n        },\n        \"showPercentChange\":
+    false,\n        \"textMode\": \"auto\",\n        \"wideLayout\": true\n      },\n
+    \     \"pluginVersion\": \"12.4.2\",\n      \"targets\": [\n        {\n          \"datasource\":
+    {\n            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n
+    \         },\n          \"editorMode\": \"code\",\n          \"expr\": \"nodejs_eventloop_lag_seconds{job=~\\\"$job\\\",
+    instance=~\\\"$instance\\\"}\",\n          \"legendFormat\": \"Lag\",\n          \"range\":
+    true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"Event
+    Loop Lag\",\n      \"type\": \"stat\"\n    },\n    {\n      \"collapsed\": true,\n
+    \     \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n        \"x\": 0,\n
+    \       \"y\": 5\n      },\n      \"id\": 101,\n      \"panels\": [\n        {\n
+    \         \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\":
+    \"Prometheus\"\n          },\n          \"description\": \"rate(process_cpu_seconds_total[rate_interval])
+    — instantaneous CPU usage as a fraction of one core (1.0 = 100% of one core).
+    Metric(process_cpu_seconds_total).\",\n          \"fieldConfig\": {\n            \"defaults\":
+    {\n              \"color\": {\n                \"mode\": \"palette-classic\"\n
+    \             },\n              \"custom\": {\n                \"axisBorderShow\":
+    false,\n                \"axisCenteredZero\": false,\n                \"axisColorMode\":
+    \"text\",\n                \"axisLabel\": \"\",\n                \"axisPlacement\":
+    \"auto\",\n                \"barAlignment\": 0,\n                \"barWidthFactor\":
+    0.6,\n                \"drawStyle\": \"line\",\n                \"fillOpacity\":
+    15,\n                \"gradientMode\": \"opacity\",\n                \"hideFrom\":
+    {\n                  \"legend\": false,\n                  \"tooltip\": false,\n
+    \                 \"viz\": false\n                },\n                \"insertNulls\":
+    false,\n                \"lineInterpolation\": \"smooth\",\n                \"lineWidth\":
+    2,\n                \"pointSize\": 5,\n                \"scaleDistribution\":
+    {\n                  \"type\": \"linear\"\n                },\n                \"showPoints\":
+    \"never\",\n                \"showValues\": false,\n                \"spanNulls\":
+    false,\n                \"stacking\": {\n                  \"group\": \"A\",\n
+    \                 \"mode\": \"none\"\n                },\n                \"thresholdsStyle\":
+    {\n                  \"mode\": \"line\"\n                }\n              },\n
+    \             \"mappings\": [],\n              \"thresholds\": {\n                \"mode\":
+    \"absolute\",\n                \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  },\n                  {\n
+    \                   \"color\": \"red\",\n                    \"value\": 0.8\n
+    \                 }\n                ]\n              },\n              \"unit\":
+    \"percentunit\"\n            },\n            \"overrides\": []\n          },\n
+    \         \"gridPos\": {\n            \"h\": 8,\n            \"w\": 12,\n            \"x\":
+    0,\n            \"y\": 6\n          },\n          \"id\": 10,\n          \"options\":
+    {\n            \"legend\": {\n              \"calcs\": [\n                \"mean\",\n
+    \               \"max\",\n                \"lastNotNull\"\n              ],\n
+    \             \"displayMode\": \"table\",\n              \"placement\": \"bottom\",\n
+    \             \"showLegend\": true\n            },\n            \"tooltip\": {\n
+    \             \"hideZeros\": false,\n              \"mode\": \"multi\",\n              \"sort\":
+    \"desc\"\n            }\n          },\n          \"pluginVersion\": \"12.4.2\",\n
+    \         \"targets\": [\n            {\n              \"datasource\": {\n                \"type\":
+    \"prometheus\",\n                \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"rate(process_cpu_seconds_total{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}[$__rate_interval])\",\n
+    \             \"legendFormat\": \"{{instance}} — CPU rate\",\n              \"refId\":
+    \"A\"\n            }\n          ],\n          \"title\": \"CPU Usage Rate\",\n
+    \         \"type\": \"timeseries\"\n        },\n        {\n          \"datasource\":
+    {\n            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n
+    \         },\n          \"description\": \"Current CPU usage visualised as a gauge.
+    Metric(process_cpu_seconds_total).\",\n          \"fieldConfig\": {\n            \"defaults\":
+    {\n              \"color\": {\n                \"mode\": \"thresholds\"\n              },\n
+    \             \"mappings\": [],\n              \"max\": 1,\n              \"min\":
+    0,\n              \"thresholds\": {\n                \"mode\": \"absolute\",\n
+    \               \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  },\n                  {\n
+    \                   \"color\": \"yellow\",\n                    \"value\": 0.5\n
+    \                 },\n                  {\n                    \"color\": \"red\",\n
+    \                   \"value\": 0.8\n                  }\n                ]\n              },\n
+    \             \"unit\": \"percentunit\"\n            },\n            \"overrides\":
+    []\n          },\n          \"gridPos\": {\n            \"h\": 8,\n            \"w\":
+    6,\n            \"x\": 12,\n            \"y\": 6\n          },\n          \"id\":
+    11,\n          \"options\": {\n            \"minVizHeight\": 75,\n            \"minVizWidth\":
+    75,\n            \"orientation\": \"auto\",\n            \"reduceOptions\": {\n
+    \             \"calcs\": [\n                \"lastNotNull\"\n              ],\n
+    \             \"fields\": \"\",\n              \"values\": false\n            },\n
+    \           \"showThresholdLabels\": false,\n            \"showThresholdMarkers\":
+    true,\n            \"sizing\": \"auto\"\n          },\n          \"pluginVersion\":
+    \"12.4.2\",\n          \"targets\": [\n            {\n              \"datasource\":
+    {\n                \"type\": \"prometheus\",\n                \"uid\": \"Prometheus\"\n
+    \             },\n              \"expr\": \"rate(process_cpu_seconds_total{job=~\\\"$job\\\",
+    instance=~\\\"$instance\\\"}[$__rate_interval])\",\n              \"legendFormat\":
+    \"CPU\",\n              \"refId\": \"A\"\n            }\n          ],\n          \"title\":
+    \"CPU Gauge\",\n          \"type\": \"gauge\"\n        },\n        {\n          \"datasource\":
+    {\n            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n
+    \         },\n          \"description\": \"Total CPU seconds consumed since process
+    start (counter value). Metrcis(process_cpu_seconds_total).\",\n          \"fieldConfig\":
+    {\n            \"defaults\": {\n              \"color\": {\n                \"fixedColor\":
+    \"blue\",\n                \"mode\": \"fixed\"\n              },\n              \"displayName\":
+    \"CPU seconds total\",\n              \"mappings\": [],\n              \"thresholds\":
+    {\n                \"mode\": \"absolute\",\n                \"steps\": [\n                  {\n
+    \                   \"color\": \"blue\",\n                    \"value\": 0\n                  }\n
+    \               ]\n              },\n              \"unit\": \"s\"\n            },\n
+    \           \"overrides\": []\n          },\n          \"gridPos\": {\n            \"h\":
+    8,\n            \"w\": 6,\n            \"x\": 18,\n            \"y\": 6\n          },\n
+    \         \"id\": 12,\n          \"options\": {\n            \"colorMode\": \"value\",\n
+    \           \"graphMode\": \"area\",\n            \"justifyMode\": \"auto\",\n
+    \           \"orientation\": \"auto\",\n            \"percentChangeColorMode\":
+    \"standard\",\n            \"reduceOptions\": {\n              \"calcs\": [\n
+    \               \"lastNotNull\"\n              ],\n              \"fields\": \"\",\n
+    \             \"values\": false\n            },\n            \"showPercentChange\":
+    false,\n            \"textMode\": \"auto\",\n            \"wideLayout\": true\n
+    \         },\n          \"pluginVersion\": \"12.4.2\",\n          \"targets\":
+    [\n            {\n              \"datasource\": {\n                \"type\": \"prometheus\",\n
+    \               \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"process_cpu_seconds_total{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \             \"legendFormat\": \"CPU seconds\",\n              \"refId\": \"A\"\n
+    \           }\n          ],\n          \"title\": \"CPU Accumulated\",\n          \"type\":
+    \"stat\"\n        }\n      ],\n      \"title\": \"⚡ CPU\",\n      \"type\": \"row\"\n
+    \   },\n    {\n      \"collapsed\": true,\n      \"gridPos\": {\n        \"h\":
+    1,\n        \"w\": 24,\n        \"x\": 0,\n        \"y\": 6\n      },\n      \"id\":
+    102,\n      \"panels\": [\n        {\n          \"datasource\": {\n            \"type\":
+    \"prometheus\",\n            \"uid\": \"Prometheus\"\n          },\n          \"description\":
+    \"RSS memory over time. Steady growth indicates a memory leak. Metric(process_resident_memory_bytes).\",\n
+    \         \"fieldConfig\": {\n            \"defaults\": {\n              \"color\":
+    {\n                \"mode\": \"palette-classic\"\n              },\n              \"custom\":
+    {\n                \"axisBorderShow\": false,\n                \"axisCenteredZero\":
+    false,\n                \"axisColorMode\": \"text\",\n                \"axisLabel\":
+    \"\",\n                \"axisPlacement\": \"auto\",\n                \"barAlignment\":
+    0,\n                \"barWidthFactor\": 0.6,\n                \"drawStyle\": \"line\",\n
+    \               \"fillOpacity\": 20,\n                \"gradientMode\": \"opacity\",\n
+    \               \"hideFrom\": {\n                  \"legend\": false,\n                  \"tooltip\":
+    false,\n                  \"viz\": false\n                },\n                \"insertNulls\":
+    false,\n                \"lineInterpolation\": \"smooth\",\n                \"lineWidth\":
+    2,\n                \"pointSize\": 5,\n                \"scaleDistribution\":
+    {\n                  \"type\": \"linear\"\n                },\n                \"showPoints\":
+    \"never\",\n                \"showValues\": false,\n                \"spanNulls\":
+    false,\n                \"stacking\": {\n                  \"group\": \"A\",\n
+    \                 \"mode\": \"none\"\n                },\n                \"thresholdsStyle\":
+    {\n                  \"mode\": \"line\"\n                }\n              },\n
+    \             \"mappings\": [],\n              \"thresholds\": {\n                \"mode\":
+    \"absolute\",\n                \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  },\n                  {\n
+    \                   \"color\": \"yellow\",\n                    \"value\": 268435456\n
+    \                 },\n                  {\n                    \"color\": \"red\",\n
+    \                   \"value\": 536870912\n                  }\n                ]\n
+    \             },\n              \"unit\": \"bytes\"\n            },\n            \"overrides\":
+    []\n          },\n          \"gridPos\": {\n            \"h\": 8,\n            \"w\":
+    16,\n            \"x\": 0,\n            \"y\": 15\n          },\n          \"id\":
+    20,\n          \"options\": {\n            \"legend\": {\n              \"calcs\":
+    [\n                \"mean\",\n                \"max\",\n                \"lastNotNull\"\n
+    \             ],\n              \"displayMode\": \"table\",\n              \"placement\":
+    \"bottom\",\n              \"showLegend\": true\n            },\n            \"tooltip\":
+    {\n              \"hideZeros\": false,\n              \"mode\": \"multi\",\n              \"sort\":
+    \"desc\"\n            }\n          },\n          \"pluginVersion\": \"12.4.2\",\n
+    \         \"targets\": [\n            {\n              \"datasource\": {\n                \"type\":
+    \"prometheus\",\n                \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"process_resident_memory_bytes{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \             \"legendFormat\": \"{{instance}} — RSS\",\n              \"refId\":
+    \"A\"\n            }\n          ],\n          \"title\": \"Resident Memory\",\n
+    \         \"type\": \"timeseries\"\n        },\n        {\n          \"datasource\":
+    {\n            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n
+    \         },\n          \"description\": \"Current RSS vs thresholds (256 MB warning
+    / 512 MB critical). Metric(process_resident_memory_bytes).\",\n          \"fieldConfig\":
+    {\n            \"defaults\": {\n              \"color\": {\n                \"mode\":
+    \"thresholds\"\n              },\n              \"mappings\": [],\n              \"max\":
+    1073741824,\n              \"min\": 0,\n              \"thresholds\": {\n                \"mode\":
+    \"absolute\",\n                \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  },\n                  {\n
+    \                   \"color\": \"yellow\",\n                    \"value\": 268435456\n
+    \                 },\n                  {\n                    \"color\": \"red\",\n
+    \                   \"value\": 536870912\n                  }\n                ]\n
+    \             },\n              \"unit\": \"bytes\"\n            },\n            \"overrides\":
+    []\n          },\n          \"gridPos\": {\n            \"h\": 8,\n            \"w\":
+    8,\n            \"x\": 16,\n            \"y\": 15\n          },\n          \"id\":
+    21,\n          \"options\": {\n            \"minVizHeight\": 75,\n            \"minVizWidth\":
+    75,\n            \"orientation\": \"auto\",\n            \"reduceOptions\": {\n
+    \             \"calcs\": [\n                \"lastNotNull\"\n              ],\n
+    \             \"fields\": \"\",\n              \"values\": false\n            },\n
+    \           \"showThresholdLabels\": true,\n            \"showThresholdMarkers\":
+    true,\n            \"sizing\": \"auto\"\n          },\n          \"pluginVersion\":
+    \"12.4.2\",\n          \"targets\": [\n            {\n              \"datasource\":
+    {\n                \"type\": \"prometheus\",\n                \"uid\": \"Prometheus\"\n
+    \             },\n              \"editorMode\": \"code\",\n              \"expr\":
+    \"process_resident_memory_bytes{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \             \"legendFormat\": \"RSS\",\n              \"range\": true,\n              \"refId\":
+    \"A\"\n            }\n          ],\n          \"title\": \"Memory Gauge - RSS\",\n
+    \         \"type\": \"gauge\"\n        }\n      ],\n      \"title\": \"\U0001F9E0
+    Memory\",\n      \"type\": \"row\"\n    },\n    {\n      \"collapsed\": true,\n
+    \     \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n        \"x\": 0,\n
+    \       \"y\": 7\n      },\n      \"id\": 103,\n      \"panels\": [\n        {\n
+    \         \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\":
+    \"Prometheus\"\n          },\n          \"description\": \"Delay in the Node.js
+    event loop. Values > 100ms indicate blocking I/O or CPU-bound code. Metric(nodejs_eventloop_lag_seconds).\",\n
+    \         \"fieldConfig\": {\n            \"defaults\": {\n              \"color\":
+    {\n                \"mode\": \"palette-classic\"\n              },\n              \"custom\":
+    {\n                \"axisBorderShow\": false,\n                \"axisCenteredZero\":
+    false,\n                \"axisColorMode\": \"text\",\n                \"axisLabel\":
+    \"\",\n                \"axisPlacement\": \"auto\",\n                \"barAlignment\":
+    0,\n                \"barWidthFactor\": 0.6,\n                \"drawStyle\": \"line\",\n
+    \               \"fillOpacity\": 15,\n                \"gradientMode\": \"opacity\",\n
+    \               \"hideFrom\": {\n                  \"legend\": false,\n                  \"tooltip\":
+    false,\n                  \"viz\": false\n                },\n                \"insertNulls\":
+    false,\n                \"lineInterpolation\": \"smooth\",\n                \"lineWidth\":
+    2,\n                \"pointSize\": 5,\n                \"scaleDistribution\":
+    {\n                  \"type\": \"linear\"\n                },\n                \"showPoints\":
+    \"never\",\n                \"showValues\": false,\n                \"spanNulls\":
+    false,\n                \"stacking\": {\n                  \"group\": \"A\",\n
+    \                 \"mode\": \"none\"\n                },\n                \"thresholdsStyle\":
+    {\n                  \"mode\": \"dashed\"\n                }\n              },\n
+    \             \"mappings\": [],\n              \"thresholds\": {\n                \"mode\":
+    \"absolute\",\n                \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  },\n                  {\n
+    \                   \"color\": \"yellow\",\n                    \"value\": 0.01\n
+    \                 },\n                  {\n                    \"color\": \"red\",\n
+    \                   \"value\": 0.1\n                  }\n                ]\n              },\n
+    \             \"unit\": \"s\"\n            },\n            \"overrides\": []\n
+    \         },\n          \"gridPos\": {\n            \"h\": 8,\n            \"w\":
+    16,\n            \"x\": 0,\n            \"y\": 24\n          },\n          \"id\":
+    30,\n          \"options\": {\n            \"legend\": {\n              \"calcs\":
+    [\n                \"mean\",\n                \"max\",\n                \"lastNotNull\"\n
+    \             ],\n              \"displayMode\": \"table\",\n              \"placement\":
+    \"bottom\",\n              \"showLegend\": true\n            },\n            \"tooltip\":
+    {\n              \"hideZeros\": false,\n              \"mode\": \"multi\",\n              \"sort\":
+    \"desc\"\n            }\n          },\n          \"pluginVersion\": \"12.4.2\",\n
+    \         \"targets\": [\n            {\n              \"datasource\": {\n                \"type\":
+    \"prometheus\",\n                \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"nodejs_eventloop_lag_seconds{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \             \"legendFormat\": \"{{instance}} — lag\",\n              \"refId\":
+    \"A\"\n            }\n          ],\n          \"title\": \"Event Loop Lag\",\n
+    \         \"type\": \"timeseries\"\n        },\n        {\n          \"datasource\":
+    {\n            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n
+    \         },\n          \"description\": \"Current lag vs SLO thresholds. Metric(nodejs_eventloop_lag_seconds).\",\n
+    \         \"fieldConfig\": {\n            \"defaults\": {\n              \"color\":
+    {\n                \"mode\": \"thresholds\"\n              },\n              \"mappings\":
+    [\n                {\n                  \"options\": {\n                    \"from\":
+    0,\n                    \"result\": {\n                      \"text\": \"Healthy\"\n
+    \                   },\n                    \"to\": 0.01\n                  },\n
+    \                 \"type\": \"range\"\n                },\n                {\n
+    \                 \"options\": {\n                    \"from\": 0.01,\n                    \"result\":
+    {\n                      \"text\": \"Warning\"\n                    },\n                    \"to\":
+    0.1\n                  },\n                  \"type\": \"range\"\n                },\n
+    \               {\n                  \"options\": {\n                    \"from\":
+    0.1,\n                    \"result\": {\n                      \"text\": \"Degraded\"\n
+    \                   },\n                    \"to\": 10\n                  },\n
+    \                 \"type\": \"range\"\n                }\n              ],\n              \"max\":
+    0.5,\n              \"min\": 0,\n              \"thresholds\": {\n                \"mode\":
+    \"absolute\",\n                \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  },\n                  {\n
+    \                   \"color\": \"yellow\",\n                    \"value\": 0.01\n
+    \                 },\n                  {\n                    \"color\": \"red\",\n
+    \                   \"value\": 0.1\n                  }\n                ]\n              },\n
+    \             \"unit\": \"s\"\n            },\n            \"overrides\": []\n
+    \         },\n          \"gridPos\": {\n            \"h\": 8,\n            \"w\":
+    8,\n            \"x\": 16,\n            \"y\": 24\n          },\n          \"id\":
+    31,\n          \"options\": {\n            \"minVizHeight\": 75,\n            \"minVizWidth\":
+    75,\n            \"orientation\": \"auto\",\n            \"reduceOptions\": {\n
+    \             \"calcs\": [\n                \"lastNotNull\"\n              ],\n
+    \             \"fields\": \"\",\n              \"values\": false\n            },\n
+    \           \"showThresholdLabels\": true,\n            \"showThresholdMarkers\":
+    true,\n            \"sizing\": \"auto\"\n          },\n          \"pluginVersion\":
+    \"12.4.2\",\n          \"targets\": [\n            {\n              \"datasource\":
+    {\n                \"type\": \"prometheus\",\n                \"uid\": \"Prometheus\"\n
+    \             },\n              \"editorMode\": \"code\",\n              \"expr\":
+    \"nodejs_eventloop_lag_seconds{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \             \"legendFormat\": \"Lag\",\n              \"range\": true,\n              \"refId\":
+    \"A\"\n            }\n          ],\n          \"title\": \"Event Loop Lag Gauge\",\n
+    \         \"type\": \"gauge\"\n        }\n      ],\n      \"title\": \"⏱ Event
+    Loop\",\n      \"type\": \"row\"\n    },\n    {\n      \"collapsed\": true,\n
+    \     \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n        \"x\": 0,\n
+    \       \"y\": 8\n      },\n      \"id\": 104,\n      \"panels\": [\n        {\n
+    \         \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\":
+    \"Prometheus\"\n          },\n          \"description\": \"Total active libuv
+    handles. Sustained growth = handle leak (unclosed sockets, timers, etc.). Metric(nodejs_active_handles_total).\",\n
+    \         \"fieldConfig\": {\n            \"defaults\": {\n              \"color\":
+    {\n                \"mode\": \"palette-classic\"\n              },\n              \"custom\":
+    {\n                \"axisBorderShow\": false,\n                \"axisCenteredZero\":
+    false,\n                \"axisColorMode\": \"text\",\n                \"axisLabel\":
+    \"\",\n                \"axisPlacement\": \"auto\",\n                \"barAlignment\":
+    0,\n                \"barWidthFactor\": 0.6,\n                \"drawStyle\": \"line\",\n
+    \               \"fillOpacity\": 15,\n                \"gradientMode\": \"opacity\",\n
+    \               \"hideFrom\": {\n                  \"legend\": false,\n                  \"tooltip\":
+    false,\n                  \"viz\": false\n                },\n                \"insertNulls\":
+    false,\n                \"lineInterpolation\": \"smooth\",\n                \"lineWidth\":
+    2,\n                \"pointSize\": 5,\n                \"scaleDistribution\":
+    {\n                  \"type\": \"linear\"\n                },\n                \"showPoints\":
+    \"never\",\n                \"showValues\": false,\n                \"spanNulls\":
+    false,\n                \"stacking\": {\n                  \"group\": \"A\",\n
+    \                 \"mode\": \"none\"\n                },\n                \"thresholdsStyle\":
+    {\n                  \"mode\": \"line\"\n                }\n              },\n
+    \             \"mappings\": [],\n              \"thresholds\": {\n                \"mode\":
+    \"absolute\",\n                \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  },\n                  {\n
+    \                   \"color\": \"yellow\",\n                    \"value\": 50\n
+    \                 },\n                  {\n                    \"color\": \"red\",\n
+    \                   \"value\": 100\n                  }\n                ]\n              },\n
+    \             \"unit\": \"short\"\n            },\n            \"overrides\":
+    []\n          },\n          \"gridPos\": {\n            \"h\": 8,\n            \"w\":
+    12,\n            \"x\": 0,\n            \"y\": 33\n          },\n          \"id\":
+    40,\n          \"options\": {\n            \"legend\": {\n              \"calcs\":
+    [\n                \"mean\",\n                \"max\",\n                \"lastNotNull\"\n
+    \             ],\n              \"displayMode\": \"table\",\n              \"placement\":
+    \"bottom\",\n              \"showLegend\": true\n            },\n            \"tooltip\":
+    {\n              \"hideZeros\": false,\n              \"mode\": \"multi\",\n              \"sort\":
+    \"desc\"\n            }\n          },\n          \"pluginVersion\": \"12.4.2\",\n
+    \         \"targets\": [\n            {\n              \"datasource\": {\n                \"type\":
+    \"prometheus\",\n                \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"nodejs_active_handles_total{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \             \"legendFormat\": \"{{instance}} — handles\",\n              \"refId\":
+    \"A\"\n            }\n          ],\n          \"title\": \"Active Handles\",\n
+    \         \"type\": \"timeseries\"\n        },\n        {\n          \"datasource\":
+    {\n            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n
+    \         },\n          \"description\": \"Total GC pause time per GC kind (Scavenge,
+    MarkSweepCompact, IncrementalMarking, WeakCallbacks). High MarkSweepCompact =
+    heap pressure. Metric(nodejs_gc_duration_seconds_sum).\",\n          \"fieldConfig\":
+    {\n            \"defaults\": {\n              \"color\": {\n                \"mode\":
+    \"palette-classic\"\n              },\n              \"custom\": {\n                \"axisBorderShow\":
+    false,\n                \"axisCenteredZero\": false,\n                \"axisColorMode\":
+    \"text\",\n                \"axisLabel\": \"\",\n                \"axisPlacement\":
+    \"auto\",\n                \"barAlignment\": 0,\n                \"barWidthFactor\":
+    0.6,\n                \"drawStyle\": \"bars\",\n                \"fillOpacity\":
+    80,\n                \"gradientMode\": \"none\",\n                \"hideFrom\":
+    {\n                  \"legend\": false,\n                  \"tooltip\": false,\n
+    \                 \"viz\": false\n                },\n                \"insertNulls\":
+    false,\n                \"lineInterpolation\": \"linear\",\n                \"lineWidth\":
+    1,\n                \"pointSize\": 5,\n                \"scaleDistribution\":
+    {\n                  \"type\": \"linear\"\n                },\n                \"showPoints\":
+    \"never\",\n                \"showValues\": false,\n                \"spanNulls\":
+    false,\n                \"stacking\": {\n                  \"group\": \"A\",\n
+    \                 \"mode\": \"normal\"\n                },\n                \"thresholdsStyle\":
+    {\n                  \"mode\": \"off\"\n                }\n              },\n
+    \             \"mappings\": [],\n              \"thresholds\": {\n                \"mode\":
+    \"absolute\",\n                \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  }\n                ]\n
+    \             },\n              \"unit\": \"s\"\n            },\n            \"overrides\":
+    []\n          },\n          \"gridPos\": {\n            \"h\": 8,\n            \"w\":
+    12,\n            \"x\": 12,\n            \"y\": 33\n          },\n          \"id\":
+    50,\n          \"options\": {\n            \"legend\": {\n              \"calcs\":
+    [\n                \"sum\",\n                \"max\"\n              ],\n              \"displayMode\":
+    \"table\",\n              \"placement\": \"bottom\",\n              \"showLegend\":
+    true\n            },\n            \"tooltip\": {\n              \"hideZeros\":
+    false,\n              \"mode\": \"multi\",\n              \"sort\": \"desc\"\n
+    \           }\n          },\n          \"pluginVersion\": \"12.4.2\",\n          \"targets\":
+    [\n            {\n              \"datasource\": {\n                \"type\": \"prometheus\",\n
+    \               \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"increase(nodejs_gc_duration_seconds_sum{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}[$__rate_interval])\",\n
+    \             \"legendFormat\": \"{{kind}}\",\n              \"refId\": \"A\"\n
+    \           }\n          ],\n          \"title\": \"GC Duration by Kind\",\n          \"type\":
+    \"timeseries\"\n        },\n        {\n          \"datasource\": {\n            \"type\":
+    \"prometheus\",\n            \"uid\": \"Prometheus\"\n          },\n          \"description\":
+    \"GC pause time per kind in the last interval. Metric(nodejs_gc_duration_seconds_sum).\",\n
+    \         \"fieldConfig\": {\n            \"defaults\": {\n              \"color\":
+    {\n                \"mode\": \"thresholds\"\n              },\n              \"custom\":
+    {\n                \"align\": \"auto\",\n                \"cellOptions\": {\n
+    \                 \"type\": \"auto\"\n                },\n                \"filterable\":
+    false,\n                \"footer\": {\n                  \"reducers\": []\n                },\n
+    \               \"inspect\": false\n              },\n              \"mappings\":
+    [],\n              \"thresholds\": {\n                \"mode\": \"absolute\",\n
+    \               \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  },\n                  {\n
+    \                   \"color\": \"yellow\",\n                    \"value\": 0.01\n
+    \                 },\n                  {\n                    \"color\": \"red\",\n
+    \                   \"value\": 0.1\n                  }\n                ]\n              },\n
+    \             \"unit\": \"s\"\n            },\n            \"overrides\": [\n
+    \             {\n                \"matcher\": {\n                  \"id\": \"byName\",\n
+    \                 \"options\": \"Value\"\n                },\n                \"properties\":
+    []\n              }\n            ]\n          },\n          \"gridPos\": {\n            \"h\":
+    6,\n            \"w\": 12,\n            \"x\": 0,\n            \"y\": 41\n          },\n
+    \         \"id\": 51,\n          \"options\": {\n            \"cellHeight\": \"sm\",\n
+    \           \"showHeader\": true\n          },\n          \"pluginVersion\": \"12.4.2\",\n
+    \         \"targets\": [\n            {\n              \"datasource\": {\n                \"type\":
+    \"prometheus\",\n                \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"increase(nodejs_gc_duration_seconds_sum{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}[$__rate_interval])\",\n
+    \             \"format\": \"table\",\n              \"instant\": true,\n              \"legendFormat\":
+    \"{{kind}}\",\n              \"refId\": \"A\"\n            }\n          ],\n          \"title\":
+    \"GC Rate Table\",\n          \"transformations\": [\n            {\n              \"id\":
+    \"organize\",\n              \"options\": {\n                \"renameByName\":
+    {\n                  \"Value\": \"Duration (s)\",\n                  \"kind\":
+    \"GC Kind\"\n                }\n              }\n            }\n          ],\n
+    \         \"type\": \"table\"\n        }\n      ],\n      \"title\": \"\U0001F517
+    Handles & GC\",\n      \"type\": \"row\"\n    },\n    {\n      \"collapsed\":
+    true,\n      \"gridPos\": {\n        \"h\": 1,\n        \"w\": 24,\n        \"x\":
+    0,\n        \"y\": 9\n      },\n      \"id\": 105,\n      \"panels\": [\n        {\n
+    \         \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\":
+    \"Prometheus\"\n          },\n          \"description\": \"Unix timestamp when
+    the process started. Restarts appear as a value reset. Metric(process_start_time_seconds).\",\n
+    \         \"fieldConfig\": {\n            \"defaults\": {\n              \"color\":
+    {\n                \"mode\": \"palette-classic\"\n              },\n              \"custom\":
+    {\n                \"axisBorderShow\": false,\n                \"axisCenteredZero\":
+    false,\n                \"axisColorMode\": \"text\",\n                \"axisLabel\":
+    \"\",\n                \"axisPlacement\": \"auto\",\n                \"barAlignment\":
+    0,\n                \"barWidthFactor\": 0.6,\n                \"drawStyle\": \"line\",\n
+    \               \"fillOpacity\": 5,\n                \"gradientMode\": \"none\",\n
+    \               \"hideFrom\": {\n                  \"legend\": false,\n                  \"tooltip\":
+    false,\n                  \"viz\": false\n                },\n                \"insertNulls\":
+    false,\n                \"lineInterpolation\": \"stepAfter\",\n                \"lineWidth\":
+    2,\n                \"pointSize\": 6,\n                \"scaleDistribution\":
+    {\n                  \"type\": \"linear\"\n                },\n                \"showPoints\":
+    \"auto\",\n                \"showValues\": false,\n                \"spanNulls\":
+    false,\n                \"stacking\": {\n                  \"group\": \"A\",\n
+    \                 \"mode\": \"none\"\n                },\n                \"thresholdsStyle\":
+    {\n                  \"mode\": \"off\"\n                }\n              },\n
+    \             \"mappings\": [],\n              \"thresholds\": {\n                \"mode\":
+    \"absolute\",\n                \"steps\": [\n                  {\n                    \"color\":
+    \"green\",\n                    \"value\": 0\n                  }\n                ]\n
+    \             },\n              \"unit\": \"dateTimeFromNow\"\n            },\n
+    \           \"overrides\": []\n          },\n          \"gridPos\": {\n            \"h\":
+    6,\n            \"w\": 12,\n            \"x\": 0,\n            \"y\": 34\n          },\n
+    \         \"id\": 60,\n          \"options\": {\n            \"legend\": {\n              \"calcs\":
+    [],\n              \"displayMode\": \"list\",\n              \"placement\": \"bottom\",\n
+    \             \"showLegend\": true\n            },\n            \"tooltip\": {\n
+    \             \"hideZeros\": false,\n              \"mode\": \"single\",\n              \"sort\":
+    \"none\"\n            }\n          },\n          \"pluginVersion\": \"12.4.2\",\n
+    \         \"targets\": [\n            {\n              \"datasource\": {\n                \"type\":
+    \"prometheus\",\n                \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"process_start_time_seconds{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n
+    \             \"legendFormat\": \"{{instance}} — start time\",\n              \"refId\":
+    \"A\"\n            }\n          ],\n          \"title\": \"Process Start Time\",\n
+    \         \"type\": \"timeseries\"\n        },\n        {\n          \"datasource\":
+    {\n            \"type\": \"prometheus\",\n            \"uid\": \"Prometheus\"\n
+    \         },\n          \"description\": \"All labels exposed by nodejs_version_info.
+    Metric(nodejs_version_info).\",\n          \"fieldConfig\": {\n            \"defaults\":
+    {\n              \"color\": {\n                \"fixedColor\": \"blue\",\n                \"mode\":
+    \"fixed\"\n              },\n              \"custom\": {\n                \"align\":
+    \"auto\",\n                \"cellOptions\": {\n                  \"type\": \"auto\"\n
+    \               },\n                \"filterable\": false,\n                \"footer\":
+    {\n                  \"reducers\": []\n                },\n                \"inspect\":
+    false\n              },\n              \"mappings\": [],\n              \"thresholds\":
+    {\n                \"mode\": \"absolute\",\n                \"steps\": [\n                  {\n
+    \                   \"color\": \"blue\",\n                    \"value\": 0\n                  }\n
+    \               ]\n              }\n            },\n            \"overrides\":
+    []\n          },\n          \"gridPos\": {\n            \"h\": 6,\n            \"w\":
+    12,\n            \"x\": 12,\n            \"y\": 34\n          },\n          \"id\":
+    61,\n          \"options\": {\n            \"cellHeight\": \"sm\",\n            \"showHeader\":
+    true\n          },\n          \"pluginVersion\": \"12.4.2\",\n          \"targets\":
+    [\n            {\n              \"datasource\": {\n                \"type\": \"prometheus\",\n
+    \               \"uid\": \"Prometheus\"\n              },\n              \"expr\":
+    \"nodejs_version_info{job=~\\\"$job\\\", instance=~\\\"$instance\\\"}\",\n              \"format\":
+    \"table\",\n              \"instant\": true,\n              \"legendFormat\":
+    \"\",\n              \"refId\": \"A\"\n            }\n          ],\n          \"title\":
+    \"Version Info Table\",\n          \"transformations\": [\n            {\n              \"id\":
+    \"organize\",\n              \"options\": {\n                \"excludeByName\":
+    {\n                  \"Time\": true,\n                  \"Value\": true,\n                  \"__name__\":
+    true\n                },\n                \"renameByName\": {\n                  \"major\":
+    \"Major\",\n                  \"minor\": \"Minor\",\n                  \"patch\":
+    \"Patch\",\n                  \"version\": \"Node Version\"\n                }\n
+    \             }\n            }\n          ],\n          \"type\": \"table\"\n
+    \       }\n      ],\n      \"title\": \"\U0001F550 Process Info\",\n      \"type\":
+    \"row\"\n    }\n  ],\n  \"preload\": false,\n  \"refresh\": \"10s\",\n  \"schemaVersion\":
+    42,\n  \"tags\": [\n    \"nodejs\",\n    \"prom-client\",\n    \"runtime\",\n
+    \   \"performance\"\n  ],\n  \"templating\": {\n    \"list\": [\n      {\n        \"current\":
+    {},\n        \"datasource\": {\n          \"type\": \"prometheus\",\n          \"uid\":
+    \"Prometheus\"\n        },\n        \"definition\": \"label_values(process_cpu_seconds_total,
+    job)\",\n        \"includeAll\": true,\n        \"label\": \"Job\",\n        \"multi\":
+    true,\n        \"name\": \"job\",\n        \"options\": [],\n        \"query\":
+    {\n          \"query\": \"label_values(process_cpu_seconds_total, job)\",\n          \"refId\":
+    \"StandardVariableQuery\"\n        },\n        \"refresh\": 2,\n        \"regex\":
+    \"\",\n        \"regexApplyTo\": \"value\",\n        \"sort\": 1,\n        \"type\":
+    \"query\"\n      },\n      {\n        \"current\": {},\n        \"datasource\":
+    {\n          \"type\": \"prometheus\",\n          \"uid\": \"Prometheus\"\n        },\n
+    \       \"definition\": \"label_values(process_cpu_seconds_total{job=~\\\"$job\\\"},
+    instance)\",\n        \"includeAll\": true,\n        \"label\": \"Instance\",\n
+    \       \"multi\": true,\n        \"name\": \"instance\",\n        \"options\":
+    [],\n        \"query\": {\n          \"query\": \"label_values(process_cpu_seconds_total{job=~\\\"$job\\\"},
+    instance)\",\n          \"refId\": \"StandardVariableQuery\"\n        },\n        \"refresh\":
+    2,\n        \"regex\": \"\",\n        \"regexApplyTo\": \"value\",\n        \"sort\":
+    1,\n        \"type\": \"query\"\n      }\n    ]\n  },\n  \"time\": {\n    \"from\":
+    \"now-1h\",\n    \"to\": \"now\"\n  },\n  \"timepicker\": {},\n  \"timezone\":
+    \"browser\",\n  \"title\": \"TaskPad - Metrcis\",\n  \"uid\": \"nodejs-prom-client-v1\",\n
+    \ \"version\": 25,\n  \"weekStart\": \"\"\n}\n"
+kind: ConfigMap
+metadata:
+  name: monitoring-config-map
+  namespace: monitoring

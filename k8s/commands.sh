@@ -35,26 +35,33 @@ kubectl apply -f namespace/app/config/app-tls-secret.yaml --namespace app
 kubectl apply -f namespace/app/deployment.yaml --namespace app
 
 kubectl get pods --namespace app
+kubectl get svc --namespace app
 kubectl get pvc --namespace app
 
 # Namespace monitoring
-kubectl create configmap monitoring-config-map \
-  --from-file=taskpad-dashboard-metrics.json=namespace/monitoring/grafana/TaskPad-Dashboard-Metrics.json \
-  --namespace monitoring \
-  --dry-run=client -o yaml > namespace/monitoring/config/monitoring-config-map.yaml
-
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm install -f prometheus/prometheus-values.yaml taskpad-prometheus prometheus-community/prometheus --version 29.2.0 --namespace monitoring
+helm install -f namespace/monitoring/prometheus/prometheus-values.yaml taskpad-prometheus prometheus-community/prometheus --version 29.2.0 --namespace monitoring
+
+kubectl get svc taskpad-prometheus-server -n monitoring -o jsonpath='{.metadata.name}.{.metadata.namespace}.svc.cluster.local:{.spec.ports[0].port}{"\n"}'
+echo "You must update the env PROMETHEUS_URL_AWS_EKS in .env.production"
 
 source ../.env.production
 export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD PROMETHEUS_URL_AWS_EKS
 envsubst < namespace/monitoring/grafana/grafana-secret-template.yaml > namespace/monitoring/grafana/grafana-secret.yaml
 envsubst < namespace/monitoring/grafana/grafana-values-template.yaml > namespace/monitoring/grafana/grafana-values.yaml
 
-kubectl apply -f namespace/monitoring/config/monitoring-config-map.yaml --namespace monitoring
-helm repo add grafana-community https://grafana-community.github.io/helm-charts/
-helm install -f grafana/grafana-values.yaml taskpad-grafana grafana-community/grafana --version 11.6.0 --namespace monitoring
+kubectl create configmap monitoring-config-map \
+  --from-file=taskpad-dashboard-metrics.json=namespace/monitoring/grafana/TaskPad-Dashboard-Metrics.json \
+  --namespace monitoring \
+  --dry-run=client -o yaml > namespace/monitoring/config/monitoring-config-map.yaml
 
-kubectl get pods --namespace app
-kubectl get pvc --namespace app
-kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'
+kubectl apply -f namespace/monitoring/config/monitoring-config-map.yaml --namespace monitoring
+kubectl apply -f namespace/monitoring/grafana/grafana-secret.yaml --namespace monitoring
+
+helm repo add grafana-community https://grafana-community.github.io/helm-charts/
+helm install -f namespace/monitoring/grafana/grafana-values.yaml taskpad-grafana grafana-community/grafana --version 11.6.0 --namespace monitoring
+
+# Commands check
+kubectl get pods --namespace monitoring
+kubectl get svc --namespace monitoring
+kubectl get pvc --namespace monitoring

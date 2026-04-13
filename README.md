@@ -303,13 +303,7 @@ IP.2 = <NODE_IP_2>
 > Substitua os valores pelos IPs reais dos nodes do seu cluster.
 
 ```bash
-mkdir -p certs && cd certs
-
-openssl req -x509 -nodes -days 365 \
--newkey rsa:2048 \
--keyout key.pem \
--out cert.pem \
--config openssl.conf
+bash ../certs/generate.sh
   ```
 
 ### 📁 Arquivos gerados
@@ -420,13 +414,7 @@ Repository → Settings → Secrets → Actions
 
 O deploy da aplicação deve ser realizado a partir da pasta: **k8s/**. Localizada na raiz do projeto.
 
-> Utilizar o arquivo **install.sh** para realizar o deploy completo.
-> Recomenda-se executar em ambiente controlado e validar cada etapa em caso de falhas.
-> Evite utilizar o comando abaixo diretamente no terminal, porque vai dificultar o debug de erros
-```bash
-chmod +x commands.sh
-./commands.sh
-```
+> Utilizar o arquivo **commands.sh** apenas como documentação guia para o deploy.
 
 ### 🚀 Serviços implantados
 
