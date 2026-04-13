@@ -424,8 +424,8 @@ O deploy da aplicação deve ser realizado a partir da pasta: **k8s/**. Localiza
 > Recomenda-se executar em ambiente controlado e validar cada etapa em caso de falhas.
 > Evite utilizar o comando abaixo diretamente no terminal, porque vai dificultar o debug de erros
 ```bash
-chmod +x install.sh
-./install.sh
+chmod +x commands.sh
+./commands.sh
 ```
 
 ### 🚀 Serviços implantados

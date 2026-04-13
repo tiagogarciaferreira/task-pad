@@ -6,7 +6,7 @@ metadata:
   labels:
     app: taskpad-app
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: taskpad-app
@@ -110,17 +110,3 @@ spec:
       port: 4000
       targetPort: 4000
       nodePort: 30080
----
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: taskpad-app-hpa
-  namespace: app
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: taskpad-app
-  minReplicas: 1
-  maxReplicas: 1
-  targetCPUUtilizationPercentage: 85
