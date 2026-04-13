@@ -296,7 +296,10 @@ if (isProduction) {
 }
 
 const server = (() => {
-  if (!isProduction) return app;
+  const keyPath = '/certs/tls.key';
+  const certPath = '/certs/tls.crt';
+
+  if (!isProduction || !fs.existsSync(keyPath) || !fs.existsSync(certPath)) return app;
   const key = fs.readFileSync('/certs/tls.key', 'utf8');
   const cert = fs.readFileSync('/certs/tls.crt', 'utf8');
   return createServer({ key, cert }, app);
