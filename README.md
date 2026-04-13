@@ -93,7 +93,6 @@ O comando `make full` deve orquestrar:
 Neste caso **específico**, o ambiente padrão será: **.env.production**
 
 > Certifique-se de que todas as variáveis estejam corretamente configuradas antes da execução.
-> O uso do Makefile simplifica o fluxo e padroniza a execução do ambiente completo.
 
 ## 🔐 Firebase
 
@@ -131,7 +130,7 @@ Firebase Console → Project Settings (ícone de engrenagem) → Service Account
 
 Para converter o arquivo de credenciais do Firebase, utilize o comando abaixo no seu terminal:
   ```bash
-  base64 service-account.json
+  iconv -f UTF-8 -t UTF-8 service-account.json | base64 -w 0
   ```
 ### Configurar no .env
 
@@ -143,6 +142,9 @@ A string gerada deve ser inserida nos arquivos de configuração de ambiente cor
 FIREBASE_SERVICE_ACCOUNT=<BASE64>
 
 ## 📁 Configuração de Ambientes Firebase
+
+**Caminho Firebase:**  
+Firebase Console → Project Settings → General
 
 **Caminho:**  
 `src/environments/`
@@ -176,40 +178,9 @@ Firebase Console → Authentication → Settings → Authorized domains
 
 Para listar os nodes e seus respectivos IPs:
 
-  ```bash
-kubectl get nodes -o wide
-  ```
-
-#### 📌 Saída esperada:
-
-- **EXTERNAL-IP** → IP público do node
-- **INTERNAL-IP** → IP interno da VPC
-
-> Utilize preferencialmente o DNS do LoadBalancer em vez de IP direto, sempre que disponível.
-> Em ambientes produtivos, evite exposição direta via NodePort quando possível.
-
-## ⚙️ Variáveis de Ambiente
-
-Na raiz do projeto, gerencie os arquivos de configuração conforme os ambientes:
-
-- `.env.template` (Modelo de referência)
-- `.env.development` (Ambiente de desenvolvimento)
-- `.env.production` (Ambiente de produção)
-
-> **Nota:** Todos os arquivos devem seguir rigorosamente o padrão definido no template.
-
-### 🔑 Configuração do Firebase
-
-Para configurar a conta de serviço, realize a conversão do arquivo JSON para Base64:
-
-**Converter JSON para Base64:**
-  ```bash
-  base64 service-account.json
-  ```
-
-**Configurar no .env:**
-Adicione o resultado nos arquivos `.env.development` ou `.env.production`:
-FIREBASE_SERVICE_ACCOUNT=<BASE64>
+```bash
+kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="ExternalIP")].address}{"\n"}{end}'
+   ```
 
 ## 🐳 Docker Hub
 
@@ -222,13 +193,13 @@ https://hub.docker.com/
 ### 🔐 Geração de Access Token
 
 #### 📍 Caminho:
-
 Docker Hub → Account Settings → Security → New Access Token
 
 #### ⚙️ Passos:
 
 - Criar um token com permissão de leitura e escrita
 - Copiar e armazenar o valor gerado com segurança
+- Esse token precisa ser inserido na secret **DOCKER_HUB_ACCESS_TOKEN** no GitHub Actions
 
 > Utilize o token no lugar da senha em integrações com CI/CD.
 > Nunca exponha o token em código-fonte ou repositórios públicos.
@@ -283,6 +254,9 @@ Após a execução, serão criados os seguintes arquivos:
 Armazene as chaves como secrets no repositório:
 
 Settings → Secrets → Actions
+- COSIGN_PASSWORD
+- COSIGN_PRIVATE_KEY
+- COSIGN_PUBLIC_KEY
 
 ## 🔐 Certificados SSL
 
@@ -293,14 +267,6 @@ Execute os comandos abaixo dentro da pasta `certs`:
 #### ⚙️ Configuração do openssl.conf
 
 O arquivo `openssl.conf` deve conter os IPs dos nodes do cluster EKS para garantir a validade do certificado.
-
-#### Exemplo:
-
-[ alt_names ]  
-IP.1 = <NODE_IP_1>  
-IP.2 = <NODE_IP_2>
-
-> Substitua os valores pelos IPs reais dos nodes do seu cluster.
 
 ```bash
 bash ../certs/generate.sh
@@ -322,15 +288,14 @@ Após a execução, serão criados os seguintes arquivos:
 Os certificados gerados devem ser convertidos para Base64 para utilização em variáveis de ambiente:
 
 ```bash
-base64 key.pem  
-base64 cert.pem
+  iconv -f UTF-8 -t UTF-8 key.pem | base64 -w 0
+  iconv -f UTF-8 -t UTF-8 cert.pem | base64 -w 0
   ```
 
 ### ⚙️ Configuração nos arquivos `.env`
 
-Adicione os valores convertidos nos seguintes arquivos:
+Adicione os valores convertidos no seguinte arquivo:
 
-- `.env.development`
 - `.env.production`
 
 #### 🔐 Variáveis:
@@ -365,12 +330,15 @@ AWS Console → EC2 → Security Groups → Selecionar SG do cluster/node group
 #### ➕ Adicionar regra:
 
 - Tipo: Custom TCP
-- Porta: (NodePort do serviço)
+- Porta: (NodePort do serviço)(Aplicação na porta: **30080** e Grafana na porta **32000**)
 - Source: 0.0.0.0/0 *(ou restringir conforme necessário)*
 
-> Para ambientes produtivos, recomenda-se restringir o acesso por IP para aumentar a segurança.
+> Recomenda-se restringir o acesso por IP para aumentar a segurança.
+- Verificar IP: http://checkip.amazonaws.com
 
 ## 🔄 GitHub Actions (OIDC + Assume Role)
+
+- [AWS Doc](https://aws.amazon.com/pt/blogs/aws-brasil/como-utilizar-iam-roles-para-conectar-o-github-actions-na-aws/)
 
 ### ☁️ Configuração na AWS
 
@@ -405,7 +373,6 @@ Repository → Settings → Secrets → Actions
 - FIREBASE_PROJECT_ID
 - FIREBASE_STORAGE_BUCKET
 
-> Utilize nomes claros e consistentes para facilitar a manutenção do pipeline CI/CD.
 > Nunca exponha credenciais diretamente no código-fonte.
 
 ## 📦 Deploy no Kubernetes
@@ -414,13 +381,13 @@ Repository → Settings → Secrets → Actions
 
 O deploy da aplicação deve ser realizado a partir da pasta: **k8s/**. Localizada na raiz do projeto.
 
-> Utilizar o arquivo **commands.sh** apenas como documentação guia para o deploy.
+> Utilizar o arquivo **k8s/commands.sh** apenas como documentação guia para o deploy.
 
 ### 🚀 Serviços implantados
 
 - PostgreSQL
-- Prometheus
 - Aplicação
+- Prometheus
 - Grafana
 
 ### 🔗 Pós-Deploy (Integração)
@@ -469,156 +436,16 @@ Para garantir o correto funcionamento do sistema, os serviços devem seguir a se
 
 > Respeitar essa ordem evita falhas de conexão e problemas de inicialização entre os serviços.
 
----
-
-## ⚙️ Script de Deploy (EKS + Kubernetes)
-
-Este script automatiza o provisionamento e deploy completo da aplicação no cluster EKS, incluindo banco de dados, aplicação e stack de observabilidade.
-
-> ⚠️ **Importante:** Não altere os comandos abaixo. Eles dependem diretamente das variáveis de ambiente e da estrutura do projeto.
-
----
-
 ## ▶️ Execução
 
 > Recomenda-se executar em ambiente controlado e validar cada etapa em caso de falhas.
-
-#### 🔐 Autenticação na AWS e configuração do kubeconfig
-
-Responsável por autenticar na AWS e configurar o acesso ao cluster EKS:
-
-```bash
-aws login
-aws eks update-kubeconfig --region us-east-1 --name taskpad-cluster
-kubectl apply -f cluster/cluster-configs.yaml
-```
----
-
-#### 📦 Namespace da aplicação e configurações iniciais
-
-Criação do namespace da aplicação e aplicação de configurações base:
-
-# Namespace app
-```bash
-kubectl create namespace app
-kubectl apply -f namespace/app/config/app-config-map.yaml --namespace app
-```
----
-
-#### 🗄️ Configuração e deploy do PostgreSQL
-
-Geração dinâmica de secrets e values via envsubst e instalação via Helm:
-
-```bash
-source ../.env.production
-export POSTGRES_PORT POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
-envsubst < namespace/app/postgres/postgres-secret-template.yaml > namespace/app/postgres/postgres-secret.yaml
-envsubst < namespace/app/postgres/postgres-values-template.yaml > namespace/app/postgres/postgres-values.yaml
-
-kubectl apply -f namespace/app/postgres/postgres-secret.yaml --namespace app
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install -f namespace/app/postgres/postgres-values.yaml taskpad-postgres bitnami/postgresql --version 18.5.15 --namespace app
-```
----
-
-#### 🔐 Configuração de secrets da aplicação (Firebase, TLS, DB)
-
-Injeção de variáveis sensíveis e criação dos secrets Kubernetes:
-
-```bash
-source ../.env.production
-export FIREBASE_SERVICE_ACCOUNT POSTGRES_PORT POSTGRES_DB POSTGRES_USER TLS_CRT TLS_KEY POSTGRES_URL_AWS_EKS
-export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD
-envsubst < namespace/app/config/app-secrets-template.yaml > namespace/app/config/app-secrets.yaml
-envsubst < namespace/app/config/app-tls-secret-template.yaml > namespace/app/config/app-tls-secret.yaml
-
-kubectl apply -f namespace/app/config/app-secrets.yaml --namespace app
-kubectl apply -f namespace/app/config/app-tls-secret.yaml --namespace app
-kubectl apply -f namespace/app/deployment.yaml --namespace app
-```
----
-
-#### 📊 Validação de recursos da aplicação
-
-Verificação do estado dos pods e volumes persistentes:
-
-```bash
-kubectl get pods --namespace app
-kubectl get pvc --namespace app
-```
----
-
-#### 📈 Namespace de monitoramento
-
-Criação do namespace dedicado à observabilidade:
-
-# Namespace monitoring
-```bash
-kubectl create namespace monitoring
-```
-
----
-
-#### 📊 ConfigMap do Grafana (dashboards)
-
-Geração de ConfigMap com dashboards customizados:
-
-```bash
-kubectl create configmap monitoring-config-map \
---from-file=taskpad-dashboard-metrics.json=namespace/monitoring/grafana/TaskPad-Dashboard-Metrics.json \
---namespace monitoring \
---dry-run=client -o yaml > namespace/monitoring/config/monitoring-config-map.yaml
-```
----
-
-#### 📡 Deploy do Prometheus
-
-Instalação do Prometheus via Helm:
-```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm install -f prometheus/prometheus-values.yaml taskpad-prometheus prometheus-community/prometheus --version 29.2.0 --namespace monitoring
-```
----
-
-#### 📊 Configuração e deploy do Grafana
-
-Injeção de variáveis e instalação do Grafana com dashboards integrados:
-
-```bash
-source ../.env.production
-export GRAFANA_SECURITY_ADMIN_USER GRAFANA_SECURITY_ADMIN_PASSWORD PROMETHEUS_URL_AWS_EKS
-envsubst < namespace/monitoring/grafana/grafana-secret-template.yaml > namespace/monitoring/grafana/grafana-secret.yaml
-envsubst < namespace/monitoring/grafana/grafana-values-template.yaml > namespace/monitoring/grafana/grafana-values.yaml
-
-kubectl apply -f namespace/monitoring/config/monitoring-config-map.yaml --namespace monitoring
-helm repo add grafana-community https://grafana-community.github.io/helm-charts/
-helm install -f grafana/grafana-values.yaml taskpad-grafana grafana-community/grafana --version 11.6.0 --namespace monitoring
-```
----
-
-#### 📊 Validação final
-
-Verificação final dos recursos após deploy completo:
-```bash
-kubectl get pods --namespace app
-kubectl get pvc --namespace app
-```
----
-
-### 📌 Observações
-
-- O script depende diretamente do arquivo `.env.production`
-- Utiliza `envsubst` para injeção dinâmica de variáveis
-- Requer AWS CLI, kubectl e Helm previamente configurados
-- Charts Helm versionados garantem previsibilidade de deploy
-
-> Recomenda-se executar em ambiente controlado e validar cada etapa em caso de falhas.
+[Comandos](https://github.com/tiagogarciaferreira/task-pad/blob/main/k8s/commands.sh)
 
 ## 🧪 Testes de Carga
 
 Para executar testes de carga utilizando o k6:
 ```bash
-k6 run k6/tests/script.js
+k6 run k6/tests/basic-script.js
 ```
 
 > Certifique-se de que a aplicação esteja acessível antes de iniciar os testes.

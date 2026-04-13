@@ -17,6 +17,7 @@ on:
       - 'proxy.conf.js'
       - 'Makefile'
       - 'README.md'
+      - 'k6/**'
 
   workflow_dispatch:
 

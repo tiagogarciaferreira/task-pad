@@ -70,6 +70,6 @@ certs/key.pem
 /k8s/namespace/app/config/app-tls-secret.yaml
 /k8s/namespace/app/postgres/postgres-secret.yaml
 /k8s/namespace/app/postgres/postgres-values.yaml
-/k8s/namespace/monitoring/prometheus/prometheus-values.yaml
+!/k8s/namespace/monitoring/prometheus/prometheus-values.yaml
 /k8s/namespace/monitoring/grafana/grafana-values.yaml
 /k8s/namespace/monitoring/grafana/grafana-secret.yaml
